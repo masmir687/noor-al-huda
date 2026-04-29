@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "tag": "Beginner",
+    "title": "Introduction to Islam: The Five Pillars",
+    "description": "A comprehensive guide for those new to Islam covering Shahada, Salah, Zakat, Sawm, and Hajj.",
+    "time": "15 Min Read",
+    "icon": "ph-moon-stars",
+    "color": "var(--emd)"
+  },
+  {
+    "id": 2,
+    "tag": "Intermediate · Aqeedah",
+    "title": "Understanding Tawheed: The Oneness of Allah",
+    "description": "An in-depth look into Tawheed Ar-Rububiyyah, Al-Uluhiyyah, and Al-Asma Was-Sifat based on authentic sources.",
+    "time": "25 Min Read",
+    "icon": "ph-book-bookmark",
+    "color": "#1A4A7A"
+  },
+  {
+    "id": 3,
+    "tag": "Beginner · Fiqh",
+    "title": "How to Perform Wudu (Ablution)",
+    "description": "Step-by-step visual and textual guide on how to perform the ritual purification required before prayer.",
+    "time": "10 Min Read",
+    "icon": "ph-hands-praying",
+    "color": "#4A1A0F"
+  },
+  {
+    "id": 4,
+    "tag": "Intermediate · Seerah",
+    "title": "The Makkan Period: Patience & Perseverance",
+    "description": "Exploring the first 13 years of Prophethood, the trials faced by early Muslims, and the lessons we can extract.",
+    "time": "30 Min Read",
+    "icon": "ph-clock-counter-clockwise",
+    "color": "var(--teal)"
+  }
+]

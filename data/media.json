@@ -1,0 +1,22 @@
+[
+  {
+    "id": 1,
+    "type": "podcast",
+    "episode": "Episode 42",
+    "title": "Navigating Modern Challenges as a Muslim Youth",
+    "description": "A deep discussion on balancing Islamic identity, mental health, and modern society's pressures with special guest speakers.",
+    "series": "The Islamic Hub Podcast",
+    "gradient": "linear-gradient(135deg, #1A6B47, #0F4A31)",
+    "icon": "ph-microphone-stage"
+  },
+  {
+    "id": 2,
+    "type": "podcast",
+    "episode": "Episode 15",
+    "title": "The History of Al-Andalus (Islamic Spain)",
+    "description": "Exploring the golden age of Islamic civilization in Europe, its scientific advancements, and its eventual fall.",
+    "series": "Islamic History Series",
+    "gradient": "linear-gradient(135deg, #C8922A, #8A4A0F)",
+    "icon": "ph-microphone-stage"
+  }
+]

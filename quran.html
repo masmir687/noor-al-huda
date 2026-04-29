@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Holy Quran — Noor Al-Huda</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@400;500;700&family=Noto+Naskh+Arabic:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="icon" type="image/svg+xml" href="images/favicon.svg">
+    <link rel="apple-touch-icon" href="images/favicon.svg">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="nav">
+        <div class="container">
+            <div class="nav-content">
+                <a href="index.html" class="nav-logo">
+                    <span class="ar">نور الهدى</span>
+                    <span class="en">NOOR AL-HUDA</span>
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a href="quran.html" style="color: var(--goldl)">Quran</a>
+                    <a href="hadith.html">Hadith</a>
+                    <a href="learn.html">Learn</a>
+                    <a href="qa.html">Q&A</a>
+                    <a href="videos.html">Videos</a>
+                    <a href="media.html">Media</a>
+                </div>
+                <div class="nav-right">
+                    <button class="nav-icon-btn" aria-label="Search"><i class="ph ph-magnifying-glass"></i></button>
+                    <button class="nav-icon-btn" id="themeToggle" aria-label="Toggle Theme"><i class="ph ph-moon"></i></button>
+                    <button class="lang-btn">EN</button>
+                    <button class="mobile-menu-btn" id="menuBtn"><i class="ph ph-list"></i></button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Quran Layout -->
+    <main class="quran-layout">
+        <!-- Sidebar -->
+        <aside class="quran-sidebar">
+            <div class="sidebar-heading">Surahs</div>
+            <div class="surah-list" id="surah-list-container">
+                <!-- Dynamically populated via JS -->
+                <div style="color: var(--stone); text-align: center; padding: 20px 0; font-size: 12px;">Loading...</div>
+            </div>
+
+            <div class="sidebar-heading">Settings</div>
+            <div class="quran-settings">
+                <div class="setting-item">
+                    <span class="setting-label">Translation</span>
+                    <select class="setting-select" id="translation-select">
+                        <option value="en.sahih">Sahih International (Default)</option>
+                        <option value="en.yusufali">Abdullah Yusuf Ali</option>
+                        <option value="en.pickthall">Pickthall</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <span class="setting-label">Reciter</span>
+                    <select class="setting-select" id="reciter-select">
+                        <option value="Abdurrahmaan_As-Sudais_192kbps">Sheikh Al-Sudais</option>
+                        <option value="Alafasy_128kbps">Mishary Alafasy</option>
+                        <option value="Abdul_Basit_Mujawwad_128kbps">AbdulBaset (Mujawwad)</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <span class="setting-label">Font Size</span>
+                    <select class="setting-select" id="font-size-select">
+                        <option value="small">Small</option>
+                        <option value="normal" selected>Normal</option>
+                        <option value="large">Large</option>
+                    </select>
+                </div>
+            </div>
+        </aside>
+        
+        <!-- Mobile Sidebar Overlay -->
+        <div class="quran-overlay" id="quran-sidebar-overlay"></div>
+
+        <!-- Main Content -->
+        <section class="quran-content">
+            <div class="container" style="max-width: 800px">
+                
+                <!-- Mobile Only: Open Settings Button -->
+                <div style="display: flex; justify-content: center; margin-bottom: 20px;">
+                    <button id="mobile-sidebar-toggle" class="btn btn-outline" style="border-color: var(--sand); color: var(--stone); display: none; align-items: center; gap: 8px;">
+                        <i class="ph ph-list-dashes"></i> Surahs & Settings
+                    </button>
+                </div>
+                
+                <!-- Added inline style to force display block on mobile for the toggle button -->
+                <style>
+                    @media (max-width: 768px) {
+                        #mobile-sidebar-toggle { display: inline-flex !important; }
+                    }
+                </style>
+
+                <div class="surah-header">
+                    <h1 class="surah-header-ar" id="surah-header-ar">...</h1>
+                    <h2 class="surah-header-en" id="surah-header-en">Loading...</h2>
+                    <div class="surah-header-meta" id="surah-header-meta"></div>
+                </div>
+
+                <div id="quran-container">
+                    <!-- Ayahs dynamically populated via JS -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Persistent Player -->
+    <div class="player-bar" id="playerBar">
+        <div class="container">
+            <div class="player-content">
+                <div class="player-thumb">ق</div>
+                <div class="player-info">
+                    <span class="player-title">Surah Al-Fatiha</span>
+                    <span class="player-sub">Sheikh Abdul Rahman Al-Sudais</span>
+                </div>
+                <div class="player-controls">
+                    <button class="pc-btn"><i class="ph ph-skip-back"></i></button>
+                    <button class="pc-btn play-main"><i class="ph ph-play"></i></button>
+                    <button class="pc-btn"><i class="ph ph-skip-forward"></i></button>
+                </div>
+                <div class="player-progress">
+                    <span class="time">0:00</span>
+                    <div class="bar">
+                        <div class="fill" style="width: 0%"></div>
+                        <div class="dot" style="left: 0%"></div>
+                    </div>
+                    <span class="time">0:00</span>
+                </div>
+                <div class="player-extra">
+                    <button class="speed">1x</button>
+                    <button class="volume"><i class="ph ph-speaker-high"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script src="js/quran.js"></script>
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning Center — Noor Al-Huda</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@400;500;700&family=Noto+Naskh+Arabic:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="icon" type="image/svg+xml" href="images/favicon.svg">
+    <link rel="apple-touch-icon" href="images/favicon.svg">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="nav">
+        <div class="container">
+            <div class="nav-content">
+                <a href="index.html" class="nav-logo">
+                    <span class="ar">نور الهدى</span>
+                    <span class="en">NOOR AL-HUDA</span>
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a href="quran.html">Quran</a>
+                    <a href="hadith.html">Hadith</a>
+                    <a href="learn.html" style="color: var(--goldl)">Learn</a>
+                    <a href="qa.html">Q&A</a>
+                    <a href="videos.html">Videos</a>
+                    <a href="media.html">Media</a>
+                </div>
+                <div class="nav-right">
+                    <button class="nav-icon-btn" aria-label="Search"><i class="ph ph-magnifying-glass"></i></button>
+                    <button class="nav-icon-btn" id="themeToggle" aria-label="Toggle Theme"><i class="ph ph-moon"></i></button>
+                    <button class="lang-btn">EN</button>
+                    <button class="mobile-menu-btn" id="menuBtn"><i class="ph ph-list"></i></button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <header class="page-header">
+        <div class="container">
+            <h1 class="page-title">Learning Center</h1>
+            <p class="page-subtitle">Structured Islamic tutorials ranging from the foundational pillars of faith for beginners to advanced studies in Fiqh and Aqeedah.</p>
+        </div>
+    </header>
+
+    <main style="background-color: var(--parch); min-height: 60vh;">
+        <div class="container">
+            <div class="collection-grid" id="learn-grid">
+                <div style="text-align: center; width: 100%; color: var(--stone); font-size: 12px; grid-column: 1 / -1;">Loading Tutorials...</div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <div class="nav-logo">
+                        <span class="ar">نور الهدى</span>
+                        <span class="en">NOOR AL-HUDA</span>
+                    </div>
+                    <p>Invite to the way of your Lord with wisdom and good instruction.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Platform</h4>
+                    <a href="quran.html">Quran</a>
+                    <a href="hadith.html">Hadith</a>
+                    <a href="learn.html">Learn</a>
+                </div>
+                <div class="footer-links">
+                    <h4>Resources</h4>
+                    <a href="videos.html">Videos</a>
+                    <a href="media.html">Media</a>
+                    <a href="qa.html">Q&A</a>
+                </div>
+                <div class="footer-links">
+                    <h4>Legal</h4>
+                    <a href="#">Privacy</a>
+                    <a href="#">Terms</a>
+                    <a href="#">Contact</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Noor Al-Huda Islamic Platform. All rights reserved.</p>
+                <span class="blessing">بَارَكَ اللَّهُ فِيكُمْ — May Allah bless your work</span>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script src="js/data-loader.js"></script>
+</body>
+</html>

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Q&A — Noor Al-Huda</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@400;500;700&family=Noto+Naskh+Arabic:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="icon" type="image/svg+xml" href="images/favicon.svg">
+    <link rel="apple-touch-icon" href="images/favicon.svg">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .qa-filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+        .filter-btn {
+            background-color: var(--cream);
+            border: 1px solid var(--sand);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--stone);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+        .filter-btn:hover { background-color: var(--sand); color: var(--ink); }
+        .filter-btn.active { background-color: var(--em); color: var(--white); border-color: var(--em); }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="nav">
+        <div class="container">
+            <div class="nav-content">
+                <a href="index.html" class="nav-logo">
+                    <span class="ar">نور الهدى</span>
+                    <span class="en">NOOR AL-HUDA</span>
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a href="quran.html">Quran</a>
+                    <a href="hadith.html">Hadith</a>
+                    <a href="learn.html">Learn</a>
+                    <a href="qa.html" style="color: var(--goldl)">Q&A</a>
+                    <a href="videos.html">Videos</a>
+                    <a href="media.html">Media</a>
+                </div>
+                <div class="nav-right">
+                    <button class="nav-icon-btn" aria-label="Search"><i class="ph ph-magnifying-glass"></i></button>
+                    <button class="nav-icon-btn" id="themeToggle" aria-label="Toggle Theme"><i class="ph ph-moon"></i></button>
+                    <button class="lang-btn">EN</button>
+                    <button class="mobile-menu-btn" id="menuBtn"><i class="ph ph-list"></i></button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <header class="page-header">
+        <div class="container">
+            <h1 class="page-title">Islamic Q&A</h1>
+            <p class="page-subtitle">Searchable database of authentic scholarly answers and embedded video references to common questions about Islam.</p>
+        </div>
+    </header>
+
+    <main style="background-color: var(--parch); min-height: 60vh;">
+        <div class="container" style="padding-top: 40px; padding-bottom: 60px;">
+            
+            <!-- Filters -->
+            <div class="qa-filters">
+                <button class="filter-btn active">All Topics</button>
+                <button class="filter-btn">Prayer (Salah)</button>
+                <button class="filter-btn">Purification (Taharah)</button>
+                <button class="filter-btn">Belief (Aqeedah)</button>
+                <button class="filter-btn">Fasting (Sawm)</button>
+                <button class="filter-btn">Finance</button>
+            </div>
+
+            <!-- Q&A List -->
+            <div class="qa-list" id="qa-grid" style="display: grid; gap: 20px;">
+                <div style="text-align: center; width: 100%; color: var(--stone); font-size: 12px;">Loading Questions...</div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <div class="nav-logo">
+                        <span class="ar">نور الهدى</span>
+                        <span class="en">NOOR AL-HUDA</span>
+                    </div>
+                    <p>Invite to the way of your Lord with wisdom and good instruction.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Platform</h4>
+                    <a href="quran.html">Quran</a>
+                    <a href="hadith.html">Hadith</a>
+                    <a href="learn.html">Learn</a>
+                </div>
+                <div class="footer-links">
+                    <h4>Resources</h4>
+                    <a href="videos.html">Videos</a>
+                    <a href="media.html">Media</a>
+                    <a href="qa.html">Q&A</a>
+                </div>
+                <div class="footer-links">
+                    <h4>Legal</h4>
+                    <a href="#">Privacy</a>
+                    <a href="#">Terms</a>
+                    <a href="#">Contact</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Noor Al-Huda Islamic Platform. All rights reserved.</p>
+                <span class="blessing">بَارَكَ اللَّهُ فِيكُمْ — May Allah bless your work</span>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script src="js/data-loader.js"></script>
+</body>
+</html>

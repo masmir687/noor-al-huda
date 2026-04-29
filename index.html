@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Noor Al-Huda — Light of Guidance</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@400;500;700&family=Noto+Naskh+Arabic:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="icon" type="image/svg+xml" href="images/favicon.svg">
+    <link rel="apple-touch-icon" href="images/favicon.svg">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="nav">
+        <div class="container">
+            <div class="nav-content">
+                <a href="index.html" class="nav-logo">
+                    <span class="ar">نور الهدى</span>
+                    <span class="en">NOOR AL-HUDA</span>
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a href="quran.html">Quran</a>
+                    <a href="hadith.html">Hadith</a>
+                    <a href="learn.html">Learn</a>
+                    <a href="qa.html">Q&A</a>
+                    <a href="videos.html">Videos</a>
+                    <a href="media.html">Media</a>
+                </div>
+                <div class="nav-right">
+                    <button class="nav-icon-btn" aria-label="Search"><i class="ph ph-magnifying-glass"></i></button>
+                    <button class="nav-icon-btn" id="themeToggle" aria-label="Toggle Theme"><i class="ph ph-moon"></i></button>
+                    <button class="lang-btn">EN</button>
+                    <button class="mobile-menu-btn" id="menuBtn"><i class="ph ph-list"></i></button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero">
+        <div class="geo-bg">
+            <svg viewBox="0 0 680 160" xmlns="http://www.w3.org/2000/svg">
+                <g stroke="white" stroke-width="0.5" fill="none" opacity="0.1">
+                    <polygon points="100,20 140,40 140,80 100,100 60,80 60,40" />
+                    <polygon points="220,10 260,30 260,70 220,90 180,70 180,30" />
+                    <polygon points="340,20 380,40 380,80 340,100 300,80 300,40" />
+                    <polygon points="460,10 500,30 500,70 460,90 420,70 420,30" />
+                    <polygon points="580,20 620,40 620,80 580,100 540,80 540,40" />
+                </g>
+            </svg>
+        </div>
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="hero-ar">نور الهدى</h1>
+                <h2 class="hero-en">Noor Al-Huda — Light of Guidance</h2>
+                <p class="hero-sub">Your complete Islamic knowledge companion · Quran · Hadith · Dawah · Learning</p>
+                <div class="hero-btns">
+                    <a href="quran.html" class="btn btn-gold" style="text-decoration: none;">Read the Quran</a>
+                    <a href="learn.html" class="btn btn-outline" style="text-decoration: none;">Start Learning</a>
+                    <a href="qa.html" class="btn btn-outline" style="text-decoration: none;">Browse Q&A</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Ayah of the Day -->
+    <section class="ayah-day">
+        <div class="container">
+            <div class="section-label"><span>Ayah of the Day</span></div>
+            <div class="ayah-content">
+                <p class="ayah-ar" dir="rtl">وَإِذَا سَأَلَكَ عِبَادِي عَنِّي فَإِنِّي قَرِيبٌ ۖ أُجِيبُ دَعْوَةَ الدَّاعِ إِذَا دَعَانِ</p>
+                <p class="ayah-tr">"And when My servants ask you concerning Me — indeed I am near. I respond to the invocation of the supplicant when he calls upon Me."</p>
+                <p class="ayah-ref">Surah Al-Baqarah (2:186)</p>
+                <div class="ayah-actions">
+                    <button class="pill listen-btn"><i class="ph ph-play-circle"></i> Listen</button>
+                    <button class="pill"><i class="ph ph-share-network"></i> Share</button>
+                    <button class="pill"><i class="ph ph-book-open"></i> Read Context</button>
+                    <button class="pill"><i class="ph ph-eye"></i> Tafsir</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Access Modules -->
+    <section class="modules">
+        <div class="container">
+            <div class="section-label"><span>Explore</span></div>
+            <div class="mod-grid">
+                <a href="quran.html" class="mod-card" style="text-decoration: none;">
+                    <div class="mod-icon mod-q"><span>ق</span></div>
+                    <div class="mod-name">The Quran</div>
+                    <div class="mod-count">114 Surahs</div>
+                </a>
+                <a href="hadith.html" class="mod-card" style="text-decoration: none;">
+                    <div class="mod-icon mod-h"><span>ح</span></div>
+                    <div class="mod-name">Hadith</div>
+                    <div class="mod-count">6 Collections</div>
+                </a>
+                <a href="learn.html" class="mod-card" style="text-decoration: none;">
+                    <div class="mod-icon mod-l"><span>🏫</span></div>
+                    <div class="mod-name">Tutorials</div>
+                    <div class="mod-count">50+ Lessons</div>
+                </a>
+                <a href="qa.html" class="mod-card" style="text-decoration: none;">
+                    <div class="mod-icon mod-qa"><span>❓</span></div>
+                    <div class="mod-name">Q&A</div>
+                    <div class="mod-count">200+ Answers</div>
+                </a>
+                <a href="videos.html" class="mod-card" style="text-decoration: none;">
+                    <div class="mod-icon mod-v"><span>▶️</span></div>
+                    <div class="mod-name">Videos</div>
+                    <div class="mod-count">150+ Videos</div>
+                </a>
+                <a href="media.html" class="mod-card" style="text-decoration: none;">
+                    <div class="mod-icon mod-m"><span>🎧</span></div>
+                    <div class="mod-name">Media</div>
+                    <div class="mod-count">Recitations</div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content Area: Q&A + Hadith -->
+    <section class="content-split">
+        <div class="container">
+            <div class="content-grid">
+                <!-- QA Section -->
+                <div class="qa-section">
+                    <div class="section-label"><span>Featured Q&A</span></div>
+                    <div class="qa-list">
+                        <div class="qa-card">
+                            <span class="qa-tag">Fiqh · Purification</span>
+                            <h3 class="qa-q">What are the authentic conditions for wiping over socks (Masah) during Wudu?</h3>
+                            <div class="qa-meta">
+                                <div class="video-indicator"><i class="ph ph-play"></i></div>
+                                <span>1 video answer</span>
+                                <a href="#" class="read-more">Read answer</a>
+                            </div>
+                        </div>
+                        <div class="qa-card">
+                            <span class="qa-tag">Aqeedah</span>
+                            <h3 class="qa-q">How do we logically and scripturally prove the Quran is the literal word of Allah?</h3>
+                            <div class="qa-meta">
+                                <div class="video-indicator"><i class="ph ph-play"></i></div>
+                                <span>3 video answers</span>
+                                <a href="#" class="read-more">Read answer</a>
+                            </div>
+                        </div>
+                        <div class="qa-card">
+                            <span class="qa-tag">Prayer</span>
+                            <h3 class="qa-q">What is the ruling on combining prayers due to heavy rain or sickness?</h3>
+                            <div class="qa-meta">
+                                <div class="video-indicator"><i class="ph ph-play"></i></div>
+                                <span>2 video answers</span>
+                                <a href="#" class="read-more">Read answer</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Hadith Section -->
+                <div class="hadith-section">
+                    <div class="section-label"><span>Hadith of the Day</span></div>
+                    <div class="hadith-card">
+                        <p class="hadith-ar" dir="rtl">مَنْ سَلَكَ طَرِيقًا يَلْتَمِسُ فِيهِ عِلْمًا سَهَّلَ اللَّهُ لَهُ بِهِ طَرِيقًا إِلَى الْجَنَّةِ</p>
+                        <p class="hadith-en">"He who travels a path in search of knowledge, Allah will make easy for him a path to Paradise."</p>
+                        <div class="hadith-meta">
+                            <div class="hadith-source">
+                                <span class="narrator">Narrated by Abu Hurairah (RA)</span>
+                                <span class="ref">Sahih Muslim 2699a · Book 48, Hadith 4</span>
+                            </div>
+                            <span class="grade-badge">Sahih</span>
+                        </div>
+                    </div>
+                    <div class="hadith-btns">
+                        <button class="btn-sm">View in Muslim</button>
+                        <button class="btn-sm outline">Share Hadith</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Videos -->
+    <section class="video-row">
+        <div class="container">
+            <div class="section-label"><span>Featured Videos</span></div>
+            <div class="vid-grid">
+                <div class="vid-card">
+                    <div class="vid-thumb" style="background: linear-gradient(135deg,#0F4A31,#1A7B8A)">
+                        <div class="play-btn"><i class="ph ph-play"></i></div>
+                        <span class="vid-dur">45:12</span>
+                    </div>
+                    <div class="vid-info">
+                        <h4 class="vid-title">Tafsir of Ayatul Kursi: The Greatest Verse</h4>
+                        <p class="vid-speaker">Shaykh Assim Al Hakeem · Tafsir</p>
+                    </div>
+                </div>
+                <div class="vid-card">
+                    <div class="vid-thumb" style="background: linear-gradient(135deg,#1A4A7A,#2D5FA0)">
+                        <div class="play-btn"><i class="ph ph-play"></i></div>
+                        <span class="vid-dur">1:20:05</span>
+                    </div>
+                    <div class="vid-info">
+                        <h4 class="vid-title">The Concept of Tawheed (Monotheism)</h4>
+                        <p class="vid-speaker">Dr. Zakir Naik · Aqeedah</p>
+                    </div>
+                </div>
+                <div class="vid-card">
+                    <div class="vid-thumb" style="background: linear-gradient(135deg,#4A1A0F,#8A3D1A)">
+                        <div class="play-btn"><i class="ph ph-play"></i></div>
+                        <span class="vid-dur">55:30</span>
+                    </div>
+                    <div class="vid-info">
+                        <h4 class="vid-title">Lessons from the Life of Prophet Yusuf (AS)</h4>
+                        <p class="vid-speaker">Mufti Menk · Seerah</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Prayer Times -->
+    <section class="prayer-widget">
+        <div class="container">
+            <div class="prayer-content">
+                <span class="prayer-label">Today's Prayer Times</span>
+                <div class="prayer-times" id="prayerTimes">
+                    <div class="prayer-item">
+                        <span class="pt-name">Fajr</span>
+                        <span class="pt-time">5:12</span>
+                    </div>
+                    <div class="prayer-item next">
+                        <span class="pt-name">Dhuhr</span>
+                        <span class="pt-time">12:48</span>
+                        <span class="pt-next">Next ●</span>
+                    </div>
+                    <div class="prayer-item">
+                        <span class="pt-name">Asr</span>
+                        <span class="pt-time">4:22</span>
+                    </div>
+                    <div class="prayer-item">
+                        <span class="pt-name">Maghrib</span>
+                        <span class="pt-time">7:51</span>
+                    </div>
+                    <div class="prayer-item">
+                        <span class="pt-name">Isha</span>
+                        <span class="pt-time">9:18</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <div class="nav-logo">
+                        <span class="ar">نور الهدى</span>
+                        <span class="en">NOOR AL-HUDA</span>
+                    </div>
+                    <p>Invite to the way of your Lord with wisdom and good instruction.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Platform</h4>
+                    <a href="#">Quran</a>
+                    <a href="#">Hadith</a>
+                    <a href="#">Learn</a>
+                </div>
+                <div class="footer-links">
+                    <h4>Resources</h4>
+                    <a href="#">Videos</a>
+                    <a href="#">Media</a>
+                    <a href="#">Q&A</a>
+                </div>
+                <div class="footer-links">
+                    <h4>Legal</h4>
+                    <a href="#">Privacy</a>
+                    <a href="#">Terms</a>
+                    <a href="#">Contact</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Noor Al-Huda Islamic Platform. All rights reserved.</p>
+                <span class="blessing">بَارَكَ اللَّهُ فِيكُمْ — May Allah bless your work</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Persistent Player -->
+    <div class="player-bar" id="playerBar">
+        <div class="container">
+            <div class="player-content">
+                <div class="player-thumb">ق</div>
+                <div class="player-info">
+                    <span class="player-title">Surah Al-Fatiha</span>
+                    <span class="player-sub">Sheikh Abdul Rahman Al-Sudais</span>
+                </div>
+                <div class="player-controls">
+                    <button class="pc-btn"><i class="ph ph-skip-back"></i></button>
+                    <button class="pc-btn play-main"><i class="ph ph-play"></i></button>
+                    <button class="pc-btn"><i class="ph ph-skip-forward"></i></button>
+                </div>
+                <div class="player-progress">
+                    <span class="time">0:45</span>
+                    <div class="bar">
+                        <div class="fill" style="width: 35%"></div>
+                        <div class="dot" style="left: 35%"></div>
+                    </div>
+                    <span class="time">2:08</span>
+                </div>
+                <div class="player-extra">
+                    <button class="speed">1x</button>
+                    <button class="volume"><i class="ph ph-speaker-high"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

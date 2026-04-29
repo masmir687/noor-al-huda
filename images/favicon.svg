@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Deep Forest Background -->
+  <rect width="512" height="512" rx="120" fill="#0F4A31"/>
+  
+  <!-- Islamic Geometric Pattern (Rub el Hizb) in Golden Amber -->
+  <g fill="none" stroke="#E8B84B" stroke-width="24" transform="translate(256 256)">
+    <!-- Square 1 -->
+    <rect x="-120" y="-120" width="240" height="240" rx="16" />
+    <!-- Square 2 (Rotated 45 degrees) -->
+    <rect x="-120" y="-120" width="240" height="240" rx="16" transform="rotate(45)" />
+    <!-- Inner Circle -->
+    <circle cx="0" cy="0" r="64" fill="#E8B84B"/>
+    <!-- Core Dot -->
+    <circle cx="0" cy="0" r="24" fill="#0F4A31"/>
+  </g>
+</svg>
