@@ -50,7 +50,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function loadSurah(surahNumber, translationCode) {
-        quranContainer.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--gold);"><i class="ph ph-spinner-gap ph-spin" style="font-size: 32px; display: inline-block; animation: spin 1s linear infinite;"></i><p style="margin-top:10px;">Loading Revelation...</p></div>';
+        const loadingText = (window.i18n && window.i18n.translations[localStorage.getItem('lang') || 'en'].loading_revelation) || "Loading Revelation...";
+        quranContainer.innerHTML = `<div style="text-align: center; padding: 40px; color: var(--gold);"><i class="ph ph-spinner-gap ph-spin" style="font-size: 32px; display: inline-block; animation: spin 1s linear infinite;"></i><p style="margin-top:10px;">${loadingText}</p></div>`;
         
         // Custom spin animation if not exists
         if (!document.getElementById('spin-style')) {
@@ -108,8 +109,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="ayah-badge">${i+1}</div>
                         <div class="ayah-actions">
                             <button class="ayah-btn play-ayah" data-surah="${surahNumber}" data-ayah="${i+1}"><i class="ph ph-play"></i></button>
-                            <button class="ayah-btn"><i class="ph ph-share-network"></i></button>
-                            <button class="ayah-btn"><i class="ph ph-bookmark-simple"></i></button>
+                            <button class="ayah-btn share-ayah" data-surah="${surahNumber}" data-ayah="${i+1}"><i class="ph ph-share-network"></i></button>
+                            <button class="ayah-btn bookmark-btn" data-id="quran_${surahNumber}_${i+1}" data-type="quran"><i class="ph ph-bookmark-simple"></i></button>
                         </div>
                     </div>
                     <div class="ayah-text-ar">${ayahArText}</div>
@@ -119,6 +120,8 @@ document.addEventListener('DOMContentLoaded', () => {
             
             quranContainer.innerHTML = html;
             attachAudioListeners(); // Re-attach audio events to the new buttons
+            attachShareListeners(); // Attach share events
+            attachBookmarkListeners(); // Attach bookmark events
             
         } catch (error) {
             console.error("Error loading Surah", error);
@@ -126,13 +129,122 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    async function attachBookmarkListeners() {
+        const btns = document.querySelectorAll('.bookmark-btn');
+        for (const btn of btns) {
+            const id = btn.dataset.id;
+            const isBookmarked = await window.BookmarkDB.get(id);
+            if (isBookmarked) {
+                btn.querySelector('i').classList.replace('ph-bookmark-simple', 'ph-bookmark-simple-fill');
+                btn.style.color = 'var(--gold)';
+            }
+
+            btn.addEventListener('click', async () => {
+                const row = btn.closest('.ayah-row');
+                const item = {
+                    id: id,
+                    type: 'quran',
+                    surah: currentSurah,
+                    ayah: btn.parentElement.parentElement.parentElement.dataset.ayah,
+                    textAr: row.querySelector('.ayah-text-ar').textContent,
+                    textTr: row.querySelector('.ayah-text-tr').textContent,
+                    title: surahHeaderEn.textContent.split('(')[0].trim()
+                };
+                
+                const added = await window.BookmarkDB.toggle(item);
+                const icon = btn.querySelector('i');
+                if (added) {
+                    icon.classList.replace('ph-bookmark-simple', 'ph-bookmark-simple-fill');
+                    btn.style.color = 'var(--gold)';
+                } else {
+                    icon.classList.replace('ph-bookmark-simple-fill', 'ph-bookmark-simple');
+                    btn.style.color = '';
+                }
+            });
+        }
+    }
+
+
+    function attachShareListeners() {
+        const shareBtns = document.querySelectorAll('.share-ayah');
+        shareBtns.forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const surahNum = btn.dataset.surah;
+                const ayahNum = btn.dataset.ayah;
+                const row = btn.closest('.ayah-row');
+                const arText = row.querySelector('.ayah-text-ar').textContent;
+                const trText = row.querySelector('.ayah-text-tr').textContent;
+                const surahName = surahHeaderEn.textContent.split('(')[0].trim();
+                const metaText = `${surahName} (${surahNum}:${ayahNum})`;
+                
+                const originalContent = btn.innerHTML;
+                btn.innerHTML = '<i class="ph ph-spinner-gap ph-spin"></i>';
+
+                const template = document.getElementById('share-card-template');
+                if (template) {
+                    document.getElementById('sc-arabic').textContent = arText;
+                    document.getElementById('sc-translation').textContent = trText;
+                    document.getElementById('sc-meta').textContent = metaText;
+                    document.getElementById('sc-url').textContent = window.location.origin + window.location.pathname;
+
+                    try {
+                        const canvas = await html2canvas(template, { scale: 2, useCORS: true });
+                        canvas.toBlob(async (blob) => {
+                            const fileName = `Quran_${surahNum}_${ayahNum}.png`;
+                            const file = new File([blob], fileName, { type: 'image/png' });
+                            
+                            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                                await navigator.share({
+                                    files: [file],
+                                    title: metaText,
+                                    text: `Shared from Noor Al-Huda`
+                                });
+                            } else {
+                                const link = document.createElement('a');
+                                link.download = fileName;
+                                link.href = URL.createObjectURL(blob);
+                                link.click();
+                            }
+                            btn.innerHTML = originalContent;
+                        }, 'image/png');
+                    } catch (err) {
+                        console.error("Quran share failed", err);
+                        btn.innerHTML = '<i class="ph ph-warning"></i>';
+                        setTimeout(() => btn.innerHTML = originalContent, 2000);
+                    }
+                }
+            });
+        });
+    }
+
+
     // Handle translation change
     if (translationSelect) {
         translationSelect.addEventListener('change', (e) => {
             currentTranslation = e.target.value;
             loadSurah(currentSurah, currentTranslation);
         });
+
+        // Auto-switch to Bengali translation if site language is BN
+        if (localStorage.getItem('lang') === 'bn') {
+            currentTranslation = 'bn.bengali';
+            translationSelect.value = 'bn.bengali';
+        }
     }
+
+    // Listen for global language changes
+    document.addEventListener('languageChanged', (e) => {
+        const lang = e.detail.lang;
+        if (lang === 'bn' && translationSelect) {
+            currentTranslation = 'bn.bengali';
+            translationSelect.value = 'bn.bengali';
+            loadSurah(currentSurah, currentTranslation);
+        } else if (lang === 'en' && translationSelect) {
+            currentTranslation = 'en.sahih';
+            translationSelect.value = 'en.sahih';
+            loadSurah(currentSurah, currentTranslation);
+        }
+    });
 
     // Handle reciter change
     const reciterSelect = document.getElementById('reciter-select');
@@ -208,6 +320,23 @@ document.addEventListener('DOMContentLoaded', () => {
         const bismillahBtn = document.querySelector('.play-bismillah');
         let isBismillahPlaying = false;
         
+        // --- Sync with global settings ---
+        const speedSelect = document.getElementById('speed-select');
+        const volSlider = document.getElementById('volume-slider');
+        
+        if (speedSelect) {
+            quranAudio.playbackRate = parseFloat(speedSelect.value);
+            speedSelect.addEventListener('change', (e) => {
+                quranAudio.playbackRate = parseFloat(e.target.value);
+            });
+        }
+        if (volSlider) {
+            quranAudio.volume = parseFloat(volSlider.value);
+            volSlider.addEventListener('input', (e) => {
+                quranAudio.volume = parseFloat(e.target.value);
+            });
+        }
+        
         // Formatter for EveryAyah CDN URLs (e.g. 002255.mp3)
         function formatSurahAyah(surah, ayah) {
             return String(surah).padStart(3, '0') + String(ayah).padStart(3, '0');
@@ -261,8 +390,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 // Highlight active row visually
                 document.querySelectorAll('.ayah-row').forEach(r => r.style.backgroundColor = 'transparent');
-                btn.closest('.ayah-row').style.backgroundColor = 'rgba(232, 184, 75, 0.05)';
-                btn.closest('.ayah-row').style.borderRadius = '12px';
+                const activeRow = btn.closest('.ayah-row');
+                activeRow.style.backgroundColor = 'rgba(232, 184, 75, 0.05)';
+                activeRow.style.borderRadius = '12px';
+                
+                // Auto-scroll to active Ayah
+                activeRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
         }
 

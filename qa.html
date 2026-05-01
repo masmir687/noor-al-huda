@@ -49,17 +49,17 @@
                     <span class="en">NOOR AL-HUDA</span>
                 </a>
                 <div class="nav-links" id="navLinks">
-                    <a href="quran.html">Quran</a>
-                    <a href="hadith.html">Hadith</a>
-                    <a href="learn.html">Learn</a>
-                    <a href="qa.html" style="color: var(--goldl)">Q&A</a>
-                    <a href="videos.html">Videos</a>
-                    <a href="media.html">Media</a>
+                    <a href="quran.html" data-t="quran">Quran</a>
+                    <a href="hadith.html" data-t="hadith">Hadith</a>
+                    <a href="learn.html" data-t="learn">Learn</a>
+                    <a href="qa.html" style="color: var(--goldl)" data-t="qa">Q&A</a>
+                    <a href="videos.html" data-t="videos">Videos</a>
+                    <a href="media.html" data-t="media">Media</a>
                 </div>
                 <div class="nav-right">
                     <button class="nav-icon-btn" aria-label="Search"><i class="ph ph-magnifying-glass"></i></button>
                     <button class="nav-icon-btn" id="themeToggle" aria-label="Toggle Theme"><i class="ph ph-moon"></i></button>
-                    <button class="lang-btn">EN</button>
+                    <button class="lang-btn" data-t="lang-btn">EN</button>
                     <button class="mobile-menu-btn" id="menuBtn"><i class="ph ph-list"></i></button>
                 </div>
             </div>
@@ -105,31 +105,73 @@
                     <p>Invite to the way of your Lord with wisdom and good instruction.</p>
                 </div>
                 <div class="footer-links">
-                    <h4>Platform</h4>
-                    <a href="quran.html">Quran</a>
-                    <a href="hadith.html">Hadith</a>
-                    <a href="learn.html">Learn</a>
+                    <h4 data-t="platform">Platform</h4>
+                    <a href="quran.html" data-t="quran">Quran</a>
+                    <a href="hadith.html" data-t="hadith">Hadith</a>
+                    <a href="learn.html" data-t="learn">Learn</a>
                 </div>
                 <div class="footer-links">
-                    <h4>Resources</h4>
-                    <a href="videos.html">Videos</a>
-                    <a href="media.html">Media</a>
-                    <a href="qa.html">Q&A</a>
+                    <h4 data-t="resources">Resources</h4>
+                    <a href="videos.html" data-t="videos">Videos</a>
+                    <a href="media.html" data-t="media">Media</a>
+                    <a href="qa.html" data-t="qa">Q&A</a>
                 </div>
                 <div class="footer-links">
-                    <h4>Legal</h4>
-                    <a href="#">Privacy</a>
-                    <a href="#">Terms</a>
-                    <a href="#">Contact</a>
+                    <h4 data-t="legal">Legal</h4>
+                    <a href="#" data-t="privacy">Privacy</a>
+                    <a href="#" data-t="terms">Terms</a>
+                    <a href="#" data-t="contact">Contact</a>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2026 Noor Al-Huda Islamic Platform. All rights reserved.</p>
-                <span class="blessing">بَارَكَ اللَّهُ فِيكُمْ — May Allah bless your work</span>
+                <p>&copy; 2026 Noor Al-Huda Islamic Platform. <span data-t="all_rights_reserved">All rights reserved.</span></p>
+                <span class="blessing">بَارَكَ اللَّهُ فِيكُمْ — <span data-t="may_allah_bless_your_work">May Allah bless your work</span></span>
             </div>
         </div>
     </footer>
 
+    <!-- Persistent Player -->
+    <div class="player-bar" id="playerBar">
+        <div class="container">
+            <div class="player-content">
+                <div class="player-thumb">ق</div>
+                <div class="player-info">
+                    <span class="player-title">Surah Al-Fatiha</span>
+                    <span class="player-sub">Sheikh Abdul Rahman Al-Sudais</span>
+                </div>
+                <div class="player-controls">
+                    <button class="pc-btn"><i class="ph ph-skip-back"></i></button>
+                    <button class="pc-btn play-main"><i class="ph ph-play"></i></button>
+                    <button class="pc-btn"><i class="ph ph-skip-forward"></i></button>
+                </div>
+                <div class="player-progress">
+                    <span class="time" id="player-progress-current">0:00</span>
+                    <div class="bar">
+                        <div class="fill" id="player-progress-fill" style="width: 0%"></div>
+                        <div class="dot" id="player-progress-dot" style="left: 0%"></div>
+                    </div>
+                    <span class="time" id="player-progress-total">0:00</span>
+                </div>
+                <div class="player-extra">
+                    <select id="speed-select" style="background: transparent; border: 1px solid rgba(255,255,255,0.2); color: white; font-size: 10px; padding: 2px 4px; border-radius: 4px; cursor: pointer;">
+                        <option value="0.5" style="color: black;">0.5x</option>
+                        <option value="0.75" style="color: black;">0.75x</option>
+                        <option value="1" selected style="color: black;">1x</option>
+                        <option value="1.25" style="color: black;">1.25x</option>
+                        <option value="1.5" style="color: black;">1.5x</option>
+                        <option value="2" style="color: black;">2x</option>
+                    </select>
+                    <div class="volume-control" style="display: flex; align-items: center; gap: 8px;">
+                        <i class="ph ph-speaker-high" id="volume-icon"></i>
+                        <input type="range" id="volume-slider" min="0" max="1" step="0.1" value="1" style="width: 80px; height: 4px; accent-color: var(--gold); cursor: pointer;">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/i18n.js"></script>
+    <script src="js/bookmarks.js"></script>
     <script src="js/main.js"></script>
     <script src="js/data-loader.js"></script>
 </body>
