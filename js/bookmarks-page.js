@@ -91,10 +91,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Navigate to Quran with Directory-based Surah context
                     const s = item.surah || 1;
                     const a = item.ayah || 1;
-                    window.location.href = `quran/${s}/index.html?ayah=${a}#ayah-${a}`;
+                    window.location.href = `quran/${s}/?ayah=${a}#ayah-${a}`;
                 } else if (item.type === 'hadith') {
                     // Navigate to specific collection page with Hadith Number and unique ID
-                    const collectionPath = `collection/${item.collectionId}/index.html`;
+                    const collectionPath = `collection/${item.collectionId}/`;
                     const uniqueId = item.id.split('_').slice(1).join('_') || item.number;
                     window.location.href = `${collectionPath}?number=${item.number}&id=${uniqueId}#hadith-${uniqueId}`;
                 }

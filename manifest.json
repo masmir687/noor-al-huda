@@ -2,7 +2,7 @@
   "name": "Noor Al-Huda",
   "short_name": "Noor Al-Huda",
   "description": "Islamic Dawah Web Application & Quran Reader",
-  "start_url": "./index.html",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#F5F0E8",
   "theme_color": "#0F4A31",

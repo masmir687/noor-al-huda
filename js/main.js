@@ -5,6 +5,20 @@
 
 // --- GLOBAL UTILITIES (Top Level) ---
 
+(function() {
+    const url = window.location.href;
+    if (url.endsWith('index.html')) {
+        const newUrl = url.replace('index.html', '');
+        window.history.replaceState(null, '', newUrl);
+    } else if (url.includes('index.html?')) {
+        const newUrl = url.replace('index.html?', '?');
+        window.history.replaceState(null, '', newUrl);
+    } else if (url.includes('index.html#')) {
+        const newUrl = url.replace('index.html#', '#');
+        window.history.replaceState(null, '', newUrl);
+    }
+})();
+
 window.copyToClipboard = function(text) {
     const textArea = document.createElement("textarea");
     textArea.value = text;
@@ -308,8 +322,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 5. Floating Player Button (Created early so UI sync works)
     let playerToggleBtn = null;
-    const isHomepage = path === '/' || path === '' || (path.endsWith('index.html') && !path.includes('/quran/') && !path.includes('/collection/'));
-    const isExcludedPage = isHomepage || path.includes('hadith.html') || path.includes('bookmarks.html');
+    const isQuran = path.includes('/quran/') || path.includes('quran.html') || window.SURAH_ID;
+    const isHadith = path.includes('/collection/') || path.includes('hadith.html');
+    const shouldShowPlayer = isQuran || isHadith;
+    const isExcludedPage = !shouldShowPlayer;
     
     if (!isExcludedPage) {
         playerToggleBtn = document.createElement('button');
@@ -533,10 +549,10 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // 8. Page Cleanups
-    const isBookmarks = path.includes('bookmarks.html');
-    if (isHomepage || isBookmarks) {
+    if (isExcludedPage) {
         const pb = document.getElementById('playerBar');
         if (pb) pb.remove();
+        document.body.classList.add('player-restricted');
     }
 
     // 9. Splash

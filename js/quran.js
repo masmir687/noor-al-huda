@@ -137,7 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             data.data.forEach(surah => {
                 const a = document.createElement('a');
-                const targetPath = window.SURAH_ID ? `../../quran/${surah.number}/index.html` : `quran/${surah.number}/index.html`;
+                const targetPath = window.SURAH_ID ? `../../quran/${surah.number}/` : `quran/${surah.number}/`;
                 const displayTitle = lang === 'bn' ? surahNamesBn[surah.number - 1] : surah.englishName;
                 a.href = targetPath;
                 a.className = `surah-item ${surah.number === currentSurah ? 'active' : ''}`;

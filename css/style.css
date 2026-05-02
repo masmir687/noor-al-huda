@@ -84,11 +84,18 @@ body {
     font-family: 'DM Sans', sans-serif;
     background-color: var(--parch);
     color: var(--ink);
+    padding-top: 60px; /* Navbar height */
     font-size: 14px;
     line-height: 1.6;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+}
+
+@media (max-width: 768px) {
+    body {
+        padding-top: 54px; /* Mobile navbar height */
+    }
 }
 
 .container {
@@ -152,8 +159,9 @@ body {
     width: 100%;
     display: flex;
     align-items: center;
-    position: sticky;
+    position: fixed;
     top: 0;
+    left: 0;
     z-index: 1000;
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
@@ -631,8 +639,12 @@ body {
 }
 
 /* Ensure content is not hidden behind the fixed player bar */
-body {
+body:not(.player-restricted) {
     padding-bottom: 100px !important;
+}
+
+body.player-restricted {
+    padding-bottom: 0 !important;
 }
 
 .quran-content, 
@@ -641,8 +653,12 @@ body {
     padding-bottom: 120px !important;
 }
 
+body.player-restricted .collection-grid {
+    padding-bottom: 40px !important;
+}
+
 /* Adjust padding when player is hidden */
-body.player-hidden {
+body.player-hidden:not(.player-restricted) {
     padding-bottom: 0 !important;
 }
 body.player-hidden .quran-content,
