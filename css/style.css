@@ -1032,6 +1032,18 @@ body.player-hidden .collection-grid {
     background-color: rgba(255,255,255,0.15);
 }
 
+.surah-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.surah-translation {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: 400;
+}
+
 [data-theme='dark'] .surah-item.active {
     background-color: rgba(255,255,255,0.1); border-left: 3px solid var(--gold);
 }
@@ -1314,4 +1326,119 @@ body.player-hidden .collection-grid {
 
 .page-dots {
     color: var(--stone); padding: 0 4px;
+}
+
+/* Language Modal */
+.lang-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.lang-modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.lang-modal {
+    background: var(--cream);
+    padding: 25px;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 350px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    border: 1px solid var(--gold);
+    transform: translateY(20px);
+    transition: all 0.3s ease;
+}
+
+.lang-modal-overlay.active .lang-modal {
+    transform: translateY(0);
+}
+
+.lang-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.lang-modal-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    color: var(--gold);
+    font-weight: 700;
+}
+
+.lang-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--stone);
+    cursor: pointer;
+}
+
+.lang-option {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 12px;
+    border: 1px solid var(--sand);
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--parch);
+}
+
+.lang-option:hover {
+    background: var(--white);
+    border-color: var(--gold);
+    transform: scale(1.02);
+}
+
+.lang-option.active {
+    border-color: var(--gold);
+    background: var(--gold);
+    color: var(--white);
+}
+
+.lang-code {
+    font-weight: 800;
+    color: var(--gold);
+    font-size: 0.9rem;
+    background: var(--sand);
+    padding: 4px 8px;
+    border-radius: 6px;
+    min-width: 45px;
+    text-align: center;
+}
+
+.lang-option.active .lang-code {
+    background: var(--white);
+    color: var(--gold);
+}
+
+.lang-name {
+    flex: 1;
+    font-weight: 600;
+}
+
+.lang-check {
+    opacity: 0;
+}
+
+.lang-option.active .lang-check {
+    opacity: 1;
 }

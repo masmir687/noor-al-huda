@@ -18,18 +18,69 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Inject Language Modal
+    const modalHTML = `
+        <div class="lang-modal-overlay" id="langModal">
+            <div class="lang-modal">
+                <div class="lang-modal-header">
+                    <span class="lang-modal-title" data-t="select_language">Select Language</span>
+                    <button class="lang-close"><i class="ph ph-x"></i></button>
+                </div>
+                <div class="lang-options">
+                    <div class="lang-option ${currentLang === 'en' ? 'active' : ''}" data-lang="en">
+                        <span class="lang-code">ENG</span>
+                        <span class="lang-name">English</span>
+                        <i class="ph ph-check lang-check"></i>
+                    </div>
+                    <div class="lang-option ${currentLang === 'bn' ? 'active' : ''}" data-lang="bn">
+                        <span class="lang-code">BNG</span>
+                        <span class="lang-name">বাংলা (Bengali)</span>
+                        <i class="ph ph-check lang-check"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+    const langModal = document.getElementById('langModal');
     const langBtn = document.querySelector('.lang-btn');
+    const langClose = langModal.querySelector('.lang-close');
+    const langOptions = langModal.querySelectorAll('.lang-option');
+
     if (langBtn) {
         langBtn.addEventListener('click', () => {
-            currentLang = currentLang === 'en' ? 'bn' : 'en';
-            localStorage.setItem('lang', currentLang);
-            if (window.i18n) {
-                window.i18n.translatePage(currentLang);
-                // Trigger a re-render of dynamic content if necessary
-                document.dispatchEvent(new CustomEvent('languageChanged', { detail: { lang: currentLang } }));
-            }
+            langModal.classList.add('active');
         });
     }
+
+    if (langClose) {
+        langClose.addEventListener('click', () => {
+            langModal.classList.remove('active');
+        });
+    }
+
+    langModal.addEventListener('click', (e) => {
+        if (e.target === langModal) langModal.classList.remove('active');
+    });
+
+    langOptions.forEach(option => {
+        option.addEventListener('click', () => {
+            const lang = option.dataset.lang;
+            currentLang = lang;
+            localStorage.setItem('lang', currentLang);
+            
+            // Update UI
+            langOptions.forEach(opt => opt.classList.toggle('active', opt.dataset.lang === lang));
+            
+            if (window.i18n) {
+                window.i18n.translatePage(currentLang);
+                document.dispatchEvent(new CustomEvent('languageChanged', { detail: { lang: currentLang } }));
+            }
+            
+            setTimeout(() => langModal.classList.remove('active'), 300);
+        });
+    });
 
     // Run on load
     initLanguage();

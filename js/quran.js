@@ -48,8 +48,26 @@ document.addEventListener('DOMContentLoaded', () => {
             await loadSurahList();
             
             // Sync UI
-            if (translationSelect) translationSelect.value = currentTranslation;
-            if (reciterSelect) reciterSelect.value = currentReciter;
+            if (translationSelect) {
+                // Auto-switch to Bengali translation if app lang is BN
+                const lang = localStorage.getItem('lang') || 'en';
+                if (lang === 'bn' && currentTranslation.startsWith('en.')) {
+                    currentTranslation = 'bn.bengali';
+                }
+                translationSelect.value = currentTranslation;
+                translationSelect.onchange = (e) => {
+                    currentTranslation = e.target.value;
+                    localStorage.setItem('quran-translation', currentTranslation);
+                    loadSurah(currentSurah, currentTranslation);
+                };
+            }
+            if (reciterSelect) {
+                reciterSelect.value = currentReciter;
+                reciterSelect.onchange = (e) => {
+                    currentReciter = e.target.value;
+                    localStorage.setItem('quran-reciter', currentReciter);
+                };
+            }
             if (fontSizeSelect) quranContainer.classList.add(`font-${fontSizeSelect.value}`);
 
             document.querySelectorAll('.surah-item').forEach(el => {
@@ -80,7 +98,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 a.dataset.number = surah.number;
                 a.innerHTML = `
                     <span class="surah-number">${surah.number}</span>
-                    <span class="surah-name">${surah.englishName}</span>
+                    <div class="surah-info">
+                        <span class="surah-name">${surah.englishName}</span>
+                        <span class="surah-translation">${surah.englishNameTranslation}</span>
+                    </div>
                     <span class="surah-name-ar">${surah.name.replace('سُورَةُ ', '')}</span>
                 `;
                 a.onclick = (e) => {
@@ -111,10 +132,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const surahAr = arData.data;
             const surahTr = trData.data;
 
+            const t = (window.i18n && window.i18n.translations[lang]) || { surah: "Surah" };
             surahHeaderAr.textContent = surahAr.name;
-            surahHeaderEn.textContent = `Surah ${surahAr.englishName} (${surahAr.englishNameTranslation})`;
+            surahHeaderEn.textContent = `${t.surah} ${surahAr.englishName} (${surahAr.englishNameTranslation})`;
             surahHeaderMeta.textContent = `${surahAr.revelationType} · ${surahAr.numberOfAyahs} Ayahs`;
-            document.querySelector('.player-title').textContent = `Surah ${surahAr.englishName}`;
+            document.querySelector('.player-title').textContent = `${t.surah} ${surahAr.englishName}`;
+            document.title = `${t.surah} ${surahAr.englishName} — Noor Al-Huda`;
 
             let html = '';
             if (surahNumber !== 1 && surahNumber !== 9) {
@@ -403,6 +426,12 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('hashchange', () => {
         const hash = window.location.hash;
         if (hash.startsWith('#ayah-')) scrollToElement(hash.substring(1));
+    });
+
+    document.addEventListener('languageChanged', (e) => {
+        const lang = e.detail.lang;
+        loadSurahList();
+        loadSurah(currentSurah, currentTranslation);
     });
 
     init();

@@ -247,7 +247,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="hadith-meta">
                     <div>
                         <span class="narrator">${t.narrated_by || 'Narrated by'} ${h.narrator}</span>
-                        <span class="ref">${(currentLang === 'bn' ? collectionMeta?.titleBn : collectionMeta?.titleEn)} · Hadith ${h.number}</span>
+                        <span class="ref">${(currentLang === 'bn' ? collectionMeta?.titleBn : collectionMeta?.titleEn)} · ${t.hadith_single || 'Hadith'} ${h.number}</span>
                     </div>
                     <span class="grade-badge ${gradeClass}">${t[grade] || h.grade}</span>
                 </div>
@@ -441,6 +441,13 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('hashchange', () => {
         const hash = window.location.hash;
         if (hash.startsWith('#hadith-')) scrollToElement(hash.substring(1));
+    });
+
+    document.addEventListener('languageChanged', (e) => {
+        currentLang = e.detail.lang;
+        updateDocumentTitle();
+        renderSidebar();
+        loadBook(currentBook);
     });
 
     // --- Sidebar Logic ---
