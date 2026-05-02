@@ -1,0 +1,73 @@
+{
+  "id": "ibnmajah",
+  "titleEn": "Sunan Ibn Majah",
+  "titleAr": "سنن ابن ماجه",
+  "titleBn": "সুনান ইবনে মাজাহ",
+  "author": "Imam Ibn Majah",
+  "books": [
+    {
+      "number": 1,
+      "nameEn": "Volume 1 (H: 1-500)",
+      "nameBn": "খণ্ড 1 (হা: 1-500)",
+      "nameAr": "الجزء 1",
+      "file": "ibnmajah_v1.json"
+    },
+    {
+      "number": 2,
+      "nameEn": "Volume 2 (H: 501-1000)",
+      "nameBn": "খণ্ড 2 (হা: 501-1000)",
+      "nameAr": "الجزء 2",
+      "file": "ibnmajah_v2.json"
+    },
+    {
+      "number": 3,
+      "nameEn": "Volume 3 (H: 1001-1500)",
+      "nameBn": "খণ্ড 3 (হা: 1001-1500)",
+      "nameAr": "الجزء 3",
+      "file": "ibnmajah_v3.json"
+    },
+    {
+      "number": 4,
+      "nameEn": "Volume 4 (H: 1501-2000)",
+      "nameBn": "খণ্ড 4 (হা: 1501-2000)",
+      "nameAr": "الجزء 4",
+      "file": "ibnmajah_v4.json"
+    },
+    {
+      "number": 5,
+      "nameEn": "Volume 5 (H: 2001-2500)",
+      "nameBn": "খণ্ড 5 (হা: 2001-2500)",
+      "nameAr": "الجزء 5",
+      "file": "ibnmajah_v5.json"
+    },
+    {
+      "number": 6,
+      "nameEn": "Volume 6 (H: 2501-3000)",
+      "nameBn": "খণ্ড 6 (হা: 2501-3000)",
+      "nameAr": "الجزء 6",
+      "file": "ibnmajah_v6.json"
+    },
+    {
+      "number": 7,
+      "nameEn": "Volume 7 (H: 3001-3500)",
+      "nameBn": "খণ্ড 7 (হা: 3001-3500)",
+      "nameAr": "الجزء 7",
+      "file": "ibnmajah_v7.json"
+    },
+    {
+      "number": 8,
+      "nameEn": "Volume 8 (H: 3501-3999)",
+      "nameBn": "খণ্ড 8 (হা: 3501-3999)",
+      "nameAr": "الجزء 8",
+      "file": "ibnmajah_v8.json"
+    },
+    {
+      "number": 9,
+      "nameEn": "Volume 9 (H: 4000-4341)",
+      "nameBn": "খণ্ড 9 (হা: 4000-4341)",
+      "nameAr": "الجزء 9",
+      "file": "ibnmajah_v9.json"
+    }
+  ],
+  "indexFile": "ibnmajah_index.json"
+}

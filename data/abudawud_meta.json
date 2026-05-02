@@ -1,0 +1,87 @@
+{
+  "id": "abudawud",
+  "titleEn": "Sunan Abu Dawud",
+  "titleAr": "سنন أبي داود",
+  "titleBn": "সুনান আবু দাউদ",
+  "author": "Imam Abu Dawud",
+  "books": [
+    {
+      "number": 1,
+      "nameEn": "Volume 1 (H: 1-500)",
+      "nameBn": "খণ্ড 1 (হা: 1-500)",
+      "nameAr": "الجزء 1",
+      "file": "abudawud_v1.json"
+    },
+    {
+      "number": 2,
+      "nameEn": "Volume 2 (H: 501-1000)",
+      "nameBn": "খণ্ড 2 (হা: 501-1000)",
+      "nameAr": "الجزء 2",
+      "file": "abudawud_v2.json"
+    },
+    {
+      "number": 3,
+      "nameEn": "Volume 3 (H: 1001-1500)",
+      "nameBn": "খণ্ড 3 (হা: 1001-1500)",
+      "nameAr": "الجزء 3",
+      "file": "abudawud_v3.json"
+    },
+    {
+      "number": 4,
+      "nameEn": "Volume 4 (H: 1501-2000)",
+      "nameBn": "খণ্ড 4 (হা: 1501-2000)",
+      "nameAr": "الجزء 4",
+      "file": "abudawud_v4.json"
+    },
+    {
+      "number": 5,
+      "nameEn": "Volume 5 (H: 2001-2500)",
+      "nameBn": "খণ্ড 5 (হা: 2001-2500)",
+      "nameAr": "الجزء 5",
+      "file": "abudawud_v5.json"
+    },
+    {
+      "number": 6,
+      "nameEn": "Volume 6 (H: 2501-3000)",
+      "nameBn": "খণ্ড 6 (হা: 2501-3000)",
+      "nameAr": "الجزء 6",
+      "file": "abudawud_v6.json"
+    },
+    {
+      "number": 7,
+      "nameEn": "Volume 7 (H: 3001-3500)",
+      "nameBn": "খণ্ড 7 (হা: 3001-3500)",
+      "nameAr": "الجزء 7",
+      "file": "abudawud_v7.json"
+    },
+    {
+      "number": 8,
+      "nameEn": "Volume 8 (H: 3501-4000)",
+      "nameBn": "খণ্ড 8 (হা: 3501-4000)",
+      "nameAr": "الجزء 8",
+      "file": "abudawud_v8.json"
+    },
+    {
+      "number": 9,
+      "nameEn": "Volume 9 (H: 4001-4500)",
+      "nameBn": "খণ্ড 9 (হা: 4001-4500)",
+      "nameAr": "الجزء 9",
+      "file": "abudawud_v9.json"
+    },
+    {
+      "number": 10,
+      "nameEn": "Volume 10 (H: 4501-5000)",
+      "nameBn": "খণ্ড 10 (হা: 4501-5000)",
+      "nameAr": "الجزء 10",
+      "file": "abudawud_v10.json"
+    },
+    {
+      "number": 11,
+      "nameEn": "Volume 11 (H: 5001-5274)",
+      "nameBn": "খণ্ড 11 (হা: 5001-5274)",
+      "nameAr": "الجزء 11",
+      "file": "abudawud_v11.json"
+    }
+  ],
+  "indexFile": "abudawud_index.json"
+}

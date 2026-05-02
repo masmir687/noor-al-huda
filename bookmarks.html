@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Bookmarks — Noor Al-Huda</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@400;500;700&family=Noto+Naskh+Arabic:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="icon" type="image/svg+xml" href="images/favicon.svg">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="nav">
+        <div class="container">
+            <div class="nav-content">
+                <a href="index.html" class="nav-logo">
+                    <span class="ar">نور الهدى</span>
+                    <span class="en">NOOR AL-HUDA</span>
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a href="quran/1/index.html" data-t="quran">Quran</a>
+                    <a href="hadith.html" data-t="hadith">Hadith</a>
+                    <a href="bookmarks.html" style="color: var(--goldl)" data-t="bookmarks">Bookmarks</a>
+                    <a href="learn.html" data-t="learn">Learn</a>
+                    <a href="qa.html" data-t="qa">Q&A</a>
+                    <a href="videos.html" data-t="videos">Videos</a>
+                    <a href="media.html" data-t="media">Media</a>
+                </div>
+                <div class="nav-right">
+                    <button class="nav-icon-btn" id="themeToggle" aria-label="Toggle Theme"><i class="ph ph-moon"></i></button>
+                    <button class="lang-btn" data-t="lang-btn">EN</button>
+                    <button class="mobile-menu-btn" id="menuBtn"><i class="ph ph-list"></i></button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <header class="page-header">
+        <div class="container">
+            <h1 class="page-title" data-t="bookmarks">My Bookmarks</h1>
+            <p class="page-subtitle">Your personal collection of saved Quran verses and Hadiths.</p>
+        </div>
+    </header>
+
+    <main style="background-color: var(--parch); min-height: 70vh; padding: 40px 0;">
+        <div class="container" style="max-width: 900px;">
+            <div id="bookmarks-container">
+                <div style="text-align: center; color: var(--stone); padding: 50px;">
+                    <i class="ph ph-spinner-gap ph-spin" style="font-size: 32px; display: block; margin: 0 auto 15px;"></i>
+                    <p>Loading your bookmarks...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <div class="nav-logo">
+                        <span class="ar">নূর আল-হুদা</span>
+                        <span class="en">NOOR AL-HUDA</span>
+                    </div>
+                    <p>Invite to the way of your Lord with wisdom and good instruction.</p>
+                </div>
+                <div class="footer-links">
+                    <h4 data-t="platform">Platform</h4>
+                    <a href="quran/1/index.html" data-t="quran">Quran</a>
+                    <a href="hadith.html" data-t="hadith">Hadith</a>
+                    <a href="bookmarks.html" data-t="bookmarks">Bookmarks</a>
+                </div>
+                <div class="footer-links">
+                    <h4 data-t="resources">Resources</h4>
+                    <a href="videos.html" data-t="videos">Videos</a>
+                    <a href="media.html" data-t="media">Media</a>
+                    <a href="qa.html" data-t="qa">Q&A</a>
+                </div>
+                <div class="footer-links">
+                    <h4 data-t="legal">Legal</h4>
+                    <a href="#" data-t="privacy">Privacy</a>
+                    <a href="#" data-t="terms">Terms</a>
+                    <a href="#" data-t="contact">Contact</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Noor Al-Huda Islamic Platform. <span data-t="all_rights_reserved">All rights reserved.</span></p>
+                <span class="blessing">بَارَكَ اللَّهُ فِيكُمْ — <span data-t="may_allah_bless_your_work">May Allah bless your work</span></span>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/i18n.js"></script>
+    <script src="js/bookmarks.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/bookmarks-page.js"></script>
+</body>
+</html>

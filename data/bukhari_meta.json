@@ -1,0 +1,122 @@
+{
+  "id": "bukhari",
+  "titleEn": "Sahih Al-Bukhari",
+  "titleAr": "صحيح البخاري",
+  "titleBn": "সহীহ আল-বুখারী",
+  "author": "Imam Muhammad al-Bukhari",
+  "books": [
+    {
+      "number": 1,
+      "nameEn": "Volume 1 (H: 1-499)",
+      "nameBn": "খণ্ড 1 (হা: 1-499)",
+      "nameAr": "الجزء 1",
+      "file": "bukhari_v1.json"
+    },
+    {
+      "number": 2,
+      "nameEn": "Volume 2 (H: 500-997)",
+      "nameBn": "খণ্ড 2 (হা: 500-997)",
+      "nameAr": "الجزء 2",
+      "file": "bukhari_v2.json"
+    },
+    {
+      "number": 3,
+      "nameEn": "Volume 3 (H: 998-1492)",
+      "nameBn": "খণ্ড 3 (হা: 998-1492)",
+      "nameAr": "الجزء 3",
+      "file": "bukhari_v3.json"
+    },
+    {
+      "number": 4,
+      "nameEn": "Volume 4 (H: 1493-1992)",
+      "nameBn": "খণ্ড 4 (হা: 1493-1992)",
+      "nameAr": "الجزء 4",
+      "file": "bukhari_v4.json"
+    },
+    {
+      "number": 5,
+      "nameEn": "Volume 5 (H: 1993-2488)",
+      "nameBn": "খণ্ড 5 (হা: 1993-2488)",
+      "nameAr": "الجزء 5",
+      "file": "bukhari_v5.json"
+    },
+    {
+      "number": 6,
+      "nameEn": "Volume 6 (H: 2489-2988)",
+      "nameBn": "খণ্ড 6 (হা: 2489-2988)",
+      "nameAr": "الجزء 6",
+      "file": "bukhari_v6.json"
+    },
+    {
+      "number": 7,
+      "nameEn": "Volume 7 (H: 2989-3488)",
+      "nameBn": "খণ্ড 7 (হা: 2989-3488)",
+      "nameAr": "الجزء 7",
+      "file": "bukhari_v7.json"
+    },
+    {
+      "number": 8,
+      "nameEn": "Volume 8 (H: 3489-3984)",
+      "nameBn": "খণ্ড 8 (হা: 3489-3984)",
+      "nameAr": "الجزء 8",
+      "file": "bukhari_v8.json"
+    },
+    {
+      "number": 9,
+      "nameEn": "Volume 9 (H: 3985-4484)",
+      "nameBn": "খণ্ড 9 (হা: 3985-4484)",
+      "nameAr": "الجزء 9",
+      "file": "bukhari_v9.json"
+    },
+    {
+      "number": 10,
+      "nameEn": "Volume 10 (H: 4485-4982)",
+      "nameBn": "খণ্ড 10 (হা: 4485-4982)",
+      "nameAr": "الجزء 10",
+      "file": "bukhari_v10.json"
+    },
+    {
+      "number": 11,
+      "nameEn": "Volume 11 (H: 4983-5477)",
+      "nameBn": "খণ্ড 11 (হা: 4983-5477)",
+      "nameAr": "الجزء 11",
+      "file": "bukhari_v11.json"
+    },
+    {
+      "number": 12,
+      "nameEn": "Volume 12 (H: 5478-5976)",
+      "nameBn": "খণ্ড 12 (হা: 5478-5976)",
+      "nameAr": "الجزء 12",
+      "file": "bukhari_v12.json"
+    },
+    {
+      "number": 13,
+      "nameEn": "Volume 13 (H: 5977-6476)",
+      "nameBn": "খণ্ড 13 (হা: 5977-6476)",
+      "nameAr": "الجزء 13",
+      "file": "bukhari_v13.json"
+    },
+    {
+      "number": 14,
+      "nameEn": "Volume 14 (H: 6477-6974)",
+      "nameBn": "খণ্ড 14 (হা: 6477-6974)",
+      "nameAr": "الجزء 14",
+      "file": "bukhari_v14.json"
+    },
+    {
+      "number": 15,
+      "nameEn": "Volume 15 (H: 6975-7474)",
+      "nameBn": "খণ্ড 15 (হা: 6975-7474)",
+      "nameAr": "الجزء 15",
+      "file": "bukhari_v15.json"
+    },
+    {
+      "number": 16,
+      "nameEn": "Volume 16 (H: 7475-7563)",
+      "nameBn": "খণ্ড 16 (হা: 7475-7563)",
+      "nameAr": "الجزء 16",
+      "file": "bukhari_v16.json"
+    }
+  ],
+  "indexFile": "bukhari_index.json"
+}

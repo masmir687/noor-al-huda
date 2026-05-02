@@ -1,0 +1,44 @@
+[
+  {
+    "id": 1,
+    "title": "Tafsir of Ayatul Kursi: The Greatest Verse",
+    "speaker": "Shaykh Assim Al Hakeem",
+    "duration": "45:12",
+    "gradient": "linear-gradient(135deg,#0F4A31,#1A7B8A)"
+  },
+  {
+    "id": 2,
+    "title": "The Concept of Tawheed (Monotheism)",
+    "speaker": "Dr. Zakir Naik",
+    "duration": "1:20:05",
+    "gradient": "linear-gradient(135deg,#1A4A7A,#2D5FA0)"
+  },
+  {
+    "id": 3,
+    "title": "Lessons from the Life of Prophet Yusuf (AS)",
+    "speaker": "Mufti Menk",
+    "duration": "55:30",
+    "gradient": "linear-gradient(135deg,#4A1A0F,#8A3D1A)"
+  },
+  {
+    "id": 4,
+    "title": "How to Defend Islam Academically",
+    "speaker": "Mohammed Hijab",
+    "duration": "1:02:15",
+    "gradient": "linear-gradient(135deg,#4A0F4A,#8A1A4F)"
+  },
+  {
+    "id": 5,
+    "title": "Signs of the End Times Explained",
+    "speaker": "Dr. Yasir Qadhi",
+    "duration": "48:10",
+    "gradient": "linear-gradient(135deg,#1A3B0F,#5A4D1A)"
+  },
+  {
+    "id": 6,
+    "title": "Introduction to Usool al-Fiqh",
+    "speaker": "Shaykh Uthman Ibn Farooq",
+    "duration": "35:45",
+    "gradient": "linear-gradient(135deg,#1A6B47,#C8922A)"
+  }
+]

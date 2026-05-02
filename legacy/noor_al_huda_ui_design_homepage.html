@@ -1,0 +1,549 @@
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@400;500&family=Noto+Naskh+Arabic:wght@400;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --em:#1A6B47;--eml:#2D9A68;--emd:#0F4A31;
+  --gold:#C8922A;--goldl:#E8B84B;
+  --teal:#1A7B8A;
+  --parch:#F5F0E8;--cream:#FDFAF5;
+  --sand:#E2D9CC;--stone:#6B6560;
+  --ink:#1C1C1E;--warm:#F0ECE4;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--parch);color:var(--ink);font-size:13px}
+.nav{background:var(--emd);display:flex;align-items:center;justify-content:space-between;padding:0 20px;height:48px}
+.nav-logo{color:#fff;font-family:'Playfair Display',serif;font-size:16px;font-weight:700;display:flex;align-items:center;gap:8px}
+.nav-logo span{color:var(--goldl);font-family:'Noto Naskh Arabic',serif;font-size:18px}
+.nav-links{display:flex;gap:4px}
+.nav-links a{color:rgba(255,255,255,0.8);font-size:11px;padding:4px 8px;border-radius:4px;text-decoration:none;cursor:pointer}
+.nav-links a:hover{background:rgba(255,255,255,0.12);color:#fff}
+.nav-right{display:flex;gap:8px;align-items:center}
+.nav-icon{width:28px;height:28px;border-radius:6px;border:0.5px solid rgba(255,255,255,0.25);background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;cursor:pointer;color:rgba(255,255,255,0.8);font-size:12px}
+
+/* HERO */
+.hero{background:var(--emd);padding:32px 20px;position:relative;overflow:hidden;text-align:center}
+.geo-bg{position:absolute;inset:0;opacity:0.06}
+.hero-content{position:relative;z-index:1}
+.hero-ar{color:var(--goldl);font-family:'Noto Naskh Arabic',serif;font-size:26px;margin-bottom:4px;letter-spacing:1px}
+.hero-en{color:#fff;font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin-bottom:6px}
+.hero-sub{color:rgba(255,255,255,0.65);font-size:12px;margin-bottom:20px}
+.hero-btns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.btn-gold{background:var(--gold);color:#fff;border:none;padding:8px 16px;border-radius:6px;font-size:11px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif}
+.btn-outline{background:transparent;color:rgba(255,255,255,0.9);border:0.5px solid rgba(255,255,255,0.4);padding:8px 16px;border-radius:6px;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif}
+
+/* AYAH OF DAY */
+.ayah-day{background:var(--cream);border-top:3px solid var(--gold);border-bottom:0.5px solid var(--sand);padding:16px 20px}
+.section-label{font-size:10px;font-weight:500;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.section-label::after{content:'';flex:1;height:0.5px;background:var(--sand)}
+.ayah-ar{font-family:'Noto Naskh Arabic',serif;font-size:20px;text-align:right;direction:rtl;color:var(--emd);line-height:1.9;margin-bottom:8px}
+.ayah-tr{color:var(--stone);font-size:11px;font-style:italic;margin-bottom:4px}
+.ayah-ref{color:var(--em);font-size:10px;font-weight:500}
+.ayah-actions{display:flex;gap:6px;margin-top:10px}
+.pill{background:var(--parch);border:0.5px solid var(--sand);border-radius:20px;padding:4px 10px;font-size:10px;color:var(--stone);cursor:pointer;display:flex;align-items:center;gap:3px}
+.pill:hover{background:var(--sand)}
+
+/* MODULES */
+.modules{padding:16px 20px;background:var(--parch)}
+.mod-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.mod-card{background:var(--cream);border:0.5px solid var(--sand);border-radius:10px;padding:12px 8px;text-align:center;cursor:pointer;transition:all 0.15s}
+.mod-card:hover{border-color:var(--em);background:#fff}
+.mod-icon{width:36px;height:36px;border-radius:8px;margin:0 auto 8px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.mod-name{font-size:10px;font-weight:500;color:var(--ink)}
+.mod-count{font-size:9px;color:var(--stone);margin-top:1px}
+.mod-q{background:#e8f5ee}
+.mod-h{background:#f0f4ff}
+.mod-l{background:#fdf0e0}
+.mod-qa{background:#f5eefa}
+.mod-v{background:#e6f4f8}
+.mod-m{background:#fff0e8}
+
+/* CONTENT SECTION */
+.content-area{display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:0.5px solid var(--sand)}
+
+/* QA Section */
+.qa-section{padding:16px 20px;border-right:0.5px solid var(--sand)}
+.qa-card{background:var(--cream);border:0.5px solid var(--sand);border-radius:8px;padding:12px;margin-bottom:8px;cursor:pointer}
+.qa-card:hover{border-color:var(--eml)}
+.qa-tag{display:inline-block;background:#e8f5ee;color:var(--emd);font-size:9px;padding:2px 7px;border-radius:10px;margin-bottom:6px;font-weight:500}
+.qa-q{font-size:12px;font-weight:500;color:var(--ink);margin-bottom:6px;line-height:1.4}
+.qa-meta{display:flex;align-items:center;gap:6px;font-size:9px;color:var(--stone)}
+.video-thumb{width:36px;height:26px;background:var(--emd);border-radius:3px;display:flex;align-items:center;justify-content:center}
+.play-tri{width:0;height:0;border-style:solid;border-width:4px 0 4px 7px;border-color:transparent transparent transparent rgba(255,255,255,0.9)}
+
+/* HADITH */
+.hadith-section{padding:16px 20px;background:#FDFBF8}
+.hadith-card{background:var(--cream);border:0.5px solid var(--sand);border-left:3px solid var(--gold);border-radius:8px;padding:14px}
+.hadith-ar{font-family:'Noto Naskh Arabic',serif;font-size:15px;text-align:right;direction:rtl;color:var(--emd);line-height:1.9;margin-bottom:8px;padding-bottom:8px;border-bottom:0.5px solid var(--sand)}
+.hadith-en{font-size:11px;color:var(--ink);line-height:1.6;margin-bottom:8px;font-style:italic}
+.hadith-meta{display:flex;align-items:center;justify-content:space-between}
+.grade-badge{font-size:9px;font-weight:500;padding:2px 8px;border-radius:10px;background:#e8f5ee;color:#166534}
+.source-ref{font-size:9px;color:var(--stone)}
+
+/* VIDEO ROW */
+.video-row{padding:16px 20px;background:var(--cream);border-top:0.5px solid var(--sand)}
+.vid-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}
+.vid-card{border:0.5px solid var(--sand);border-radius:8px;overflow:hidden;cursor:pointer}
+.vid-card:hover{border-color:var(--teal)}
+.vid-thumb{background:var(--emd);height:70px;display:flex;align-items:center;justify-content:center;position:relative}
+.vid-dur{position:absolute;bottom:4px;right:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:8px;padding:1px 4px;border-radius:2px}
+.vid-info{padding:8px}
+.vid-title{font-size:10px;font-weight:500;color:var(--ink);margin-bottom:3px;line-height:1.3}
+.vid-speaker{font-size:9px;color:var(--stone)}
+.play-btn{width:28px;height:28px;background:rgba(255,255,255,0.9);border-radius:50%;display:flex;align-items:center;justify-content:center}
+
+/* PRAYER WIDGET */
+.prayer-widget{background:var(--emd);padding:14px 20px;display:flex;align-items:center;gap:0;border-top:0.5px solid var(--sand)}
+.prayer-title{color:rgba(255,255,255,0.7);font-size:9px;text-transform:uppercase;letter-spacing:1px;margin-right:16px;white-space:nowrap}
+.prayer-times{display:flex;gap:0;flex:1}
+.prayer-item{flex:1;text-align:center;padding:6px;border-right:0.5px solid rgba(255,255,255,0.1)}
+.prayer-item:last-child{border-right:none}
+.prayer-item.next{background:rgba(255,255,255,0.1);border-radius:6px}
+.pt-name{font-size:9px;color:rgba(255,255,255,0.6);margin-bottom:2px}
+.pt-time{font-size:12px;font-weight:500;color:#fff}
+.pt-next{font-size:8px;color:var(--goldl);margin-top:1px}
+
+/* PLAYER BAR */
+.player-bar{background:var(--ink);padding:10px 20px;display:flex;align-items:center;gap:12px;border-top:2px solid var(--gold)}
+.player-thumb{width:32px;height:32px;background:var(--em);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.player-info{flex:1;min-width:0}
+.player-title{color:#fff;font-size:11px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.player-sub{color:rgba(255,255,255,0.5);font-size:9px}
+.player-controls{display:flex;align-items:center;gap:8px}
+.pc{width:24px;height:24px;border-radius:50%;border:0.5px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;cursor:pointer;color:rgba(255,255,255,0.7);font-size:9px}
+.pc.main{width:30px;height:30px;background:var(--gold);border-color:var(--gold);color:#fff;font-size:11px}
+.player-prog{flex:1;height:3px;background:rgba(255,255,255,0.15);border-radius:2px;position:relative}
+.player-fill{height:100%;width:35%;background:var(--gold);border-radius:2px}
+.player-dot{width:8px;height:8px;background:var(--goldl);border-radius:50%;position:absolute;top:-2.5px;left:calc(35% - 4px)}
+.player-time{color:rgba(255,255,255,0.45);font-size:9px;white-space:nowrap}
+.speed-btn{color:rgba(255,255,255,0.6);font-size:9px;padding:2px 5px;border:0.5px solid rgba(255,255,255,0.2);border-radius:3px;cursor:pointer}
+
+/* DESIGN SPEC PANEL */
+.spec-panel{background:var(--cream);border-top:2px solid var(--em);padding:16px 20px}
+.spec-title{font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--emd);margin-bottom:12px}
+.spec-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.spec-card{background:var(--parch);border:0.5px solid var(--sand);border-radius:8px;padding:10px}
+.spec-head{font-size:9px;font-weight:500;color:var(--gold);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px}
+.color-row{display:flex;align-items:center;gap:6px;margin-bottom:5px}
+.swatch{width:18px;height:18px;border-radius:4px;flex-shrink:0}
+.color-name{font-size:9px;color:var(--ink);font-weight:500}
+.color-hex{font-size:9px;color:var(--stone);font-family:monospace}
+.font-sample{margin-bottom:6px}
+.font-label{font-size:9px;color:var(--stone);margin-bottom:2px}
+.font-display{font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--emd)}
+.font-body{font-family:'DM Sans',sans-serif;font-size:11px;color:var(--ink)}
+.font-arabic{font-family:'Noto Naskh Arabic',serif;font-size:16px;color:var(--emd);direction:rtl;text-align:right}
+.comp-row{margin-bottom:7px}
+.comp-label{font-size:9px;color:var(--stone);margin-bottom:3px}
+.comp-demo{display:flex;gap:4px;align-items:center;flex-wrap:wrap}
+.comp-btn-p{background:var(--em);color:#fff;border:none;padding:4px 10px;border-radius:5px;font-size:9px;cursor:pointer;font-family:'DM Sans',sans-serif}
+.comp-btn-g{background:transparent;color:var(--em);border:0.5px solid var(--em);padding:4px 10px;border-radius:5px;font-size:9px;cursor:pointer;font-family:'DM Sans',sans-serif}
+.comp-btn-au{background:var(--gold);color:#fff;border:none;padding:4px 10px;border-radius:5px;font-size:9px;cursor:pointer;font-family:'DM Sans',sans-serif}
+.badge-sah{background:#e8f5ee;color:#166534;font-size:9px;padding:2px 7px;border-radius:10px;font-weight:500}
+.badge-has{background:#fef3c7;color:#92400e;font-size:9px;padding:2px 7px;border-radius:10px;font-weight:500}
+.badge-daif{background:#fee2e2;color:#991b1b;font-size:9px;padding:2px 7px;border-radius:10px;font-weight:500}
+
+/* QURAN PAGE PREVIEW */
+.page-preview{border-top:0.5px solid var(--sand);display:grid;grid-template-columns:180px 1fr;background:var(--cream)}
+.sidebar-p{background:var(--emd);padding:12px;overflow:hidden}
+.sb-head{color:rgba(255,255,255,0.5);font-size:9px;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.surah-item{padding:5px 8px;border-radius:5px;cursor:pointer;display:flex;align-items:center;gap:6px;margin-bottom:2px}
+.surah-item.active{background:rgba(255,255,255,0.12)}
+.surah-item:hover{background:rgba(255,255,255,0.08)}
+.surah-num{width:18px;height:18px;border:0.5px solid rgba(255,255,255,0.25);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;color:rgba(255,255,255,0.7);flex-shrink:0}
+.surah-name{color:#fff;font-size:10px;font-weight:500}
+.surah-ar{color:rgba(255,255,255,0.6);font-family:'Noto Naskh Arabic',serif;font-size:11px;margin-left:auto}
+.reader-area{padding:16px}
+.surah-header{text-align:center;margin-bottom:14px;padding-bottom:12px;border-bottom:0.5px solid var(--sand)}
+.sh-ar{font-family:'Noto Naskh Arabic',serif;font-size:20px;color:var(--emd);margin-bottom:3px}
+.sh-en{font-family:'Playfair Display',serif;font-size:14px;color:var(--ink);margin-bottom:2px}
+.sh-meta{font-size:9px;color:var(--stone)}
+.bismillah{text-align:center;font-family:'Noto Naskh Arabic',serif;font-size:17px;color:var(--gold);padding:10px;margin-bottom:12px;border:0.5px solid var(--sand);border-radius:8px;background:var(--parch)}
+.ayah-row{display:flex;flex-direction:column;gap:0;margin-bottom:12px;padding-bottom:12px;border-bottom:0.5px solid var(--sand)}
+.ayah-num-badge{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.ayah-num-circle{width:20px;height:20px;border-radius:50%;background:var(--parch);border:0.5px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:8px;color:var(--gold);font-weight:500}
+.ayah-play{width:20px;height:20px;border-radius:50%;background:var(--parch);border:0.5px solid var(--sand);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.tri-sm{width:0;height:0;border-style:solid;border-width:3px 0 3px 5px;border-color:transparent transparent transparent var(--em)}
+.ar-txt{font-family:'Noto Naskh Arabic',serif;font-size:17px;direction:rtl;text-align:right;color:var(--emd);line-height:1.9;margin-bottom:5px}
+.tr-txt{font-size:10px;color:var(--stone);line-height:1.5;font-style:italic}
+</style>
+
+<h2 class="sr-only">Noor Al-Huda Islamic Dawah Web Application — UI Design Mockup showing homepage layout, Quran reader, design system, and component library</h2>
+
+<div style="border:0.5px solid var(--sand);border-radius:12px;overflow:hidden;background:var(--parch)">
+
+<!-- NAVBAR -->
+<div class="nav">
+  <div class="nav-logo">
+    <span>نور الهدى</span>
+    NOOR AL-HUDA
+  </div>
+  <div class="nav-links">
+    <a>Quran</a><a>Hadith</a><a>Learn</a><a>Q&amp;A</a><a>Videos</a><a>Media</a>
+  </div>
+  <div class="nav-right">
+    <div class="nav-icon">&#9740;</div>
+    <div class="nav-icon">&#9790;</div>
+    <div class="nav-icon" style="font-size:9px">EN</div>
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <svg class="geo-bg" viewBox="0 0 680 160" xmlns="http://www.w3.org/2000/svg">
+    <g stroke="white" stroke-width="0.5" fill="none" opacity="1">
+      <polygon points="100,20 140,40 140,80 100,100 60,80 60,40" /><polygon points="100,20 100,60 140,40" /><polygon points="100,100 100,60 60,80" />
+      <polygon points="220,10 260,30 260,70 220,90 180,70 180,30" /><polygon points="220,10 220,50 260,30" /><polygon points="220,90 220,50 180,70" />
+      <polygon points="340,20 380,40 380,80 340,100 300,80 300,40" /><polygon points="340,20 340,60 380,40" /><polygon points="340,100 340,60 300,80" />
+      <polygon points="460,10 500,30 500,70 460,90 420,70 420,30" /><polygon points="460,10 460,50 500,30" /><polygon points="460,90 460,50 420,70" />
+      <polygon points="580,20 620,40 620,80 580,100 540,80 540,40" /><polygon points="580,20 580,60 620,40" /><polygon points="580,100 580,60 540,80" />
+      <line x1="140" y1="40" x2="180" y2="30"/><line x1="140" y1="80" x2="180" y2="70"/>
+      <line x1="260" y1="30" x2="300" y2="40"/><line x1="260" y1="70" x2="300" y2="80"/>
+      <line x1="380" y1="40" x2="420" y2="30"/><line x1="380" y1="80" x2="420" y2="70"/>
+      <line x1="500" y1="30" x2="540" y2="40"/><line x1="500" y1="70" x2="540" y2="80"/>
+    </g>
+  </svg>
+  <div class="hero-content">
+    <div class="hero-ar">نور الهدى</div>
+    <div class="hero-en">Noor Al-Huda — Light of Guidance</div>
+    <div class="hero-sub">Your complete Islamic knowledge companion · Quran · Hadith · Dawah · Learning</div>
+    <div class="hero-btns">
+      <button class="btn-gold">Read the Quran</button>
+      <button class="btn-outline">Start Learning</button>
+      <button class="btn-outline">Browse Q&amp;A</button>
+    </div>
+  </div>
+</div>
+
+<!-- AYAH OF DAY -->
+<div class="ayah-day">
+  <div class="section-label">Ayah of the Day</div>
+  <div class="ayah-ar">وَإِذَا سَأَلَكَ عِبَادِي عَنِّي فَإِنِّي قَرِيبٌ ۖ أُجِيبُ دَعْوَةَ الدَّاعِ إِذَا دَعَانِ</div>
+  <div class="ayah-tr">"And when My servants ask you concerning Me — indeed I am near. I respond to the invocation of the supplicant when he calls upon Me."</div>
+  <div class="ayah-ref">Surah Al-Baqarah (2:186)</div>
+  <div class="ayah-actions">
+    <div class="pill">&#9654; Listen</div>
+    <div class="pill">&#128279; Share</div>
+    <div class="pill">&#128218; Read Context</div>
+    <div class="pill">&#128065; Tafsir</div>
+  </div>
+</div>
+
+<!-- QUICK ACCESS MODULES -->
+<div class="modules">
+  <div class="section-label">Explore</div>
+  <div class="mod-grid">
+    <div class="mod-card">
+      <div class="mod-icon mod-q"><span style="font-family:'Noto Naskh Arabic',serif;font-size:14px;color:#1A6B47">ق</span></div>
+      <div class="mod-name">The Quran</div>
+      <div class="mod-count">114 Surahs</div>
+    </div>
+    <div class="mod-card">
+      <div class="mod-icon mod-h"><span style="font-family:'Noto Naskh Arabic',serif;font-size:14px;color:#1A4A8A">ح</span></div>
+      <div class="mod-name">Hadith</div>
+      <div class="mod-count">6 Collections</div>
+    </div>
+    <div class="mod-card">
+      <div class="mod-icon mod-l" style="background:#fdf0e0"><span style="font-size:14px">&#127979;</span></div>
+      <div class="mod-name">Tutorials</div>
+      <div class="mod-count">50+ Lessons</div>
+    </div>
+    <div class="mod-card">
+      <div class="mod-icon mod-qa" style="background:#f5eefa"><span style="font-size:14px">&#10067;</span></div>
+      <div class="mod-name">Q&amp;A</div>
+      <div class="mod-count">200+ Answers</div>
+    </div>
+    <div class="mod-card">
+      <div class="mod-icon mod-v" style="background:#e6f4f8"><span style="font-size:14px">&#9654;</span></div>
+      <div class="mod-name">Videos</div>
+      <div class="mod-count">150+ Videos</div>
+    </div>
+    <div class="mod-card">
+      <div class="mod-icon mod-m" style="background:#fff0e8"><span style="font-size:14px">&#127925;</span></div>
+      <div class="mod-name">Media</div>
+      <div class="mod-count">Recitations</div>
+    </div>
+  </div>
+</div>
+
+<!-- CONTENT: QA + HADITH -->
+<div class="content-area">
+  <div class="qa-section">
+    <div class="section-label">Featured Q&amp;A</div>
+    <div class="qa-card">
+      <div class="qa-tag">Prayer</div>
+      <div class="qa-q">Is it permissible to combine Dhuhr and Asr prayers while travelling?</div>
+      <div class="qa-meta">
+        <div class="video-thumb"><div class="play-tri"></div></div>
+        <span>2 video answers</span>
+        <span style="margin-left:auto;color:var(--em);font-weight:500">Read answer</span>
+      </div>
+    </div>
+    <div class="qa-card">
+      <div class="qa-tag">Fiqh</div>
+      <div class="qa-q">What is the Islamic ruling on crypto currency investment and trading?</div>
+      <div class="qa-meta">
+        <div class="video-thumb"><div class="play-tri"></div></div>
+        <span>3 video answers</span>
+        <span style="margin-left:auto;color:var(--em);font-weight:500">Read answer</span>
+      </div>
+    </div>
+    <div class="qa-card">
+      <div class="qa-tag">Aqeedah</div>
+      <div class="qa-q">How do we respond to the claim that the Quran was written by humans?</div>
+      <div class="qa-meta">
+        <div class="video-thumb"><div class="play-tri"></div></div>
+        <span>1 video answer</span>
+        <span style="margin-left:auto;color:var(--em);font-weight:500">Read answer</span>
+      </div>
+    </div>
+  </div>
+  <div class="hadith-section">
+    <div class="section-label">Hadith of the Day</div>
+    <div class="hadith-card">
+      <div class="hadith-ar">إِنَّمَا الأَعْمَالُ بِالنِّيَّاتِ وَإِنَّمَا لِكُلِّ امْرِئٍ مَا نَوَى</div>
+      <div class="hadith-en">"Actions are but by intentions, and every man shall have only what he intended."</div>
+      <div class="hadith-meta">
+        <div>
+          <div style="font-size:9px;color:var(--stone);margin-bottom:2px">Narrated by Umar ibn Al-Khattab (RA)</div>
+          <div class="source-ref">Sahih Al-Bukhari · Book 1 · Hadith 1</div>
+        </div>
+        <div class="grade-badge">Sahih</div>
+      </div>
+    </div>
+    <div style="margin-top:10px;display:flex;gap:6px">
+      <button style="flex:1;padding:6px;background:var(--parch);border:0.5px solid var(--sand);border-radius:6px;font-size:9px;color:var(--em);cursor:pointer;font-family:'DM Sans',sans-serif">View in Bukhari</button>
+      <button style="flex:1;padding:6px;background:var(--parch);border:0.5px solid var(--sand);border-radius:6px;font-size:9px;color:var(--stone);cursor:pointer;font-family:'DM Sans',sans-serif">Share Hadith</button>
+    </div>
+  </div>
+</div>
+
+<!-- VIDEO ROW -->
+<div class="video-row">
+  <div class="section-label">Featured Videos</div>
+  <div class="vid-grid">
+    <div class="vid-card">
+      <div class="vid-thumb" style="background:linear-gradient(135deg,#0F4A31,#1A7B8A)">
+        <div class="play-btn"><div class="play-tri" style="border-color:transparent transparent transparent #1A6B47"></div></div>
+        <div class="vid-dur">42:18</div>
+      </div>
+      <div class="vid-info">
+        <div class="vid-title">The Purpose of Life in Islam</div>
+        <div class="vid-speaker">Dr. Yasir Qadhi · Dawah</div>
+      </div>
+    </div>
+    <div class="vid-card">
+      <div class="vid-thumb" style="background:linear-gradient(135deg,#1A4A7A,#2D5FA0)">
+        <div class="play-btn"><div class="play-tri" style="border-color:transparent transparent transparent #1A4A7A"></div></div>
+        <div class="vid-dur">28:05</div>
+      </div>
+      <div class="vid-info">
+        <div class="vid-title">100 Questions Non-Muslims Ask</div>
+        <div class="vid-speaker">Mufti Menk · Q&amp;A</div>
+      </div>
+    </div>
+    <div class="vid-card">
+      <div class="vid-thumb" style="background:linear-gradient(135deg,#4A1A0F,#8A3D1A)">
+        <div class="play-btn"><div class="play-tri" style="border-color:transparent transparent transparent #8A3D1A"></div></div>
+        <div class="vid-dur">1:12:40</div>
+      </div>
+      <div class="vid-info">
+        <div class="vid-title">The Seerah of Prophet Muhammad ﷺ</div>
+        <div class="vid-speaker">Shaykh Omar Suleiman · Seerah</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PRAYER TIMES -->
+<div class="prayer-widget">
+  <div class="prayer-title">Today's Prayer Times</div>
+  <div class="prayer-times">
+    <div class="prayer-item">
+      <div class="pt-name">Fajr</div>
+      <div class="pt-time">5:12</div>
+    </div>
+    <div class="prayer-item next">
+      <div class="pt-name">Dhuhr</div>
+      <div class="pt-time">12:48</div>
+      <div class="pt-next">Next &#9679;</div>
+    </div>
+    <div class="prayer-item">
+      <div class="pt-name">Asr</div>
+      <div class="pt-time">4:22</div>
+    </div>
+    <div class="prayer-item">
+      <div class="pt-name">Maghrib</div>
+      <div class="pt-time">7:51</div>
+    </div>
+    <div class="prayer-item">
+      <div class="pt-name">Isha</div>
+      <div class="pt-time">9:18</div>
+    </div>
+  </div>
+</div>
+
+<!-- PERSISTENT AUDIO PLAYER -->
+<div class="player-bar">
+  <div class="player-thumb">
+    <span style="font-family:'Noto Naskh Arabic',serif;font-size:14px;color:#fff">ق</span>
+  </div>
+  <div class="player-info">
+    <div class="player-title">Surah Al-Fatiha — Sheikh Abdul Rahman Al-Sudais</div>
+    <div class="player-sub">Quran Audio · 7 Ayahs</div>
+  </div>
+  <div class="player-controls">
+    <div class="pc">&#9664;&#9664;</div>
+    <div class="pc">&#9664;</div>
+    <div class="pc main">&#9654;</div>
+    <div class="pc">&#9654;</div>
+    <div class="pc">&#9654;&#9654;</div>
+  </div>
+  <div style="flex:1;display:flex;align-items:center;gap:8px;min-width:0">
+    <div class="player-time">0:45</div>
+    <div class="player-prog">
+      <div class="player-fill"></div>
+      <div class="player-dot"></div>
+    </div>
+    <div class="player-time">2:08</div>
+  </div>
+  <div class="speed-btn">1x</div>
+  <div class="pc">&#128266;</div>
+</div>
+
+<!-- DESIGN SPEC PANEL -->
+<div class="spec-panel">
+  <div class="spec-title">Design System Reference</div>
+  <div class="spec-grid">
+
+    <div class="spec-card">
+      <div class="spec-head">Color Palette — Desert Dawn</div>
+      <div class="color-row"><div class="swatch" style="background:#1A6B47"></div><div><div class="color-name">Emerald Green (Primary)</div><div class="color-hex">#1A6B47</div></div></div>
+      <div class="color-row"><div class="swatch" style="background:#C8922A"></div><div><div class="color-name">Golden Amber (Accent)</div><div class="color-hex">#C8922A</div></div></div>
+      <div class="color-row"><div class="swatch" style="background:#1A7B8A"></div><div><div class="color-name">Royal Teal (Tertiary)</div><div class="color-hex">#1A7B8A</div></div></div>
+      <div class="color-row"><div class="swatch" style="background:#F5F0E8;border:0.5px solid #e2d9cc"></div><div><div class="color-name">Parchment (Background)</div><div class="color-hex">#F5F0E8</div></div></div>
+      <div class="color-row"><div class="swatch" style="background:#0F4A31"></div><div><div class="color-name">Deep Forest (Dark)</div><div class="color-hex">#0F4A31</div></div></div>
+      <div class="color-row"><div class="swatch" style="background:#1C1C1E"></div><div><div class="color-name">Ink Charcoal (Dark mode bg)</div><div class="color-hex">#1C1C1E</div></div></div>
+    </div>
+
+    <div class="spec-card">
+      <div class="spec-head">Typography</div>
+      <div class="font-sample">
+        <div class="font-label">Display — Playfair Display 700</div>
+        <div class="font-display">Noor Al-Huda</div>
+      </div>
+      <div class="font-sample">
+        <div class="font-label">Body — DM Sans 400</div>
+        <div class="font-body">Spreading knowledge with clarity</div>
+      </div>
+      <div class="font-sample">
+        <div class="font-label">Arabic Quran — Noto Naskh Arabic</div>
+        <div class="font-arabic">بِسْمِ ٱللَّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ</div>
+      </div>
+      <div class="spec-head" style="margin-top:8px">Hadith Grading Badges</div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap">
+        <span class="badge-sah">Sahih</span>
+        <span class="badge-has">Hasan</span>
+        <span class="badge-daif">Da'if</span>
+      </div>
+    </div>
+
+    <div class="spec-card">
+      <div class="spec-head">Component Library</div>
+      <div class="comp-row">
+        <div class="comp-label">Buttons</div>
+        <div class="comp-demo">
+          <button class="comp-btn-p">Primary</button>
+          <button class="comp-btn-g">Outline</button>
+          <button class="comp-btn-au">Gold CTA</button>
+        </div>
+      </div>
+      <div class="comp-row">
+        <div class="comp-label">Category Pills</div>
+        <div class="comp-demo">
+          <span style="background:#e8f5ee;color:#0F4A31;font-size:9px;padding:2px 8px;border-radius:10px">Prayer</span>
+          <span style="background:#f5eefa;color:#4A1A8A;font-size:9px;padding:2px 8px;border-radius:10px">Aqeedah</span>
+          <span style="background:#fdf0e0;color:#8A4A0F;font-size:9px;padding:2px 8px;border-radius:10px">Seerah</span>
+        </div>
+      </div>
+      <div class="comp-row">
+        <div class="comp-label">Icon Accent Line</div>
+        <div style="background:var(--parch);border-left:3px solid var(--gold);padding:6px 8px;border-radius:0 5px 5px 0;font-size:9px;color:var(--stone)">
+          "Whoever Allah guides, none can misguide."
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- QURAN READER PREVIEW -->
+<div class="page-preview" style="border-top:2px solid var(--em)">
+  <div class="sidebar-p">
+    <div class="sb-head">Surahs</div>
+    <div class="surah-item active">
+      <div class="surah-num">1</div>
+      <div class="surah-name">Al-Fatiha</div>
+      <div class="surah-ar">الفاتحة</div>
+    </div>
+    <div class="surah-item">
+      <div class="surah-num">2</div>
+      <div class="surah-name">Al-Baqarah</div>
+      <div class="surah-ar">البقرة</div>
+    </div>
+    <div class="surah-item">
+      <div class="surah-num">3</div>
+      <div class="surah-name">Al-Imran</div>
+      <div class="surah-ar">آل عمران</div>
+    </div>
+    <div class="surah-item">
+      <div class="surah-num">4</div>
+      <div class="surah-name">An-Nisa</div>
+      <div class="surah-ar">النساء</div>
+    </div>
+    <div class="surah-item">
+      <div class="surah-num">5</div>
+      <div class="surah-name">Al-Ma'idah</div>
+      <div class="surah-ar">المائدة</div>
+    </div>
+    <div style="margin-top:8px;padding:6px 8px;background:rgba(255,255,255,0.06);border-radius:5px">
+      <div class="sb-head">Settings</div>
+      <div style="color:rgba(255,255,255,0.65);font-size:9px;margin-bottom:3px">Translation: Sahih International</div>
+      <div style="color:rgba(255,255,255,0.65);font-size:9px;margin-bottom:3px">Reciter: Al-Sudais</div>
+      <div style="color:rgba(255,255,255,0.65);font-size:9px">Font: Large</div>
+    </div>
+  </div>
+  <div class="reader-area">
+    <div class="surah-header">
+      <div class="sh-ar">سورة الفاتحة</div>
+      <div class="sh-en">Surah Al-Fatiha — The Opening</div>
+      <div class="sh-meta">Meccan · 7 Ayahs · Juz 1 · Page 1</div>
+    </div>
+    <div class="bismillah">بِسْمِ ٱللَّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ</div>
+    <div class="ayah-row">
+      <div class="ayah-num-badge">
+        <div class="ayah-num-circle">1</div>
+        <div class="ayah-play"><div class="tri-sm"></div></div>
+      </div>
+      <div class="ar-txt">ٱلْحَمْدُ لِلَّٰهِ رَبِّ ٱلْعَٰلَمِينَ</div>
+      <div class="tr-txt">[All] praise is [due] to Allah, Lord of the worlds —</div>
+    </div>
+    <div class="ayah-row">
+      <div class="ayah-num-badge">
+        <div class="ayah-num-circle">2</div>
+        <div class="ayah-play"><div class="tri-sm"></div></div>
+      </div>
+      <div class="ar-txt">ٱلرَّحْمَٰنِ ٱلرَّحِيمِ</div>
+      <div class="tr-txt">The Entirely Merciful, the Especially Merciful,</div>
+    </div>
+    <div class="ayah-row">
+      <div class="ayah-num-badge">
+        <div class="ayah-num-circle">3</div>
+        <div class="ayah-play"><div class="tri-sm"></div></div>
+      </div>
+      <div class="ar-txt">مَٰلِكِ يَوْمِ ٱلدِّينِ</div>
+      <div class="tr-txt">Sovereign of the Day of Recompense.</div>
+    </div>
+  </div>
+</div>
+
+</div>

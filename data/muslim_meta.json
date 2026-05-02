@@ -1,0 +1,122 @@
+{
+  "id": "muslim",
+  "titleEn": "Sahih Muslim",
+  "titleAr": "صحيح مسلم",
+  "titleBn": "সহীহ মুসলিম",
+  "author": "Imam Muslim ibn al-Hajjaj",
+  "books": [
+    {
+      "number": 1,
+      "nameEn": "Volume 1 (H: 1-500)",
+      "nameBn": "খণ্ড 1 (হা: 1-500)",
+      "nameAr": "الجزء 1",
+      "file": "muslim_v1.json"
+    },
+    {
+      "number": 2,
+      "nameEn": "Volume 2 (H: 501-1000)",
+      "nameBn": "খণ্ড 2 (হা: 501-1000)",
+      "nameAr": "الجزء 2",
+      "file": "muslim_v2.json"
+    },
+    {
+      "number": 3,
+      "nameEn": "Volume 3 (H: 1001-1500)",
+      "nameBn": "খণ্ড 3 (হা: 1001-1500)",
+      "nameAr": "الجزء 3",
+      "file": "muslim_v3.json"
+    },
+    {
+      "number": 4,
+      "nameEn": "Volume 4 (H: 1501-2000)",
+      "nameBn": "খণ্ড 4 (হা: 1501-2000)",
+      "nameAr": "الجزء 4",
+      "file": "muslim_v4.json"
+    },
+    {
+      "number": 5,
+      "nameEn": "Volume 5 (H: 2001-2500)",
+      "nameBn": "খণ্ড 5 (হা: 2001-2500)",
+      "nameAr": "الجزء 5",
+      "file": "muslim_v5.json"
+    },
+    {
+      "number": 6,
+      "nameEn": "Volume 6 (H: 2501-3000)",
+      "nameBn": "খণ্ড 6 (হা: 2501-3000)",
+      "nameAr": "الجزء 6",
+      "file": "muslim_v6.json"
+    },
+    {
+      "number": 7,
+      "nameEn": "Volume 7 (H: 3001-3500)",
+      "nameBn": "খণ্ড 7 (হা: 3001-3500)",
+      "nameAr": "الجزء 7",
+      "file": "muslim_v7.json"
+    },
+    {
+      "number": 8,
+      "nameEn": "Volume 8 (H: 3501-4000)",
+      "nameBn": "খণ্ড 8 (হা: 3501-4000)",
+      "nameAr": "الجزء 8",
+      "file": "muslim_v8.json"
+    },
+    {
+      "number": 9,
+      "nameEn": "Volume 9 (H: 4001-4500)",
+      "nameBn": "খণ্ড 9 (হা: 4001-4500)",
+      "nameAr": "الجزء 9",
+      "file": "muslim_v9.json"
+    },
+    {
+      "number": 10,
+      "nameEn": "Volume 10 (H: 4501-5000)",
+      "nameBn": "খণ্ড 10 (হা: 4501-5000)",
+      "nameAr": "الجزء 10",
+      "file": "muslim_v10.json"
+    },
+    {
+      "number": 11,
+      "nameEn": "Volume 11 (H: 5001-5500)",
+      "nameBn": "খণ্ড 11 (হা: 5001-5500)",
+      "nameAr": "الجزء 11",
+      "file": "muslim_v11.json"
+    },
+    {
+      "number": 12,
+      "nameEn": "Volume 12 (H: 5501-6000)",
+      "nameBn": "খণ্ড 12 (হা: 5501-6000)",
+      "nameAr": "الجزء 12",
+      "file": "muslim_v12.json"
+    },
+    {
+      "number": 13,
+      "nameEn": "Volume 13 (H: 6001-6500)",
+      "nameBn": "খণ্ড 13 (হা: 6001-6500)",
+      "nameAr": "الجزء 13",
+      "file": "muslim_v13.json"
+    },
+    {
+      "number": 14,
+      "nameEn": "Volume 14 (H: 6501-7000)",
+      "nameBn": "খণ্ড 14 (হা: 6501-7000)",
+      "nameAr": "الجزء 14",
+      "file": "muslim_v14.json"
+    },
+    {
+      "number": 15,
+      "nameEn": "Volume 15 (H: 7001-7500)",
+      "nameBn": "খণ্ড 15 (হা: 7001-7500)",
+      "nameAr": "الجزء 15",
+      "file": "muslim_v15.json"
+    },
+    {
+      "number": 16,
+      "nameEn": "Volume 16 (H: 7501-7563)",
+      "nameBn": "খণ্ড 16 (হা: 7501-7563)",
+      "nameAr": "الجزء 16",
+      "file": "muslim_v16.json"
+    }
+  ],
+  "indexFile": "muslim_index.json"
+}

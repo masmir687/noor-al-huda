@@ -1,0 +1,66 @@
+{
+  "id": "tirmidhi",
+  "titleEn": "Jami At-Tirmidhi",
+  "titleAr": "جامع الترمذي",
+  "titleBn": "জামি আত-তিরমিযী",
+  "author": "Imam Abu Isa Muhammad at-Tirmidhi",
+  "books": [
+    {
+      "number": 1,
+      "nameEn": "Volume 1 (H: 1-499)",
+      "nameBn": "খণ্ড 1 (হা: 1-499)",
+      "nameAr": "الجزء 1",
+      "file": "tirmidhi_v1.json"
+    },
+    {
+      "number": 2,
+      "nameEn": "Volume 2 (H: 500-998)",
+      "nameBn": "খণ্ড 2 (হা: 500-998)",
+      "nameAr": "الجزء 2",
+      "file": "tirmidhi_v2.json"
+    },
+    {
+      "number": 3,
+      "nameEn": "Volume 3 (H: 999-1492)",
+      "nameBn": "খণ্ড 3 (হা: 999-1492)",
+      "nameAr": "الجزء 3",
+      "file": "tirmidhi_v3.json"
+    },
+    {
+      "number": 4,
+      "nameEn": "Volume 4 (H: 1493-1988)",
+      "nameBn": "খণ্ড 4 (হা: 1493-1988)",
+      "nameAr": "الجزء 4",
+      "file": "tirmidhi_v4.json"
+    },
+    {
+      "number": 5,
+      "nameEn": "Volume 5 (H: 1989-2487)",
+      "nameBn": "খণ্ড 5 (হা: 1989-2487)",
+      "nameAr": "الجزء 5",
+      "file": "tirmidhi_v5.json"
+    },
+    {
+      "number": 6,
+      "nameEn": "Volume 6 (H: 2488-2969)",
+      "nameBn": "খণ্ড 6 (হা: 2488-2969)",
+      "nameAr": "الجزء 6",
+      "file": "tirmidhi_v6.json"
+    },
+    {
+      "number": 7,
+      "nameEn": "Volume 7 (H: 2970-3467)",
+      "nameBn": "খণ্ড 7 (হা: 2970-3467)",
+      "nameAr": "الجزء 7",
+      "file": "tirmidhi_v7.json"
+    },
+    {
+      "number": 8,
+      "nameEn": "Volume 8 (H: 3468-3956)",
+      "nameBn": "খণ্ড 8 (হা: 3468-3956)",
+      "nameAr": "الجزء 8",
+      "file": "tirmidhi_v8.json"
+    }
+  ],
+  "indexFile": "tirmidhi_index.json"
+}

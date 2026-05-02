@@ -1,0 +1,50 @@
+[
+  {
+    "id": "bukhari",
+    "titleAr": "صحيح البخاري",
+    "titleEn": "Sahih Al-Bukhari",
+    "titleBn": "সহীহ আল-বুখারী",
+    "author": "Imam Muhammad al-Bukhari",
+    "count": "7,589"
+  },
+  {
+    "id": "muslim",
+    "titleAr": "صحيح مسلم",
+    "titleEn": "Sahih Muslim",
+    "titleBn": "সহীহ মুসলিম",
+    "author": "Imam Muslim ibn al-Hajjaj",
+    "count": "7,563"
+  },
+  {
+    "id": "abudawud",
+    "titleAr": "سنن أبي داود",
+    "titleEn": "Sunan Abu Dawud",
+    "titleBn": "সুনান আবু দাউদ",
+    "author": "Imam Abu Dawud",
+    "count": "5,274"
+  },
+  {
+    "id": "tirmidhi",
+    "titleAr": "جامع الترمذي",
+    "titleEn": "Jami At-Tirmidhi",
+    "titleBn": "জামি আত-তিরমিযী",
+    "author": "Imam Abu Isa Muhammad at-Tirmidhi",
+    "count": "3,998"
+  },
+  {
+    "id": "nasai",
+    "titleAr": "سنن النسائي",
+    "titleEn": "Sunan An-Nasai",
+    "titleBn": "সুনান আন-নাসায়ী",
+    "author": "Imam Ahmad an-Nasai",
+    "count": "5,765"
+  },
+  {
+    "id": "ibnmajah",
+    "titleAr": "سنن ابن ماجه",
+    "titleEn": "Sunan Ibn Majah",
+    "titleBn": "সুনান ইবনে মাজাহ",
+    "author": "Imam Ibn Majah",
+    "count": "4,343"
+  }
+]

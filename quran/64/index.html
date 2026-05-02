@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Holy Quran — Noor Al-Huda</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@400;500;700&family=Noto+Naskh+Arabic:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="icon" type="image/svg+xml" href="../../images/favicon.svg">
+    <link rel="apple-touch-icon" href="../../images/favicon.svg">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0F4A31">
+    <link rel="stylesheet" href="../../css/style.css">
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script>window.SURAH_ID = 64;</script>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="nav">
+        <div class="container">
+            <div class="nav-content">
+                <a href="../../index.html" class="nav-logo">
+                    <span class="ar">نور الهدى</span>
+                    <span class="en" data-t="brand_name">NOOR AL-HUDA</span>
+                </a>
+                <div class="nav-links" id="navLinks">
+                    <a href="../../quran.html" style="color: var(--goldl)" data-t="quran">Quran</a>
+                    <a href="../../hadith.html" data-t="hadith">Hadith</a>
+                    <a href="../../bookmarks.html" data-t="bookmarks">Bookmarks</a>
+                    <a href="../../learn.html" data-t="learn">Learn</a>
+                    <a href="../../qa.html" data-t="qa">Q&A</a>
+                    <a href="../../videos.html" data-t="videos">Videos</a>
+                    <a href="../../media.html" data-t="media">Media</a>
+                </div>
+                <div class="nav-right">
+                    
+                    <button class="nav-icon-btn" id="themeToggle" aria-label="Toggle Theme"><i class="ph ph-moon"></i></button>
+                    <button class="lang-btn" data-t="lang-btn">EN</button>
+                    <button class="mobile-menu-btn" id="menuBtn"><i class="ph ph-list"></i></button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Quran Layout -->
+    <main class="quran-layout">
+        <!-- Sidebar -->
+        <aside class="quran-sidebar">
+            <div class="sidebar-heading" data-t="surahs">Surahs</div>
+            <div class="surah-list" id="surah-list-container">
+                <!-- Dynamically populated via JS -->
+                <div style="color: var(--stone); text-align: center; padding: 20px 0; font-size: 12px;" data-t="loading">Loading...</div>
+            </div>
+
+            <div class="sidebar-heading" data-t="settings">Settings</div>
+            <div class="quran-settings">
+                <div class="setting-item">
+                    <span class="setting-label" data-t="translation">Translation</span>
+                    <select class="setting-select" id="translation-select">
+                        <option value="en.sahih">Sahih International (Default)</option>
+                        <option value="en.yusufali">Abdullah Yusuf Ali</option>
+                        <option value="bn.bengali">Bengali (Bayan Foundation)</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <span class="setting-label" data-t="reciter">Reciter</span>
+                    <select class="setting-select" id="reciter-select">
+                        <option value="Abdurrahmaan_As-Sudais_192kbps">Sheikh Al-Sudais</option>
+                        <option value="Alafasy_128kbps">Mishary Alafasy</option>
+                        <option value="Abdul_Basit_Mujawwad_128kbps">AbdulBaset (Mujawwad)</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <span class="setting-label" data-t="font_size">Font Size</span>
+                    <select class="setting-select" id="font-size-select">
+                        <option value="small" data-t="small">Small</option>
+                        <option value="normal" selected data-t="normal">Normal</option>
+                        <option value="large" data-t="large">Large</option>
+                    </select>
+                </div>
+            </div>
+        </aside>
+        
+        <!-- Mobile Sidebar Overlay -->
+        <div class="quran-overlay" id="quran-sidebar-overlay"></div>
+
+        <!-- Main Content -->
+        <section class="quran-content">
+            <div class="container" style="max-width: 800px">
+                
+                <!-- Mobile Only: Open Settings Button -->
+                <div style="display: flex; justify-content: center; margin-bottom: 20px;">
+                    <button id="mobile-sidebar-toggle" class="sidebar-toggle-btn">
+                        <i class="ph ph-list-dashes"></i> <span data-t="surahs_settings">Surahs & Settings</span>
+                    </button>
+                </div>
+
+                <div class="surah-header">                    <h1 class="surah-header-ar" id="surah-header-ar">...</h1>
+                    <h2 class="surah-header-en" id="surah-header-en" data-t="loading">Loading...</h2>
+                    <div class="surah-header-meta" id="surah-header-meta"></div>
+                </div>
+
+                <div id="quran-container">
+                    <!-- Ayahs dynamically populated via JS -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Persistent Player -->
+    <div class="player-bar" id="playerBar">
+        <div class="container">
+            <div class="player-content">
+                <div class="player-info">
+                    <span class="player-title">Surah Al-Fatiha</span>
+                    <span class="player-sub">Sheikh Abdul Rahman Al-Sudais</span>
+                </div>
+                <div class="player-controls">
+                    <button class="pc-btn"><i class="ph ph-skip-back"></i></button>
+                    <button class="pc-btn play-main"><i class="ph ph-play"></i></button>
+                    <button class="pc-btn"><i class="ph ph-skip-forward"></i></button>
+                </div>
+                <div class="player-progress">
+                    <span class="time" id="player-progress-current">0:00</span>
+                    <div class="bar">
+                        <div class="fill" id="player-progress-fill" style="width: 0%"></div>
+                        <div class="dot" id="player-progress-dot" style="left: 0%"></div>
+                    </div>
+                    <span class="time" id="player-progress-total">0:00</span>
+                </div>
+                <div class="player-extra">
+                    <select id="speed-select">
+                        <option value="0.5" style="color: black;">0.5x</option>
+                        <option value="0.75" style="color: black;">0.75x</option>
+                        <option value="1" selected style="color: black;">1x</option>
+                        <option value="1.25" style="color: black;">1.25x</option>
+                        <option value="1.5" style="color: black;">1.5x</option>
+                        <option value="2" style="color: black;">2x</option>
+                    </select>
+                    <div class="volume-control" style="display: flex; align-items: center; gap: 8px;">
+                        <i class="ph ph-speaker-high" id="volume-icon"></i>
+                        <input type="range" id="volume-slider" min="0" max="1" step="0.1" value="1" style="width: 80px; height: 4px; accent-color: var(--gold); cursor: pointer;">
+                    </div>
+                    <button id="player-close" class="player-close" aria-label="Close Player"><i class="ph ph-x"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; 2026 Noor Al-Huda. <span data-t="all_rights_reserved">All rights reserved.</span></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Hidden Share Canvas Template -->
+    <div id="share-card-template" style="position: fixed; top: -2000px; left: -2000px; width: 600px; padding: 40px; background: linear-gradient(135deg, #0F4A31 0%, #1A7B8A 100%); color: white; font-family: 'DM Sans', sans-serif; border: 15px solid #C5A059; border-image: url('https://www.transparenttextures.com/patterns/arabesque.png') 30 repeat; box-shadow: 0 20px 40px rgba(0,0,0,0.3);">
+        <div style="text-align: center; margin-bottom: 30px;">
+            <span style="font-family: 'Noto Naskh Arabic', serif; font-size: 24px; color: #C5A059; display: block; margin-bottom: 10px;">নূর আল-হুদা</span>
+            <span style="letter-spacing: 3px; font-size: 14px; font-weight: 700; color: #F5E6D3; border-top: 1px solid rgba(197, 160, 89, 0.3); border-bottom: 1px solid rgba(197, 160, 89, 0.3); padding: 5px 20px; display: inline-block;">NOOR AL-HUDA</span>
+        </div>
+        
+        <div id="sc-arabic" dir="rtl" style="font-family: 'Noto Naskh Arabic', serif; font-size: 26px; line-height: 1.8; text-align: center; margin-bottom: 30px; color: #FFFFFF; text-shadow: 0 2px 4px rgba(0,0,0,0.2);"></div>
+        
+        <div id="sc-translation" style="font-size: 18px; line-height: 1.6; text-align: center; margin-bottom: 30px; color: #F5E6D3; font-style: italic;"></div>
+        
+        <div style="text-align: center; padding-top: 20px; border-top: 1px solid rgba(245, 230, 211, 0.2);">
+            <div id="sc-meta" style="font-weight: 700; color: #C5A059; font-size: 14px; text-transform: uppercase; margin-bottom: 5px;"></div>
+            <div id="sc-url" style="font-size: 12px; color: rgba(245, 230, 211, 0.6);"></div>
+        </div>
+        
+        <!-- Ornate Corner Decorations -->
+        <div style="position: absolute; top: 10px; left: 10px; width: 40px; height: 40px; border-top: 3px solid #C5A059; border-left: 3px solid #C5A059;"></div>
+        <div style="position: absolute; top: 10px; right: 10px; width: 40px; height: 40px; border-top: 3px solid #C5A059; border-right: 3px solid #C5A059;"></div>
+        <div style="position: absolute; bottom: 10px; left: 10px; width: 40px; height: 40px; border-bottom: 3px solid #C5A059; border-left: 3px solid #C5A059;"></div>
+        <div style="position: absolute; bottom: 10px; right: 10px; width: 40px; height: 40px; border-bottom: 3px solid #C5A059; border-right: 3px solid #C5A059;"></div>
+    </div>
+
+    <script src="../../js/i18n.js"></script>
+    <script src="../../js/bookmarks.js"></script>
+    <script src="../../js/main.js"></script>
+    <script src="../../js/quran.js"></script>
+</body>
+</html>
