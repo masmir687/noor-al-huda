@@ -440,6 +440,12 @@ body {
     width: 100%; box-sizing: border-box; overflow: hidden;
 }
 
+.hadith-card.active-playing {
+    border-color: var(--eml);
+    background-color: rgba(45, 154, 104, 0.05);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
 [data-theme='dark'] .hadith-card {
     background-color: #141721; border-color: #1E2235;
 }
@@ -1189,13 +1195,15 @@ body.player-hidden .quran-sidebar {
 }
 .tafsir-container.active { display: block; animation: slideDown 0.3s ease-out; }
 .tafsir-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid rgba(197, 160, 89, 0.2); padding-bottom: 10px; }
-.tafsir-title { font-weight: 700; color: var(--gold); font-size: clamp(11px, 2.5vw, 13px); text-transform: uppercase; letter-spacing: 1px; }
-.tafsir-content { font-size: clamp(13px, 3.2vw, 15px); color: var(--ink); line-height: 1.7; }
-.tafsir-content p { margin-bottom: 12px; }
-.tafsir-content h3, .tafsir-content h4 { font-size: clamp(14px, 3.5vw, 16px); color: var(--gold); margin: 15px 0 8px; font-weight: 700; line-height: 1.3; }
-.tafsir-content sup { font-size: 10px; color: var(--gold); font-weight: 700; }
-[data-theme='dark'] .tafsir-container { background-color: rgba(255, 255, 255, 0.03); border-left-color: var(--goldl); }
-[data-theme='dark'] .tafsir-content { color: var(--parch); }
+.tafsir-title { font-weight: 700; color: var(--gold); font-size: clamp(10px, 2.2vw, 12px); text-transform: uppercase; letter-spacing: 1px; }
+.tafsir-content { font-size: clamp(12px, 2.8vw, 14px); color: var(--ink); line-height: 1.6; }
+.tafsir-content p { margin-bottom: 10px; }
+.tafsir-content h1, .tafsir-content h2, .tafsir-content h3, .tafsir-content h4 { font-size: clamp(13px, 3vw, 15px); color: var(--gold); margin: 12px 0 6px; font-weight: 700; line-height: 1.2; }
+.tafsir-content sup { font-size: 9px; color: var(--gold); font-weight: 700; }
+[data-theme='dark'] .tafsir-container { background-color: rgba(0, 0, 0, 0.2); border-left-color: var(--gold); border-top: 1px solid rgba(255,255,255,0.05); }
+[data-theme='dark'] .tafsir-title { color: var(--goldl); }
+[data-theme='dark'] .tafsir-content { color: rgba(255, 255, 255, 0.9); }
+[data-theme='dark'] .tafsir-content h3, [data-theme='dark'] .tafsir-content h4 { color: var(--goldl); }
 
 @keyframes slideDown {
     from { opacity: 0; transform: translateY(-10px); }

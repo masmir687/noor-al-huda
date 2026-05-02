@@ -32,17 +32,144 @@ document.addEventListener('DOMContentLoaded', () => {
     // Pagination
     let currentPage = 1;
     let itemsPerPage = 50;
-    let totalPages = 1;
-
     // Language
     let currentLang = localStorage.getItem('lang') || 'en';
-    let isPlayingSequentially = false;
+
+    // sequential Playback State
+    let currentBatch = [];
+    let currentPlayingIndex = -1;
+    let isSequentialActive = false;
 
     // --- Path/URL Logic ---
     const urlParams = new URLSearchParams(window.location.search);
     collectionId = (window.COLLECTION_ID || urlParams.get('id') || 'bukhari').trim();
     const numberParam = urlParams.get('number');
     let specificIdParam = urlParams.get('id');
+
+    // --- Persistence ---
+    function savePlaybackState() {
+        const state = {
+            collectionId,
+            currentBook,
+            currentPage,
+            index: currentPlayingIndex,
+            active: isSequentialActive
+        };
+        localStorage.setItem('hadith_playback_state', JSON.stringify(state));
+    }
+
+    function resumePlaybackState() {
+        const saved = localStorage.getItem('hadith_playback_state');
+        if (!saved) return;
+        const state = JSON.parse(saved);
+        if (state.collectionId === collectionId && state.currentBook === currentBook && state.currentPage === currentPage) {
+            if (state.active && state.index >= 0) {
+                // We don't auto-start audio, but we set the UI
+                currentPlayingIndex = state.index;
+                updateSequentialUI();
+            }
+        }
+    }
+
+    // --- sequential Playback Core ---
+    function updateSequentialUI() {
+        if (currentPlayingIndex < 0 || !currentBatch[currentPlayingIndex]) return;
+
+        window.hadithPlaybackActive = true;
+        const total = currentBatch.length;
+        const current = currentPlayingIndex + 1;
+        const percent = (current / total) * 100;
+
+        if (window.updateProgressBar) window.updateProgressBar(percent);
+        if (window.updateProgressTime) window.updateProgressTime(`${current}`, `${total}`);
+
+        // Highlight active card
+        hadithContainer.querySelectorAll('.hadith-card').forEach(c => c.classList.remove('active-playing'));
+        const activeCard = document.getElementById(`hadith-${currentBatch[currentPlayingIndex].id}`);
+        if (activeCard) {
+            activeCard.classList.add('active-playing');
+            scrollToElement(`hadith-${currentBatch[currentPlayingIndex].id}`);
+        }
+
+        const title = document.querySelector('.player-title');
+        const sub = document.querySelector('.player-sub');
+        if (title) title.textContent = `${currentLang === 'bn' ? collectionMeta?.titleBn : collectionMeta?.titleEn} · ${current}`;
+        if (sub) sub.textContent = `Hadith ${currentBatch[currentPlayingIndex].number}`;
+    }
+
+    window.playHadith = async function(index) {
+        if (index < 0 || index >= currentBatch.length) {
+            stopSequentialPlay();
+            return;
+        }
+        currentPlayingIndex = index;
+        isSequentialActive = true;
+        
+        const h = currentBatch[index];
+
+        // If still patching, wait briefly
+        if (!h.english || h.english.includes("No text available") || h.english.includes("Loading from mirror")) {
+            const card = document.getElementById(`hadith-${h.id}`);
+            if (card) card.querySelector('.hadith-en').innerHTML = `<i class="ph ph-spinner-gap ph-spin"></i> Preparing audio...`;
+            
+            // Wait up to 5 seconds for background patch
+            for (let i = 0; i < 50; i++) {
+                if (h.english && !h.english.includes("No text available") && !h.english.includes("Loading from mirror")) break;
+                await new Promise(r => setTimeout(r, 100));
+            }
+        }
+
+        const content = currentLang === 'bn' && h.bengali ? h.bengali : h.english;
+        const card = document.getElementById(`hadith-${h.id}`);
+        const icon = card?.querySelector('.listen-btn i');
+        
+        if (window.toggleSpeech) {
+            window.toggleSpeech(content, icon || null, currentLang, () => {
+                if (isSequentialActive) window.playHadith(currentPlayingIndex + 1);
+            });
+            updateSequentialUI();
+            savePlaybackState();
+        }
+    };
+
+    function stopSequentialPlay() {
+        isSequentialActive = false;
+        window.hadithPlaybackActive = false;
+        if (window.toggleSpeech) window.toggleSpeech("", null);
+        hadithContainer.querySelectorAll('.hadith-card').forEach(c => c.classList.remove('active-playing'));
+        savePlaybackState();
+    }
+
+    // Handle Skip Buttons
+    window.onPlayerSkipBack = () => {
+        if (isSequentialActive) window.playHadith(currentPlayingIndex - 1);
+    };
+    window.onPlayerSkipForward = () => {
+        if (isSequentialActive) window.playHadith(currentPlayingIndex + 1);
+    };
+
+    // Handle Progress Bar Click (Seeking by Hadith Index)
+    const progressBar = document.querySelector('.player-progress .bar');
+    if (progressBar) {
+        progressBar.addEventListener('click', (e) => {
+            if (!isSequentialActive) return;
+            const rect = progressBar.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const width = rect.width;
+            const p = x / width;
+            const targetIndex = Math.floor(p * currentBatch.length);
+            window.playHadith(targetIndex);
+        });
+    }
+
+    window.onPlayerClose = () => {
+        isSequentialActive = false;
+        window.hadithPlaybackActive = false;
+        hadithContainer.querySelectorAll('.hadith-card').forEach(c => c.classList.remove('active-playing'));
+        savePlaybackState();
+    };
+
+    // --- Initialization ---
     if (!specificIdParam && window.location.hash.startsWith('#hadith-')) {
         specificIdParam = window.location.hash.replace('#hadith-', '');
     }
@@ -60,12 +187,14 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!res.ok) throw new Error(`Metadata not found`);
             collectionMeta = await res.json();
             
+            // Start loading index early for filters
+            if (collectionMeta.indexFile) loadIndexInBackground();
+
             if (authorSpan) authorSpan.textContent = collectionMeta.author;
             updateDocumentTitle();
             renderSidebar();
             
             if (numberParam || specificIdParam) {
-                loadIndexInBackground();
                 if (indexPromise) await indexPromise;
                 if (globalData && globalData.hadiths) {
                     const target = specificIdParam 
@@ -78,7 +207,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     } else await loadBook(1);
                 } else await loadBook(1);
             } else await loadBook(1);
-            if (collectionMeta.indexFile && !indexPromise) loadIndexInBackground();
         } catch (error) {
             console.error("Hadith Init Failed:", error);
             if (headerEn) headerEn.textContent = "Load Error";
@@ -151,9 +279,13 @@ document.addEventListener('DOMContentLoaded', () => {
     function populateFilters(hadiths) {
         if (!hadiths) return;
         const cats = new Set(), nars = new Set(), tags = new Set();
+        const placeholders = ["Narrated by Prophet's Companion", "Prophet's Companion", "Unknown", "his father", "the same chain of transmitters", "this hadith"];
+        
         hadiths.forEach(h => {
             if (h.category) cats.add(h.category);
-            if (h.narrator && h.narrator !== "Narrated by Prophet's Companion") nars.add(h.narrator);
+            if (h.narrator && !placeholders.some(p => h.narrator.includes(p))) {
+                nars.add(h.narrator.trim());
+            }
             if (h.tags) h.tags.split(',').forEach(t => tags.add(t.trim()));
         });
         const t = (window.i18n && window.i18n.translations[currentLang]) || {};
@@ -192,28 +324,45 @@ document.addEventListener('DOMContentLoaded', () => {
         hadithContainer.innerHTML = '';
         const start = (currentPage - 1) * itemsPerPage;
         const batch = filteredHadiths.slice(start, start + itemsPerPage);
+        currentBatch = batch; 
 
-        const missing = batch.filter(h => !h.english);
+        // 1. Fetch missing from local volumes
+        const missing = batch.filter(h => !h.english || h.english.includes("No text available"));
         if (missing.length > 0) {
             const vols = [...new Set(missing.map(h => h.vol))];
             const basePath = getBasePath();
             await Promise.all(vols.map(async v => {
-                if (volumeCache[v]) return;
-                const res = await fetch(`${basePath}${collectionId}/${collectionMeta.books.find(b => b.number === v).file}`);
-                const data = await res.json();
-                volumeCache[v] = data.hadiths;
+                if (volumeCache[v] || !v) return;
+                try {
+                    const b = collectionMeta.books.find(b => b.number === v);
+                    if (!b) return;
+                    const res = await fetch(`${basePath}${collectionId}/${b.file}`);
+                    const data = await res.json();
+                    volumeCache[v] = data.hadiths;
+                } catch(e) {}
             }));
-            batch.forEach(h => { if (!h.english) Object.assign(h, volumeCache[h.vol]?.find(c => c.id === h.id)); });
+            batch.forEach(h => { 
+                if (h.vol && volumeCache[h.vol]) {
+                    const full = volumeCache[h.vol].find(c => c.id === h.id);
+                    if (full && (!h.english || h.english.includes("No text available"))) Object.assign(h, full);
+                }
+            });
         }
 
+        // 2. Render Cards
         const t = (window.i18n && window.i18n.translations[currentLang]) || {};
         batch.forEach((h, idx) => {
             const grade = (h.grade || '').toLowerCase();
             const gradeClass = grade === 'sahih' ? 'badge-sah' : grade === 'hasan' ? 'badge-has' : 'badge-daif';
+            
+            const isMissing = !h.english || h.english.includes("No text available");
+            const displayEn = isMissing ? `<span class="missing-text" data-idx="${idx}"><i class="ph ph-spinner-gap ph-spin"></i> Loading from mirror...</span>` : h.english;
+            const displayBn = isMissing ? displayEn : (h.bengali || h.english);
+
             hadithContainer.insertAdjacentHTML('beforeend', `
             <section class="hadith-card" id="hadith-${h.id}" data-id="${h.id}" data-idx="${idx}">
                 <p class="hadith-ar" dir="rtl">${h.arabic}</p>
-                <p class="hadith-en">${currentLang === 'bn' && h.bengali ? h.bengali : h.english}</p>
+                <p class="hadith-en">${currentLang === 'bn' ? displayBn : displayEn}</p>
                 <div class="hadith-meta">
                     <div>
                         <span class="narrator">${t.narrated_by || 'Narrated by'} ${h.narrator}</span>
@@ -228,13 +377,61 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             </section>`);
         });
+
         attachCardListeners(batch);
         renderPagination();
+        resumePlaybackState();
+
+        // 3. Patch missing from Mirror (Background)
+        patchFromMirror(batch);
+    }
+
+    async function patchFromMirror(batch) {
+        const toPatch = batch.filter(h => !h.english || h.english.includes("No text available"));
+        if (toPatch.length === 0) return;
+
+        for (const h of toPatch) {
+            try {
+                // Fawaz Ahmed API uses different collection keys
+                const apiMap = { 'bukhari': 'eng-bukhari', 'muslim': 'eng-muslim', 'tirmidhi': 'eng-tirmidhi', 'abudawud': 'eng-abudawud', 'nasai': 'eng-nasai', 'ibnmajah': 'eng-ibnmajah' };
+                const araMap = { 'bukhari': 'ara-bukhari', 'muslim': 'ara-muslim', 'tirmidhi': 'ara-tirmidhi', 'abudawud': 'ara-abudawud', 'nasai': 'ara-nasai', 'ibnmajah': 'ara-ibnmajah' };
+                
+                const colKey = apiMap[collectionId];
+                const araKey = araMap[collectionId];
+                if (!colKey) continue;
+
+                // Fetch English & Arabic in parallel
+                const [enRes, arRes] = await Promise.all([
+                    fetch(`https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/${colKey}/${h.number}.json`),
+                    fetch(`https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/${araKey}/${h.number}.json`)
+                ]);
+
+                const enData = await enRes.json();
+                const arData = await arRes.json();
+
+                if (enData.hadiths && enData.hadiths[0]) {
+                    h.english = enData.hadiths[0].text || "(Content not available in mirror)";
+                    h.arabic = arData.hadiths?.[0]?.text || h.arabic;
+                    
+                    // Update UI
+                    const card = document.getElementById(`hadith-${h.id}`);
+                    if (card) {
+                        card.querySelector('.hadith-ar').textContent = h.arabic;
+                        card.querySelector('.hadith-en').textContent = (currentLang === 'bn' && h.bengali) ? h.bengali : h.english;
+                    }
+                }
+            } catch(e) {
+                h.english = "(Content not available in mirror)";
+                const card = document.getElementById(`hadith-${h.id}`);
+                if (card) card.querySelector('.hadith-en').textContent = h.english;
+            }
+        }
     }
 
     function attachCardListeners(batch) {
         hadithContainer.querySelectorAll('.hadith-card').forEach(card => {
-            const hData = batch[parseInt(card.dataset.idx)];
+            const index = parseInt(card.dataset.idx);
+            const hData = batch[index];
             if (!hData) return;
             const bookmarkBtn = card.querySelector('.bookmark-btn');
             const listenBtn = card.querySelector('.listen-btn');
@@ -266,8 +463,7 @@ document.addEventListener('DOMContentLoaded', () => {
             listenBtn.onclick = (e) => {
                 e.stopPropagation();
                 scrollToElement(`hadith-${hData.id}`);
-                const content = currentLang === 'bn' && hData.bengali ? hData.bengali : hData.english;
-                if (window.toggleSpeech) window.toggleSpeech(content, listenBtn.querySelector('i'), currentLang);
+                window.playHadith(index);
             };
 
             // Share (Robust Implementation)
@@ -302,6 +498,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function scrollToElement(elementId) {
+        if (isSystemScrolling) return;
         isSystemScrolling = true;
         let targetEl = null;
         for (let a = 0; a < 30; a++) {
@@ -312,8 +509,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!targetEl) { isSystemScrolling = false; return; }
         const container = document.querySelector('.quran-content');
         const rect = targetEl.getBoundingClientRect();
-        if (window.innerWidth <= 768) window.scrollTo({ top: window.pageYOffset + rect.top - 100, behavior: 'smooth' });
-        else if(container) container.scrollTo({ top: container.scrollTop + rect.top - 200, behavior: 'smooth' });
+        
+        if (window.innerWidth <= 768) {
+            window.scrollTo({ top: window.pageYOffset + rect.top - 100, behavior: 'smooth' });
+        } else if (container) {
+            const containerRect = container.getBoundingClientRect();
+            const relativeTop = rect.top - containerRect.top;
+            container.scrollTo({ top: container.scrollTop + relativeTop - 150, behavior: 'smooth' });
+        }
         targetEl.classList.add('highlight-pulse');
         setTimeout(() => { isSystemScrolling = false; targetEl.classList.remove('highlight-pulse'); }, 3000);
     }

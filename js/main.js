@@ -72,36 +72,54 @@ let currentAudioText = "";
 let isAudioUnlocked = false;
 
 // Progress Bar Sync
+window.updateProgressBar = function(percent) {
+    const fill = document.getElementById('player-progress-fill');
+    const dot = document.getElementById('player-progress-dot');
+    if (fill) fill.style.width = `${percent}%`;
+    if (dot) dot.style.left = `${percent}%`;
+};
+
+window.updateProgressTime = function(current, total) {
+    const timeC = document.getElementById('player-progress-current');
+    const timeT = document.getElementById('player-progress-total');
+    
+    if (timeC) {
+        if (typeof current === 'string') timeC.textContent = current;
+        else {
+            const m = Math.floor(current / 60), s = Math.floor(current % 60);
+            timeC.textContent = `${m}:${s < 10 ? '0' : ''}${s}`;
+        }
+    }
+    if (timeT && total !== undefined) {
+        if (typeof total === 'string') timeT.textContent = total;
+        else {
+            const m = Math.floor(total / 60), s = Math.floor(total % 60);
+            timeT.textContent = `${m}:${s < 10 ? '0' : ''}${s}`;
+        }
+    }
+};
+
 globalAudio.addEventListener('timeupdate', () => {
+    if (window.hadithPlaybackActive) return; // Handled by hadith script
     const cur = globalAudio.currentTime;
     const dur = globalAudio.duration;
     if (!dur) return;
     const p = (cur / dur) * 100;
-    const fill = document.getElementById('player-progress-fill');
-    const dot = document.getElementById('player-progress-dot');
-    const timeC = document.getElementById('player-progress-current');
-    if (fill) fill.style.width = `${p}%`;
-    if (dot) dot.style.left = `${p}%`;
-    if (timeC) {
-        const m = Math.floor(cur / 60), s = Math.floor(cur % 60);
-        timeC.textContent = `${m}:${s < 10 ? '0' : ''}${s}`;
-    }
+    window.updateProgressBar(p);
+    window.updateProgressTime(cur);
 });
 
 globalAudio.addEventListener('loadedmetadata', () => {
+    if (window.hadithPlaybackActive) return;
     const dur = globalAudio.duration;
-    const timeT = document.getElementById('player-progress-total');
-    if (timeT && dur) {
-        const m = Math.floor(dur / 60), s = Math.floor(cur % 60);
-        timeT.textContent = `${m}:${s < 10 ? '0' : ''}${s}`;
-    }
+    window.updateProgressTime(0, dur);
 
     // Ensure playback rate is maintained
     const speedS = document.getElementById('speed-select');
     if (speedS) globalAudio.playbackRate = parseFloat(speedS.value);
 });
 
-window.toggleSpeech = function(textToRead, playIconElement, lang = 'ar') {
+window.toggleSpeech = function(textToRead, playIconElement, lang = 'ar', onEnd = null) {
     if (!textToRead) {
         window.speechSynthesis.cancel();
         if (!globalAudio.paused) { globalAudio.pause(); globalAudio.currentTime = 0; }
@@ -138,12 +156,21 @@ window.toggleSpeech = function(textToRead, playIconElement, lang = 'ar') {
         const utterance = new SpeechSynthesisUtterance(textToRead);
         utterance.lang = lang === 'bn' ? 'bn-BD' : 'en-US';
         utterance.rate = speed;
-        utterance.onstart = () => { window.updateIcon(playIconElement, 'play');
-        const mainPlay = document.querySelector('.play-main i');
-        if (mainPlay && mainPlay !== playIconElement) window.updateIcon(mainPlay, 'play'); };
-        utterance.onend = () => { if (currentAudioText === textToRead) { window.updateIcon(playIconElement, 'pause');
-        const mainPlay = document.querySelector('.play-main i');
-        if (mainPlay && mainPlay !== playIconElement) window.updateIcon(mainPlay, 'pause'); currentAudioText = ""; currentAudioIcon = null; } };
+        utterance.volume = vol;
+        utterance.onstart = () => { 
+            window.updateIcon(playIconElement, 'play');
+            const mainPlay = document.querySelector('.play-main i');
+            if (mainPlay && mainPlay !== playIconElement) window.updateIcon(mainPlay, 'play'); 
+        };
+        utterance.onend = () => { 
+            if (currentAudioText === textToRead) { 
+                window.updateIcon(playIconElement, 'pause');
+                const mainPlay = document.querySelector('.play-main i');
+                if (mainPlay && mainPlay !== playIconElement) window.updateIcon(mainPlay, 'pause'); 
+                currentAudioText = ""; currentAudioIcon = null; 
+                if (onEnd) onEnd();
+            } 
+        };
         window.speechSynthesis.speak(utterance);
     } else {
         const encodedText = encodeURIComponent(textToRead.substring(0, 500));
@@ -154,10 +181,13 @@ window.toggleSpeech = function(textToRead, playIconElement, lang = 'ar') {
             const mainPlay = document.querySelector('.play-main i');
             if (mainPlay && mainPlay !== currentAudioIcon) window.updateIcon(mainPlay, 'pause');
             currentAudioText = ""; currentAudioIcon = null; 
+            if (onEnd) onEnd();
         };
-        globalAudio.play().then(() => { window.updateIcon(playIconElement, 'play');
-        const mainPlay = document.querySelector('.play-main i');
-        if (mainPlay && mainPlay !== playIconElement) window.updateIcon(mainPlay, 'play'); }).catch(console.error);
+        globalAudio.play().then(() => { 
+            window.updateIcon(playIconElement, 'play');
+            const mainPlay = document.querySelector('.play-main i');
+            if (mainPlay && mainPlay !== playIconElement) window.updateIcon(mainPlay, 'play'); 
+        }).catch(console.error);
     }
 };
 
@@ -388,6 +418,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (window.quranAudio) window.quranAudio.pause();
         window.toggleSpeech("", null);
         window.updatePlayerUI(true);
+        if (window.onPlayerClose) window.onPlayerClose();
     };
 
     const speedS = document.getElementById('speed-select');
@@ -405,6 +436,16 @@ document.addEventListener('DOMContentLoaded', () => {
             globalAudio.playbackRate = parseFloat(savedSpeed);
         }
     }
+
+    // Skip Hooks
+    document.querySelectorAll('.pc-btn').forEach(btn => {
+        if (btn.querySelector('.ph-skip-back')) {
+            btn.onclick = () => { if (window.onPlayerSkipBack) window.onPlayerSkipBack(); };
+        }
+        if (btn.querySelector('.ph-skip-forward')) {
+            btn.onclick = () => { if (window.onPlayerSkipForward) window.onPlayerSkipForward(); };
+        }
+    });
 
     const volSlider = document.getElementById('volume-slider');
     const volIcon = document.getElementById('volume-icon');
