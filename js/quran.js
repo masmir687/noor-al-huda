@@ -52,6 +52,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const m = Math.floor(dur / 60), s = Math.floor(dur % 60);
             timeT.textContent = `${m}:${s < 10 ? '0' : ''}${s}`;
         }
+        
+        // Ensure playback rate is maintained after source change
+        const speedS = document.getElementById('speed-select');
+        if (speedS) quranAudio.playbackRate = parseFloat(speedS.value);
     });
 
     // --- Bengali Surah Names ---
@@ -69,6 +73,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Initialization ---
     async function init() {
         try {
+            // Restore saved settings
+            const savedSpeed = localStorage.getItem('playbackSpeed') || "1.0";
+            const savedVol = localStorage.getItem('playbackVolume') || "1.0";
+            quranAudio.playbackRate = parseFloat(savedSpeed);
+            quranAudio.volume = parseFloat(savedVol);
+
+            const speedS = document.getElementById('speed-select');
+            if (speedS) speedS.value = savedSpeed;
+
+            const volS = document.getElementById('volume-slider');
+            if (volS) volS.value = savedVol;
+
             await loadSurahList();
             
             if (translationSelect) {
@@ -282,6 +298,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (mainPlayIcon) mainPlayIcon.className = 'ph ph-play';
         } else {
             quranAudio.src = `https://everyayah.com/data/${currentReciter}/${surah}${ayah}.mp3`;
+            
+            // Sync settings after setting src
+            const speed = document.getElementById('speed-select');
+            const vol = document.getElementById('volume-slider');
+            if (speed) quranAudio.playbackRate = parseFloat(speed.value);
+            if (vol) quranAudio.volume = parseFloat(vol.value);
+
             quranAudio.play().catch(console.error);
             btn.querySelector('i').className = 'ph ph-pause';
             if (mainPlayIcon) mainPlayIcon.className = 'ph ph-pause';
@@ -305,6 +328,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (mainPlayIcon) mainPlayIcon.className = 'ph ph-play';
         } else {
             quranAudio.src = `https://everyayah.com/data/${currentReciter}/001001.mp3`;
+            
+            // Sync settings after setting src
+            const speed = document.getElementById('speed-select');
+            const vol = document.getElementById('volume-slider');
+            if (speed) quranAudio.playbackRate = parseFloat(speed.value);
+            if (vol) quranAudio.volume = parseFloat(vol.value);
+
             quranAudio.play().catch(console.error);
             bismillahBtn.querySelector('i').className = 'ph ph-pause';
             if (mainPlayIcon) mainPlayIcon.className = 'ph ph-pause';

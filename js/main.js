@@ -52,6 +52,7 @@ window.updatePlayerUI = function(isHidden) {
 
 // Global Audio State
 const globalAudio = new Audio();
+window.globalAudio = globalAudio;
 let currentAudioIcon = null;
 let currentAudioText = "";
 let isAudioUnlocked = false;
@@ -80,6 +81,10 @@ globalAudio.addEventListener('loadedmetadata', () => {
         const m = Math.floor(dur / 60), s = Math.floor(dur % 60);
         timeT.textContent = `${m}:${s < 10 ? '0' : ''}${s}`;
     }
+
+    // Ensure playback rate is maintained
+    const speedS = document.getElementById('speed-select');
+    if (speedS) globalAudio.playbackRate = parseFloat(speedS.value);
 });
 
 window.toggleSpeech = function(textToRead, playIconElement, lang = 'ar') {
@@ -110,6 +115,8 @@ window.toggleSpeech = function(textToRead, playIconElement, lang = 'ar') {
     currentAudioIcon = playIconElement;
 
     const speed = parseFloat(document.getElementById('speed-select')?.value || "1.0");
+    const vol = parseFloat(document.getElementById('volume-slider')?.value || "1.0");
+    globalAudio.volume = vol;
 
     if ((lang === 'en' || lang === 'bn') && 'speechSynthesis' in window) {
         const utterance = new SpeechSynthesisUtterance(textToRead);
@@ -126,7 +133,12 @@ window.toggleSpeech = function(textToRead, playIconElement, lang = 'ar') {
         const encodedText = encodeURIComponent(textToRead.substring(0, 500));
         globalAudio.src = `https://translate.google.com/translate_tts?ie=UTF-8&tl=${lang}&client=tw-ob&q=${encodedText}`;
         globalAudio.playbackRate = speed;
-        globalAudio.onended = () => { if (currentAudioIcon) window.updateIcon(currentAudioIcon, 'pause'); currentAudioText = ""; currentAudioIcon = null; };
+        globalAudio.onended = () => { 
+            if (currentAudioIcon) window.updateIcon(currentAudioIcon, 'pause');
+            const mainPlay = document.querySelector('.play-main i');
+            if (mainPlay && mainPlay !== currentAudioIcon) window.updateIcon(mainPlay, 'pause');
+            currentAudioText = ""; currentAudioIcon = null; 
+        };
         globalAudio.play().then(() => { window.updateIcon(playIconElement, 'play');
         const mainPlay = document.querySelector('.play-main i');
         if (mainPlay && mainPlay !== playIconElement) window.updateIcon(mainPlay, 'play'); }).catch(console.error);
@@ -292,7 +304,59 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const speedS = document.getElementById('speed-select');
-    if (speedS) speedS.onchange = (e) => { globalAudio.playbackRate = parseFloat(e.target.value); if(window.quranAudio) window.quranAudio.playbackRate = parseFloat(e.target.value); };
+    if (speedS) {
+        speedS.addEventListener('change', (e) => {
+            const val = parseFloat(e.target.value);
+            globalAudio.playbackRate = val;
+            if (window.quranAudio) window.quranAudio.playbackRate = val;
+            localStorage.setItem('playbackSpeed', val);
+        });
+        // Restore saved speed
+        const savedSpeed = localStorage.getItem('playbackSpeed');
+        if (savedSpeed) {
+            speedS.value = savedSpeed;
+            globalAudio.playbackRate = parseFloat(savedSpeed);
+        }
+    }
+
+    const volSlider = document.getElementById('volume-slider');
+    const volIcon = document.getElementById('volume-icon');
+    if (volSlider) {
+        const updateVol = (val) => {
+            globalAudio.volume = val;
+            if (window.quranAudio) window.quranAudio.volume = val;
+            if (volIcon) {
+                if (val == 0) volIcon.className = 'ph ph-speaker-slash';
+                else if (val < 0.5) volIcon.className = 'ph ph-speaker-low';
+                else volIcon.className = 'ph ph-speaker-high';
+            }
+            localStorage.setItem('playbackVolume', val);
+        };
+        volSlider.addEventListener('input', (e) => updateVol(parseFloat(e.target.value)));
+        
+        // Restore saved volume
+        const savedVol = localStorage.getItem('playbackVolume');
+        if (savedVol) {
+            volSlider.value = savedVol;
+            updateVol(parseFloat(savedVol));
+        }
+    }
+
+    const playMainBtn = document.querySelector('.play-main');
+    if (playMainBtn) {
+        playMainBtn.onclick = () => {
+            const isLib = document.querySelector('.quran-layout') || document.getElementById('hadith-container');
+            if (isLib) return; // Handled by page scripts
+            
+            if (globalAudio.src && !globalAudio.paused) {
+                globalAudio.pause();
+                window.updateIcon(playMainBtn.querySelector('i'), 'pause');
+            } else if (globalAudio.src) {
+                globalAudio.play();
+                window.updateIcon(playMainBtn.querySelector('i'), 'play');
+            }
+        };
+    }
 
     // 6. Global Listen & Share Listeners
     document.addEventListener('click', (e) => {
