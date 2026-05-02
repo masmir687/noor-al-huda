@@ -198,11 +198,20 @@ Shared from ${appName}`;
         const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
         if (!blob) throw new Error("Blob failed");
 
-        const fileName = `NoorAlHuda_${Date.now()}.png`;
+        let fileName = "NoorAlHuda_Share.png";
+        if (data.type === 'Quran' && data.surah && data.ayah) {
+            fileName = `NoorAlHuda_Quran_${data.surah}_${data.ayah}.png`;
+        } else if (data.collection && data.number) {
+            const coll = data.collection.charAt(0).toUpperCase() + data.collection.slice(1);
+            fileName = `NoorAlHuda_${coll}_${data.number}.png`;
+        } else {
+            fileName = `NoorAlHuda_${Date.now()}.png`;
+        }
+
         const file = new File([blob], fileName, { type: 'image/png' });
 
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
-            await navigator.share({ files: [file], title: appName, text: shareText });
+            await navigator.share({ files: [file], title: appName });
         } else {
             const link = document.createElement('a');
             link.download = fileName; link.href = URL.createObjectURL(blob);
@@ -371,7 +380,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     const ar = card.querySelector('.ayah-ar, .hadith-ar, .ayah-text-ar')?.textContent || "";
                     const tr = card.querySelector('.ayah-tr, .hadith-en, .ayah-text-tr')?.textContent || "";
                     const ref = card.querySelector('.ayah-ref, .ref')?.textContent || "Revelation";
-                    window.performShare(shareBtn, { ar, tr, ref }, currentLang, e);
+                    
+                    const surah = shareBtn.dataset.surah || card.dataset.surah;
+                    const ayah = shareBtn.dataset.ayah || card.dataset.ayah;
+                    const coll = shareBtn.dataset.collection || card.dataset.collection;
+                    const num = shareBtn.dataset.number || card.dataset.number;
+                    const type = (surah && ayah) ? 'Quran' : (coll ? 'Hadith' : null);
+
+                    window.performShare(shareBtn, { ar, tr, ref, type, surah, ayah, collection: coll, number: num }, currentLang, e);
                 }
             }
         }

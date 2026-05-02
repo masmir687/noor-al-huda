@@ -278,7 +278,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const ref = `${title} · Hadith ${hData.number}`;
                 
                 if (window.performShare) {
-                    window.performShare(shareBtn, { ar, tr, ref }, currentLang, e);
+                    window.performShare(shareBtn, { ar, tr, ref, collection: collectionId, number: hData.number }, currentLang, e);
                 } else {
                     console.error("Share engine not loaded");
                 }

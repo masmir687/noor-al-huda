@@ -287,7 +287,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 const lang = localStorage.getItem('lang') || 'en';
                 if (window.performShare) {
-                    window.performShare(btn, { ar, tr, ref }, lang, e);
+                    window.performShare(btn, { ar, tr, ref, type: 'Quran', surah: row.dataset.ayah ? btn.dataset.surah : null, ayah: row.dataset.ayah }, lang, e);
                 } else {
                     console.error("Share engine not loaded");
                 }

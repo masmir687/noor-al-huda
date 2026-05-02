@@ -49,6 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                         <div class="hadith-btns" style="margin-top: 15px;">
                             <button class="btn-sm listen-btn"><i class="ph ph-play-circle"></i> <span data-t="listen">Listen</span></button>
+                            <button class="btn-sm share-btn outline"><i class="ph ph-share-network"></i> <span data-t="share">Share</span></button>
                             ${!isHadith ? `
                                 <button class="btn-sm context-btn" data-surah="${item.surah}" data-ayah="${item.ayah}"><i class="ph ph-book-open"></i> <span data-t="read_context">Context</span></button>
                                 <button class="btn-sm tafsir-btn" data-surah="${item.surah}" data-ayah="${item.ayah}"><i class="ph ph-eye"></i> <span data-t="tafsir">Tafsir</span></button>
@@ -106,6 +107,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 const content = currentLang === 'bn' && item.textBn ? item.textBn : (item.textEn || item.english || "");
                 window.toggleSpeech(content, icon, currentLang);
             });
+
+            // Share
+            const shareBtn = card.querySelector('.share-btn');
+            if (shareBtn) {
+                shareBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const ar = item.textAr;
+                    const tr = currentLang === 'bn' && item.textBn ? item.textBn : (item.textEn || item.english || "");
+                    const ref = card.querySelector('.ref').textContent;
+                    
+                    const shareData = { 
+                        ar, tr, ref, 
+                        type: item.type === 'quran' ? 'Quran' : 'Hadith',
+                        surah: item.surah,
+                        ayah: item.ayah,
+                        collection: item.collectionId,
+                        number: item.number
+                    };
+                    window.performShare(shareBtn, shareData, currentLang, e);
+                });
+            }
 
             // Remove
             card.querySelector('.remove-btn').addEventListener('click', async (e) => {
