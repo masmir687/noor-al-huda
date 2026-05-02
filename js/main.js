@@ -78,7 +78,7 @@ globalAudio.addEventListener('loadedmetadata', () => {
     const dur = globalAudio.duration;
     const timeT = document.getElementById('player-progress-total');
     if (timeT && dur) {
-        const m = Math.floor(dur / 60), s = Math.floor(dur % 60);
+        const m = Math.floor(dur / 60), s = Math.floor(cur % 60);
         timeT.textContent = `${m}:${s < 10 ? '0' : ''}${s}`;
     }
 
@@ -240,6 +240,7 @@ if ('scrollRestoration' in history) {
 
 document.addEventListener('DOMContentLoaded', () => {
     let currentLang = localStorage.getItem('lang') || 'en';
+    const path = window.location.pathname;
     
     // 1. Language Init
     if (window.i18n) window.i18n.translatePage(currentLang);
@@ -305,8 +306,67 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    // 5. Player Controls & Initial State
-    window.updatePlayerUI(localStorage.getItem('playerHidden') === 'true');
+    // 5. Floating Player Button (Created early so UI sync works)
+    let playerToggleBtn = null;
+    const isHomepage = path === '/' || path === '' || (path.endsWith('index.html') && !path.includes('/quran/') && !path.includes('/collection/'));
+    const isExcludedPage = isHomepage || path.includes('hadith.html') || path.includes('bookmarks.html');
+    
+    if (!isExcludedPage) {
+        playerToggleBtn = document.createElement('button');
+        playerToggleBtn.id = 'player-toggle-btn';
+        playerToggleBtn.className = 'player-toggle-btn';
+        playerToggleBtn.innerHTML = '<i class="ph ph-headphones"></i>';
+        playerToggleBtn.setAttribute('aria-label', 'Toggle Player');
+        document.body.appendChild(playerToggleBtn);
+
+        const savedPos = JSON.parse(localStorage.getItem('playerTogglePos'));
+        if (savedPos) {
+            let x = Math.max(20, Math.min(savedPos.x, window.innerWidth - 60));
+            let y = Math.max(70, Math.min(savedPos.y, window.innerHeight - 60));
+            playerToggleBtn.style.left = `${x}px`;
+            playerToggleBtn.style.top = `${y}px`;
+            playerToggleBtn.style.bottom = 'auto';
+            playerToggleBtn.style.right = 'auto';
+        }
+
+        let isDragging = false, dragStartX, dragStartY, buttonStartX, buttonStartY, hasMoved = false;
+
+        playerToggleBtn.onpointerdown = (e) => {
+            isDragging = true; hasMoved = false;
+            dragStartX = e.clientX; dragStartY = e.clientY;
+            const rect = playerToggleBtn.getBoundingClientRect();
+            buttonStartX = rect.left; buttonStartY = rect.top;
+            playerToggleBtn.setPointerCapture(e.pointerId);
+            playerToggleBtn.style.transition = 'none';
+        };
+
+        playerToggleBtn.onpointermove = (e) => {
+            if (!isDragging) return;
+            const dx = e.clientX - dragStartX, dy = e.clientY - dragStartY;
+            if (Math.abs(dx) > 5 || Math.abs(dy) > 5) hasMoved = true;
+            playerToggleBtn.style.left = `${buttonStartX + dx}px`;
+            playerToggleBtn.style.top = `${buttonStartY + dy}px`;
+        };
+
+        playerToggleBtn.onpointerup = (e) => {
+            isDragging = false;
+            playerToggleBtn.style.transition = '';
+            playerToggleBtn.releasePointerCapture(e.pointerId);
+            if (hasMoved) {
+                const rect = playerToggleBtn.getBoundingClientRect();
+                localStorage.setItem('playerTogglePos', JSON.stringify({ x: rect.left, y: rect.top }));
+            } else {
+                const pb = document.getElementById('playerBar');
+                if (pb) window.updatePlayerUI(pb.classList.contains('hidden') ? false : true);
+            }
+        };
+    }
+
+    // 6. Player Controls & Initial State Sync
+    const savedPlayerHidden = localStorage.getItem('playerHidden');
+    // Default to visible (false) if never set
+    window.updatePlayerUI(savedPlayerHidden === 'true');
+    
     const closeP = document.getElementById('player-close');
     if (closeP) closeP.onclick = () => {
         if (window.quranAudio) window.quranAudio.pause();
@@ -369,7 +429,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    // 6. Global Listen & Share Listeners
+    // 7. Global Listen & Share Listeners
     document.addEventListener('click', (e) => {
         const shareBtn = e.target.closest('.share-btn, .share-ayah');
         if (shareBtn && !shareBtn.querySelector('.ph-spin')) {
@@ -471,64 +531,6 @@ document.addEventListener('DOMContentLoaded', () => {
             contentDiv.innerHTML = `<div style="padding: 10px; color: var(--error); font-size: 14px;">Information not available for this Ayah yet.</div>`;
         }
     };
-
-    // 7. Toggle Player Button (Floating Headphones)
-    let playerToggleBtn = null;
-    const path = window.location.pathname;
-    // Homepage is root or index.html in the root (no subfolders)
-    const isHomepage = path === '/' || path === '' || (path.endsWith('index.html') && !path.includes('/quran/') && !path.includes('/collection/'));
-    const isExcludedPage = isHomepage || path.includes('hadith.html') || path.includes('bookmarks.html');
-    
-    if (!isExcludedPage) {
-        playerToggleBtn = document.createElement('button');
-        playerToggleBtn.id = 'player-toggle-btn';
-        playerToggleBtn.className = 'player-toggle-btn';
-        playerToggleBtn.innerHTML = '<i class="ph ph-headphones"></i>';
-        playerToggleBtn.setAttribute('aria-label', 'Toggle Player');
-        document.body.appendChild(playerToggleBtn);
-
-        const savedPos = JSON.parse(localStorage.getItem('playerTogglePos'));
-        if (savedPos) {
-            let x = Math.max(20, Math.min(savedPos.x, window.innerWidth - 60));
-            let y = Math.max(70, Math.min(savedPos.y, window.innerHeight - 60));
-            playerToggleBtn.style.left = `${x}px`;
-            playerToggleBtn.style.top = `${y}px`;
-            playerToggleBtn.style.bottom = 'auto';
-            playerToggleBtn.style.right = 'auto';
-        }
-
-        let isDragging = false, dragStartX, dragStartY, buttonStartX, buttonStartY, hasMoved = false;
-
-        playerToggleBtn.onpointerdown = (e) => {
-            isDragging = true; hasMoved = false;
-            dragStartX = e.clientX; dragStartY = e.clientY;
-            const rect = playerToggleBtn.getBoundingClientRect();
-            buttonStartX = rect.left; buttonStartY = rect.top;
-            playerToggleBtn.setPointerCapture(e.pointerId);
-            playerToggleBtn.style.transition = 'none';
-        };
-
-        playerToggleBtn.onpointermove = (e) => {
-            if (!isDragging) return;
-            const dx = e.clientX - dragStartX, dy = e.clientY - dragStartY;
-            if (Math.abs(dx) > 5 || Math.abs(dy) > 5) hasMoved = true;
-            playerToggleBtn.style.left = `${buttonStartX + dx}px`;
-            playerToggleBtn.style.top = `${buttonStartY + dy}px`;
-        };
-
-        playerToggleBtn.onpointerup = (e) => {
-            isDragging = false;
-            playerToggleBtn.style.transition = '';
-            playerToggleBtn.releasePointerCapture(e.pointerId);
-            if (hasMoved) {
-                const rect = playerToggleBtn.getBoundingClientRect();
-                localStorage.setItem('playerTogglePos', JSON.stringify({ x: rect.left, y: rect.top }));
-            } else {
-                const pb = document.getElementById('playerBar');
-                if (pb) window.updatePlayerUI(pb.classList.contains('hidden') ? false : true);
-            }
-        };
-    }
 
     // 8. Page Cleanups
     const isBookmarks = path.includes('bookmarks.html');

@@ -328,11 +328,7 @@ document.addEventListener('DOMContentLoaded', () => {
             currentAyahBtn = btn;
             isBismillahPlaying = false;
             scrollToElement(`ayah-${btn.dataset.ayah}`);
-            const playerBar = document.getElementById('playerBar');
-            if (playerBar) {
-                playerBar.classList.remove('hidden');
-                document.body.classList.remove('player-hidden');
-            }
+            if (window.updatePlayerUI) window.updatePlayerUI(false);
         }
     }
 

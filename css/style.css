@@ -238,23 +238,19 @@ body {
 }
 
 .hero-ar {
-    color: var(--goldl); font-size: 42px; margin-bottom: 15px;
+    color: var(--goldl); font-size: clamp(24px, 5vw, 42px); margin-bottom: 15px;
 }
 
 .hero-en {
-    color: var(--white); font-size: 32px; font-weight: 700; margin-bottom: 20px; line-height: 1.2;
+    color: var(--white); font-size: clamp(22px, 4vw, 32px); font-weight: 700; margin-bottom: 20px; line-height: 1.2;
 }
 
 .hero-sub {
-    color: rgba(255, 255, 255, 0.7); font-size: 15px; max-width: 650px; margin: 0 auto 35px; line-height: 1.6;
-}
-
-.hero-btns {
-    display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-top: 10px;
+    color: rgba(255, 255, 255, 0.7); font-size: clamp(12px, 2vw, 15px); max-width: 650px; margin: 0 auto 35px; line-height: 1.6;
 }
 
 .btn {
-    padding: 12px 28px; border-radius: 8px; font-weight: 500; font-size: 14px; cursor: pointer; transition: all 0.2s; border: none; font-family: 'DM Sans', sans-serif; text-decoration: none; display: inline-block;
+    padding: clamp(10px, 2vw, 12px) clamp(20px, 4vw, 28px); border-radius: 8px; font-weight: 500; font-size: clamp(13px, 2vw, 14px); cursor: pointer; transition: all 0.2s; border: none; font-family: 'DM Sans', sans-serif; text-decoration: none; display: inline-block;
 }
 
 .btn-gold {
@@ -279,49 +275,15 @@ body {
         height: 54px;
     }
     .nav-logo .en {
-        font-size: 14px;
+        font-size: clamp(10px, 3vw, 14px);
         letter-spacing: 1px;
     }
     .nav-logo .ar {
-        font-size: 16px;
+        font-size: clamp(14px, 4vw, 18px);
     }
 
     .hero {
         padding: 40px 0 50px;
-    }
-    .hero-ar {
-        font-size: 24px;
-        margin-bottom: 8px;
-    }
-    .hero-en {
-        font-size: 22px;
-        margin-bottom: 12px;
-    }
-    .hero-sub {
-        font-size: 12px;
-        margin-bottom: 20px;
-    }
-
-    .hero-btns {
-        flex-direction: column;
-        gap: 12px;
-        width: 100%;
-        max-width: 300px;
-        margin: 0 auto;
-    }
-
-    .hero-btns .btn {
-        width: 100%;
-    }
-
-    .page-header {
-        padding: 40px 0;
-    }
-    .page-title {
-        font-size: 24px;
-    }
-    .page-subtitle {
-        font-size: 12px;
     }
 }
 
@@ -331,7 +293,7 @@ body {
 }
 
 .section-label span {
-    font-size: 11px; font-weight: 700; color: var(--gold); text-transform: uppercase; letter-spacing: 1.5px; white-space: nowrap;
+    font-size: clamp(10px, 2vw, 11px); font-weight: 700; color: var(--gold); text-transform: uppercase; letter-spacing: 1.5px; white-space: nowrap;
 }
 
 .section-label::after {
@@ -340,19 +302,19 @@ body {
 
 /* Ayah of Day */
 .ayah-day {
-    background-color: var(--cream); padding: 60px 0; border-top: 4px solid var(--gold); border-bottom: 1px solid var(--sand);
+    background-color: var(--cream); padding: clamp(40px, 8vw, 60px) 0; border-top: 4px solid var(--gold); border-bottom: 1px solid var(--sand);
 }
 
 .ayah-ar {
-    font-family: 'Noto Naskh Arabic', serif; font-size: 28px; color: var(--ar-text); line-height: 2; margin-bottom: 20px;
+    font-family: 'Noto Naskh Arabic', serif; font-size: clamp(22px, 5vw, 28px); color: var(--ar-text); line-height: 2; margin-bottom: 20px;
 }
 
 .ayah-tr {
-    color: var(--stone); font-style: italic; font-size: 16px; margin-bottom: 12px; line-height: 1.6;
+    color: var(--stone); font-style: italic; font-size: clamp(14px, 3vw, 16px); margin-bottom: 12px; line-height: 1.6;
 }
 
 .ayah-ref {
-    color: var(--em); font-weight: 700; font-size: 13px;
+    color: var(--em); font-weight: 700; font-size: clamp(11px, 2.5vw, 13px);
 }
 
 .ayah-actions {
@@ -360,32 +322,20 @@ body {
 }
 
 .pill {
-    background-color: var(--parch); border: 1px solid var(--sand); border-radius: 20px; padding: 8px 18px; font-size: 12px; color: var(--stone); cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s; text-decoration: none; font-family: 'DM Sans', sans-serif;
+    background-color: var(--parch); border: 1px solid var(--sand); border-radius: 20px; padding: 8px 18px; font-size: clamp(10px, 2.5vw, 12px); color: var(--stone); cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s; text-decoration: none; font-family: 'DM Sans', sans-serif;
 }
 
 .pill i {
-    font-size: 16px;
+    font-size: clamp(14px, 3.5vw, 16px);
 }
 
 .pill:hover {
     background-color: var(--sand); color: var(--ink);
 }
 
-@media (max-width: 768px) {
-    .ayah-day {
-        padding: 40px 0;
-    }
-    .ayah-ar {
-        font-size: 22px;
-    }
-    .ayah-tr {
-        font-size: 14px;
-    }
-}
-
 /* Modules */
 .modules {
-    padding: 60px 0;
+    padding: clamp(40px, 8vw, 60px) 0;
 }
 
 .mod-grid {
@@ -737,7 +687,7 @@ body.player-hidden .collection-grid {
 }
 
 .player-toggle-btn.active {
-    background-color: var(--em);
+    background-color: var(--eml);
     border-color: var(--gold);
 }
 
@@ -1156,15 +1106,15 @@ body.player-hidden .quran-sidebar {
 }
 
 .surah-header-ar {
-    font-family: 'Noto Naskh Arabic', serif; font-size: 32px; color: var(--ar-text); margin-bottom: 5px;
+    font-family: 'Noto Naskh Arabic', serif; font-size: clamp(32px, 6vw, 48px); color: var(--ar-text); margin-bottom: 5px;
 }
 
 .surah-header-en {
-    font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; margin-bottom: 5px;
+    font-family: 'Playfair Display', serif; font-size: clamp(18px, 4vw, 24px); font-weight: 700; margin-bottom: 5px;
 }
 
 .surah-header-meta {
-    font-size: 12px; color: var(--stone);
+    font-size: clamp(10px, 2vw, 12px); color: var(--stone);
 }
 
 .bismillah-container {
@@ -1176,7 +1126,7 @@ body.player-hidden .quran-sidebar {
 }
 
 .bismillah {
-    font-family: 'Noto Naskh Arabic', serif; font-size: 24px; color: var(--ar-gold); text-align: center;
+    font-family: 'Noto Naskh Arabic', serif; font-size: clamp(18px, 4vw, 24px); color: var(--ar-gold); text-align: center;
 }
 
 .ayah-row {
@@ -1209,12 +1159,12 @@ body.player-hidden .quran-sidebar {
 }
 
 .ayah-text-ar {
-    font-family: 'Noto Naskh Arabic', serif; font-size: 28px; direction: rtl; text-align: right; color: var(--ar-text); line-height: 2; margin-bottom: 15px;
+    font-family: 'Noto Naskh Arabic', serif; font-size: clamp(24px, 5.5vw, 28px); direction: rtl; text-align: right; color: var(--ar-text); line-height: 2; margin-bottom: 15px;
     word-wrap: break-word; overflow-wrap: break-word;
 }
 
 .ayah-text-tr {
-    font-size: 15px; color: var(--ink); line-height: 1.6;
+    font-size: clamp(13px, 3.5vw, 15px); color: var(--ink); line-height: 1.6;
     word-wrap: break-word; overflow-wrap: break-word;
 }
 
@@ -1223,8 +1173,10 @@ body.player-hidden .quran-sidebar {
 }
 .tafsir-container.active { display: block; animation: slideDown 0.3s ease-out; }
 .tafsir-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid rgba(197, 160, 89, 0.2); padding-bottom: 10px; }
-.tafsir-title { font-weight: 700; color: var(--gold); font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
-.tafsir-content { font-size: 15px; color: var(--ink); line-height: 1.8; }
+.tafsir-title { font-weight: 700; color: var(--gold); font-size: clamp(11px, 2.5vw, 13px); text-transform: uppercase; letter-spacing: 1px; }
+.tafsir-content { font-size: clamp(13px, 3.2vw, 15px); color: var(--ink); line-height: 1.7; }
+.tafsir-content p { margin-bottom: 12px; }
+.tafsir-content h3, .tafsir-content h4 { font-size: clamp(14px, 3.5vw, 16px); color: var(--gold); margin: 15px 0 8px; font-weight: 700; line-height: 1.3; }
 .tafsir-content sup { font-size: 10px; color: var(--gold); font-weight: 700; }
 [data-theme='dark'] .tafsir-container { background-color: rgba(255, 255, 255, 0.03); border-left-color: var(--goldl); }
 [data-theme='dark'] .tafsir-content { color: var(--parch); }
@@ -1235,12 +1187,12 @@ body.player-hidden .quran-sidebar {
 }
 
 /* Dynamic Font Sizes */
-#quran-container.font-small .ayah-text-ar { font-size: 20px; }
-#quran-container.font-small .ayah-text-tr { font-size: 13px; }
-#quran-container.font-normal .ayah-text-ar { font-size: 28px; }
-#quran-container.font-normal .ayah-text-tr { font-size: 15px; }
-#quran-container.font-large .ayah-text-ar { font-size: 38px; }
-#quran-container.font-large .ayah-text-tr { font-size: 18px; }
+#quran-container.font-small .ayah-text-ar { font-size: 18px; }
+#quran-container.font-small .ayah-text-tr { font-size: 12px; }
+#quran-container.font-normal .ayah-text-ar { font-size: 26px; }
+#quran-container.font-normal .ayah-text-tr { font-size: 14px; }
+#quran-container.font-large .ayah-text-ar { font-size: 34px; }
+#quran-container.font-large .ayah-text-tr { font-size: 17px; }
 
 /* Mobile Quran Reader */
 @media (max-width: 768px) {
@@ -1271,9 +1223,6 @@ body.player-hidden .quran-sidebar {
     .quran-content {
         padding: 15px;
     }
-    .ayah-text-ar {
-        font-size: 22px;
-    }
     .ayah-header {
         flex-wrap: wrap;
         gap: 10px;
@@ -1298,15 +1247,15 @@ body.player-hidden .quran-sidebar {
 
 /* Inner Page Headers */
 .page-header {
-    background-color: var(--emd); color: var(--white); padding: 60px 0; text-align: center;
+    background-color: var(--emd); color: var(--white); padding: clamp(40px, 6vw, 60px) 0; text-align: center;
 }
 
 .page-title {
-    font-size: 32px; margin-bottom: 10px; color: var(--goldl);
+    font-size: clamp(24px, 5vw, 32px); margin-bottom: 10px; color: var(--goldl); font-weight: 700;
 }
 
 .page-subtitle {
-    font-size: 14px; color: rgba(255,255,255,0.7); max-width: 600px; margin: 0 auto;
+    font-size: clamp(12px, 2.5vw, 14px); color: rgba(255,255,255,0.7); max-width: 600px; margin: 0 auto;
 }
 
 /* Collections Grid (Hadith/Learn) */
