@@ -27,13 +27,14 @@
                 <div class="nav-links" id="navLinks">
                     <a href="../../quran.html" data-t="quran">Quran</a>
                     <a href="../../hadith.html" style="color: var(--goldl)" data-t="hadith">Hadith</a>
+                    <a href="../../bookmarks.html" data-t="bookmarks">Bookmarks</a>
                     <a href="../../learn.html" data-t="learn">Learn</a>
                     <a href="../../qa.html" data-t="qa">Q&A</a>
                     <a href="../../videos.html" data-t="videos">Videos</a>
                     <a href="../../media.html" data-t="media">Media</a>
                 </div>
                 <div class="nav-right">
-                    <button class="nav-icon-btn" aria-label="Search"><i class="ph ph-magnifying-glass"></i></button>
+                    
                     <button class="nav-icon-btn" id="themeToggle" aria-label="Toggle Theme"><i class="ph ph-moon"></i></button>
                     <button class="lang-btn" data-t="lang-btn">EN</button>
                     <button class="mobile-menu-btn" id="menuBtn"><i class="ph ph-list"></i></button>
@@ -100,17 +101,12 @@
                 
                 <!-- Mobile Only: Open Settings Button -->
                 <div style="display: flex; justify-content: center; margin-bottom: 20px;">
-                    <button id="mobile-sidebar-toggle" class="btn btn-outline" style="border-color: var(--sand); color: var(--stone); display: none; align-items: center; gap: 8px;">
+                    <button id="mobile-sidebar-toggle" class="sidebar-toggle-btn">
                         <i class="ph ph-list-dashes"></i> <span data-t="books_list">Books List</span>
                     </button>
                 </div>
                 
                 <!-- Added inline style to force display block on mobile for the toggle button -->
-                <style>
-                    @media (max-width: 768px) {
-                        #mobile-sidebar-toggle { display: inline-flex !important; }
-                    }
-                </style>
                 
                 <div class="surah-header">
                     <h1 class="surah-header-ar" id="book-header-ar">...</h1>

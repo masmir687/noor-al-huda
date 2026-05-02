@@ -133,7 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <p style="font-size: 13px; color: var(--stone); margin-bottom: 20px;">${lang === 'bn' && pod.descriptionBn ? pod.descriptionBn : pod.description}</p>
                             <div style="display: flex; align-items: center; justify-content: space-between; margin-top: auto;">
                                 <span style="font-size: 11px; font-weight: 700; color: var(--emd);">${pod.series}</span>
-                                <button class="btn btn-gold" style="padding: 6px 16px; font-size: 12px; display: flex; align-items: center; gap: 8px;" data-t="play_episode"><i class="ph ph-play-circle" style="font-size: 16px;"></i> ${t.play_episode || 'Play Episode'}</button>
+                                <button class="btn btn-gold listen-btn" style="padding: 6px 16px; font-size: 12px; display: flex; align-items: center; gap: 8px;" data-t="play_episode"><i class="ph ph-play-circle" style="font-size: 16px;"></i> ${t.play_episode || 'Play Episode'}</button>
                             </div>
                         </div>
                     </div>

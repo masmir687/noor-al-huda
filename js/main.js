@@ -131,6 +131,127 @@ document.addEventListener('DOMContentLoaded', () => {
     let playbackSpeed = 1.0;
     let playbackVolume = 1.0;
 
+    // Inject Toggle Player Button (Skip on Hadith Library and Bookmarks pages)
+    let playerToggleBtn = null;
+    const path = window.location.pathname;
+    const isExcludedPage = path.endsWith('hadith.html') || path.endsWith('/hadith') || path.endsWith('/hadith/') || 
+                           path.endsWith('bookmarks.html') || path.endsWith('/bookmarks') || path.endsWith('/bookmarks/');
+    
+    if (!isExcludedPage) {
+        playerToggleBtn = document.createElement('button');
+        playerToggleBtn.id = 'player-toggle-btn';
+        playerToggleBtn.className = 'player-toggle-btn';
+        playerToggleBtn.innerHTML = '<i class="ph ph-headphones"></i>';
+        playerToggleBtn.setAttribute('aria-label', 'Toggle Player');
+        document.body.appendChild(playerToggleBtn);
+
+        // Restore Position
+        const savedPos = JSON.parse(localStorage.getItem('playerTogglePos'));
+        if (savedPos) {
+            playerToggleBtn.style.left = `${savedPos.x}px`;
+            playerToggleBtn.style.top = `${savedPos.y}px`;
+            playerToggleBtn.style.bottom = 'auto';
+            playerToggleBtn.style.right = 'auto';
+        }
+
+        // --- Draggable Logic ---
+        let isDragging = false;
+        let dragStartX, dragStartY;
+        let buttonStartX, buttonStartY;
+        let hasMoved = false;
+
+        playerToggleBtn.onpointerdown = (e) => {
+            isDragging = true;
+            hasMoved = false;
+            dragStartX = e.clientX;
+            dragStartY = e.clientY;
+            const rect = playerToggleBtn.getBoundingClientRect();
+            buttonStartX = rect.left;
+            buttonStartY = rect.top;
+            playerToggleBtn.setPointerCapture(e.pointerId);
+            playerToggleBtn.style.transition = 'none'; // Disable transition while dragging
+        };
+
+        playerToggleBtn.onpointermove = (e) => {
+            if (!isDragging) return;
+            
+            const dx = e.clientX - dragStartX;
+            const dy = e.clientY - dragStartY;
+            
+            if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+                hasMoved = true;
+            }
+
+            let newX = buttonStartX + dx;
+            let newY = buttonStartY + dy;
+
+            // Boundaries
+            const padding = 10;
+            const maxX = window.innerWidth - playerToggleBtn.offsetWidth - padding;
+            const maxY = window.innerHeight - playerToggleBtn.offsetHeight - padding;
+            
+            newX = Math.max(padding, Math.min(newX, maxX));
+            newY = Math.max(padding, Math.min(newY, maxY));
+
+            playerToggleBtn.style.left = `${newX}px`;
+            playerToggleBtn.style.top = `${newY}px`;
+            playerToggleBtn.style.bottom = 'auto';
+            playerToggleBtn.style.right = 'auto';
+        };
+
+        playerToggleBtn.onpointerup = (e) => {
+            isDragging = false;
+            playerToggleBtn.style.transition = ''; // Restore transition
+            if (playerToggleBtn.hasPointerCapture(e.pointerId)) {
+                playerToggleBtn.releasePointerCapture(e.pointerId);
+            }
+            
+            if (hasMoved) {
+                // Save Position
+                const rect = playerToggleBtn.getBoundingClientRect();
+                localStorage.setItem('playerTogglePos', JSON.stringify({ x: rect.left, y: rect.top }));
+            } else {
+                togglePlayer();
+            }
+        };
+    }
+
+    function updatePlayerUI(isHidden) {
+        const playerBar = document.getElementById('playerBar');
+        if (!playerBar) return;
+
+        playerBar.classList.toggle('hidden', isHidden);
+        document.body.classList.toggle('player-hidden', isHidden);
+        
+        // Save state to localStorage
+        localStorage.setItem('playerHidden', isHidden);
+        
+        if (playerToggleBtn) {
+            if (isHidden) {
+                playerToggleBtn.classList.remove('active');
+            } else {
+                playerToggleBtn.classList.add('active');
+            }
+        }
+    }
+
+    // Initialize Player State from Storage
+    function initPlayerState() {
+        // Default to shown (false) if never set
+        const isHidden = localStorage.getItem('playerHidden') === 'true';
+        updatePlayerUI(isHidden);
+    }
+
+    function togglePlayer() {
+        const playerBar = document.getElementById('playerBar');
+        if (playerBar) {
+            updatePlayerUI(!playerBar.classList.contains('hidden'));
+        }
+    }
+
+    // Call initialization
+    initPlayerState();
+
     function updateAudioSettings() {
         synth.volume = playbackVolume;
         synth.playbackRate = playbackSpeed;
@@ -154,6 +275,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.toggleSpeech = function(textToRead, playIconElement, lang = 'ar', callback = null) {
         const playerBar = document.getElementById('playerBar');
+        const body = document.body;
 
         if (!textToRead) {
             window.speechSynthesis.cancel();
@@ -164,13 +286,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (currentIcon) updateIcon(currentIcon, 'pause');
             currentText = "";
             currentIcon = null;
-            if (playerBar) playerBar.classList.remove('active');
             return;
         }
         unlockAudio();
 
-        // Show player bar when playing
-        if (playerBar) playerBar.classList.add('active');
+        // Ensure player bar is shown if it was hidden
+        updatePlayerUI(false);
 
         // 1. If clicking the SAME button that is already playing, STOP it
         if (currentText === textToRead) {
@@ -182,7 +303,6 @@ document.addEventListener('DOMContentLoaded', () => {
             updateIcon(playIconElement, 'pause');
             currentText = "";
             currentIcon = null;
-            // Optionally hide it immediately or keep it active but paused
             return;
         }
 
@@ -209,9 +329,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     updateIcon(playIconElement, 'pause');
                     currentText = "";
                     currentIcon = null;
-                    if (callback) callback();
-                    // Don't auto-hide here if sequential is going to trigger next one
-                    if (!callback && playerBar) playerBar.classList.remove('active');
+                    if (callback) {
+                        callback();
+                    }
                 }
             };
             utterance.onerror = (e) => {
@@ -234,9 +354,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (currentIcon) updateIcon(currentIcon, 'pause');
             currentText = "";
             currentIcon = null;
-            const playerBar = document.getElementById('playerBar');
-            if (!callback && playerBar) playerBar.classList.remove('active');
-            if (callback) callback();
+            if (callback) {
+                callback();
+            }
         };
 
         synth.play()
@@ -250,7 +370,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const playerCloseBtn = document.getElementById('player-close');
     if (playerCloseBtn) {
         playerCloseBtn.addEventListener('click', () => {
-            window.toggleSpeech("", null); // This will cancel speech and remove 'active' class
+            if (window.quranAudio) {
+                window.quranAudio.pause();
+                document.querySelectorAll('.play-ayah i, .play-bismillah i, .play-main i').forEach(i => i.classList.replace('ph-pause', 'ph-play'));
+            }
+            window.toggleSpeech("", null); 
+            // Update UI
+            updatePlayerUI(true);
         });
     }
 
@@ -296,12 +422,20 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.addEventListener('click', (e) => {
             e.preventDefault();
             const icon = btn.querySelector('i');
-            const section = btn.closest('section') || btn.closest('.ayah-day') || btn.closest('.hadith-card');
+            const section = btn.closest('section') || btn.closest('.ayah-day') || btn.closest('.hadith-card') || btn.closest('.podcast-card');
             if (section) {
-                const tr = section.querySelector('.ayah-tr') || section.querySelector('.hadith-en') || section.querySelector('.ayah-text-tr');
-                const ar = section.querySelector('.ayah-ar') || section.querySelector('.hadith-ar') || section.querySelector('.ayah-text-ar');
-                if (tr) toggleSpeech(tr.textContent, icon, currentLang);
-                else if (ar) toggleSpeech(ar.textContent, icon, 'ar');
+                const tr = section.querySelector('.ayah-tr') || section.querySelector('.hadith-en') || section.querySelector('.ayah-text-tr') || section.querySelector('p');
+                const ar = section.querySelector('.ayah-ar') || section.querySelector('.hadith-ar') || section.querySelector('.ayah-text-ar') || section.querySelector('h3');
+                
+                if (section.classList.contains('podcast-card')) {
+                    const title = section.querySelector('h3')?.textContent || "";
+                    const desc = section.querySelector('p')?.textContent || "";
+                    toggleSpeech(`${title}. ${desc}`, icon, currentLang);
+                } else if (tr) {
+                    toggleSpeech(tr.textContent, icon, currentLang);
+                } else if (ar) {
+                    toggleSpeech(ar.textContent, icon, 'ar');
+                }
             }
         });
     });
@@ -352,9 +486,47 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // --- Service Worker & PWA Updates ---
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js').then(reg => console.log('SW Registered')).catch(err => {});
+            navigator.serviceWorker.register('sw.js').then(registration => {
+                console.log('SW Registered');
+
+                // Check for updates periodically
+                registration.onupdatefound = () => {
+                    const installingWorker = registration.installing;
+                    if (installingWorker) {
+                        installingWorker.onstatechange = () => {
+                            if (installingWorker.state === 'installed') {
+                                if (navigator.serviceWorker.controller) {
+                                    // New content available! Force update
+                                    console.log('New content available, refreshing...');
+                                    installingWorker.postMessage('skipWaiting');
+                                }
+                            }
+                        };
+                    }
+                };
+            }).catch(err => {
+                console.log('SW Registration Failed:', err);
+            });
         });
+
+        // Ensure refresh once the new service worker takes control
+        let refreshing = false;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+            if (!refreshing) {
+                window.location.reload();
+                refreshing = true;
+            }
+        });
+    }
+
+    // --- Bookmarks Page Cleanup ---
+    const isBookmarksPage = path.endsWith('bookmarks.html') || path.endsWith('/bookmarks') || path.endsWith('/bookmarks/');
+    if (isBookmarksPage) {
+        const playerBar = document.getElementById('playerBar');
+        if (playerBar) playerBar.remove();
+        // The toggle button is already skipped by the isHadithLibrary check if we expand it
     }
 });

@@ -1,10 +1,13 @@
-const CACHE_NAME = 'noor-al-huda-v1.0.0';
+const CACHE_VERSION = 'v1.1.4';
+const CACHE_NAME = `noor-al-huda-${CACHE_VERSION}`;
 
-const ASSETS_TO_CACHE = [
+// Assets to pre-cache immediately
+const CORE_ASSETS = [
     './',
     './index.html',
     './quran.html',
     './hadith.html',
+    './bookmarks.html',
     './learn.html',
     './qa.html',
     './videos.html',
@@ -13,83 +16,86 @@ const ASSETS_TO_CACHE = [
     './js/main.js',
     './js/quran.js',
     './js/data-loader.js',
-    './data/quran_meta.js',
-    './data/hadith.json',
-    './data/learn.json',
-    './data/qa.json',
-    './data/videos.json',
-    './data/media.json',
+    './js/hadith-reader.js',
+    './js/bookmarks.js',
+    './js/bookmarks-page.js',
+    './js/i18n.js',
     './images/favicon.svg'
 ];
 
-// Install Event - Cache Static Assets
+// Install Event
 self.addEventListener('install', event => {
     event.waitUntil(
-        caches.open(CACHE_NAME)
-            .then(cache => {
-                console.log('[Service Worker] Caching App Shell');
-                return cache.addAll(ASSETS_TO_CACHE);
-            })
-            .then(() => self.skipWaiting())
-    );
-});
-
-// Activate Event - Clean Up Old Caches (App Versioning)
-self.addEventListener('activate', event => {
-    event.waitUntil(
-        caches.keys().then(cacheNames => {
-            return Promise.all(
-                cacheNames.map(cache => {
-                    if (cache !== CACHE_NAME) {
-                        console.log('[Service Worker] Deleting old cache:', cache);
-                        return caches.delete(cache);
-                    }
+        caches.open(CACHE_NAME).then(cache => {
+            return Promise.allSettled(
+                CORE_ASSETS.map(url => {
+                    return fetch(url).then(response => {
+                        if (response.ok) return cache.put(url, response);
+                    }).catch(() => {});
                 })
             );
-        }).then(() => self.clients.claim())
+        }).then(() => self.skipWaiting())
     );
 });
 
-// Fetch Event - Serve from Cache, Fallback to Network
+// Activate Event
+self.addEventListener('activate', event => {
+    event.waitUntil(
+        caches.keys().then(keys => Promise.all(
+            keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
+        )).then(() => self.clients.claim())
+    );
+});
+
+// Fetch Event
 self.addEventListener('fetch', event => {
-    // Skip external API and Audio requests to ensure they always fetch fresh or use browser's own media cache
-    if (event.request.url.includes('api.alquran.cloud') || 
-        event.request.url.includes('everyayah.com') || 
-        event.request.url.includes('translate.google.com')) {
+    const url = new URL(event.request.url);
+
+    // Bypass for external media
+    if (url.hostname.includes('everyayah.com') || 
+        url.hostname.includes('translate.google.com') ||
+        event.request.destination === 'audio') {
+        return; 
+    }
+
+    // 1. Network-First for HTML, CSS, and JS (Ensure UI is always fresh)
+    if (event.request.mode === 'navigate' || 
+        event.request.destination === 'style' || 
+        event.request.destination === 'script') {
         
         event.respondWith(
-            fetch(event.request).catch(() => caches.match(event.request))
+            fetch(event.request)
+                .then(networkResponse => {
+                    if (networkResponse && networkResponse.status === 200) {
+                        const clonedResponse = networkResponse.clone();
+                        caches.open(CACHE_NAME).then(cache => cache.put(event.request, clonedResponse));
+                    }
+                    return networkResponse;
+                })
+                .catch(() => caches.match(event.request))
         );
         return;
     }
 
-    // Standard Cache-First Strategy for internal assets
+    // 2. Cache-First for Images and JSON data
     event.respondWith(
-        caches.match(event.request)
-            .then(cachedResponse => {
-                if (cachedResponse) {
-                    return cachedResponse;
+        caches.match(event.request).then(cachedResponse => {
+            if (cachedResponse) return cachedResponse;
+
+            return fetch(event.request).then(networkResponse => {
+                if (networkResponse && networkResponse.status === 200) {
+                    const clonedResponse = networkResponse.clone();
+                    caches.open(CACHE_NAME).then(cache => cache.put(event.request, clonedResponse));
                 }
-                
-                // If not in cache, fetch from network
-                return fetch(event.request).then(
-                    function(response) {
-                        // Check if we received a valid response
-                        if(!response || response.status !== 200 || response.type !== 'basic') {
-                            return response;
-                        }
-
-                        // Clone the response because it's a stream and can only be consumed once
-                        var responseToCache = response.clone();
-
-                        caches.open(CACHE_NAME)
-                            .then(function(cache) {
-                                cache.put(event.request, responseToCache);
-                            });
-
-                        return response;
-                    }
-                );
-            })
+                return networkResponse;
+            });
+        })
     );
+});
+
+// Update Listener
+self.addEventListener('message', event => {
+    if (event.data === 'skipWaiting') {
+        self.skipWaiting();
+    }
 });

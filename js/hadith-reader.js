@@ -40,18 +40,26 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentPlayIndex = -1;
 
     // Helper for paths
-    const getBasePath = () => window.COLLECTION_ID ? '../../data/' : 'data/';
+    const getBasePath = () => {
+        // If we are in a collection subdirectory (e.g., /collection/bukhari/index.html)
+        // we need to go up two levels to reach the root, then into data/
+        if (window.location.pathname.includes('/collection/')) {
+            return '../../data/';
+        }
+        // Otherwise, if we are at the root (e.g., /hadith.html), data/ is in the same directory
+        return 'data/';
+    };
 
     // 1. Initialize
     async function init() {
         const urlParams = new URLSearchParams(window.location.search);
-        collectionId = window.COLLECTION_ID || urlParams.get('id') || 'bukhari';
+        collectionId = (window.COLLECTION_ID || urlParams.get('id') || 'bukhari').trim();
         const basePath = getBasePath();
 
         try {
             // Load Metadata
             const res = await fetch(`${basePath}${collectionId}_meta.json`);
-            if (!res.ok) throw new Error("Metadata not found");
+            if (!res.ok) throw new Error(`Metadata not found (HTTP ${res.status})`);
             collectionMeta = await res.json();
             
             // Setup Basic UI
@@ -70,25 +78,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (error) {
             console.error("Init failed:", error);
-            if (headerEn) headerEn.textContent = "Collection Under Development";
+            if (headerEn) headerEn.textContent = "Load Error";
             hadithContainer.innerHTML = `
                 <div style="text-align: center; padding: 60px 20px; color: var(--stone);">
                     <i class="ph ph-warning-circle" style="font-size: 48px; color: var(--gold); margin-bottom: 20px; display: block;"></i>
-                    <h3 style="font-size: 24px; margin-bottom: 10px;">Collection Coming Soon</h3>
-                    <p>The ${collectionId.toUpperCase()} collection is currently being prepared and will be available soon. Please check back later.</p>
-                    <a href="${window.COLLECTION_ID ? '../../' : ''}hadith.html" class="btn btn-gold" style="margin-top: 20px; display: inline-block;">Explore Other Collections</a>
+                    <h3 style="font-size: 24px; margin-bottom: 10px;">Collection Unavailable</h3>
+                    <p>Failed to load <b>${collectionId}</b> collection.</p>
+                    <p style="font-size: 14px; opacity: 0.7; margin-top: 10px;">Error: ${error.message}</p>
+                    <p style="font-size: 11px; opacity: 0.5; margin-top: 15px;">Target Path: ${basePath}${collectionId}_meta.json</p>
+                    <a href="${window.COLLECTION_ID ? '../../' : ''}hadith.html" class="btn btn-gold" style="margin-top: 25px; display: inline-block;">Explore Other Collections</a>
                 </div>
             `;
         }
     }
 
     function updateDocumentTitle() {
+        if (!collectionMeta) return;
         const title = currentLang === 'bn' ? collectionMeta.titleBn : collectionMeta.titleEn;
         document.title = `${title || collectionMeta.titleEn} — Noor Al-Huda`;
     }
 
     // 2. Load Content (Volume or Global)
     async function loadBook(bookNumber) {
+        if (!collectionMeta) return;
         currentBook = bookNumber;
         const basePath = getBasePath();
         const loadingText = (window.i18n && window.i18n.translations[currentLang].loading) || "Loading Hadiths...";
@@ -128,15 +140,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } else {
                 const bMeta = collectionMeta.books.find(b => b.number === bookNumber);
+                if (!bMeta) throw new Error(`Book ${bookNumber} configuration missing`);
                 const path = `${basePath}${collectionId}/${bMeta.file}`;
                 const res = await fetch(path);
+                if (!res.ok) throw new Error(`Data file not found (HTTP ${res.status})`);
                 const data = await res.json();
                 allHadiths = data.hadiths;
                 applyFilters();
             }
         } catch (error) {
             console.error("Load book failed:", error);
-            hadithContainer.innerHTML = '<div style="text-align: center; padding: 40px;">Data file not found or corrupted.</div>';
+            hadithContainer.innerHTML = `<div style="text-align: center; padding: 40px; color: var(--error);">Data file error: ${error.message}</div>`;
         }
     }
 
@@ -397,6 +411,13 @@ document.addEventListener('DOMContentLoaded', () => {
     function startSequentialPlay() {
         isPlayingSequentially = true;
         updateMainPlayIcon('play');
+        const playerBar = document.getElementById('playerBar');
+        if (playerBar) {
+            playerBar.classList.remove('hidden');
+            document.body.classList.remove('player-hidden');
+            const spb = document.getElementById('show-player-btn');
+            if (spb) spb.classList.add('hidden');
+        }
         playHadithAtIndex(0);
     }
 
@@ -407,10 +428,12 @@ document.addEventListener('DOMContentLoaded', () => {
         window.toggleSpeech("", null); 
         document.querySelectorAll('.hadith-card').forEach(c => c.style.borderColor = 'var(--sand)');
         updateProgressBar(0, 0);
+        // Note: toggleSpeech("", null) will handle hiding the playerBar and body class
     }
 
     function playHadithAtIndex(index) {
         const cards = hadithContainer.querySelectorAll('.hadith-card');
+        const playerBar = document.getElementById('playerBar');
         if (!isPlayingSequentially || index >= cards.length) {
             stopSequentialPlay();
             return;
@@ -427,6 +450,14 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.hadith-card').forEach(c => c.style.borderColor = 'var(--sand)');
         card.style.borderColor = 'var(--gold)';
         card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+        // Show player
+        if (playerBar) {
+            playerBar.classList.remove('hidden');
+            document.body.classList.remove('player-hidden');
+            const spb = document.getElementById('show-player-btn');
+            if (spb) spb.classList.add('hidden');
+        }
 
         // Update Progress Bar
         updateProgressBar(index + 1, cards.length);
