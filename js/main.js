@@ -1,24 +1,227 @@
 /**
- * Noor Al-Huda — Functional Logic
+ * Noor Al-Huda — Core Application Logic
  * Vanilla JavaScript
  */
+
+// --- GLOBAL UTILITIES (Top Level) ---
+
+window.copyToClipboard = function(text) {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    textArea.style.position = "fixed";
+    textArea.style.left = "-9999px";
+    textArea.style.top = "0";
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    try {
+        const successful = document.execCommand('copy');
+        if (successful) alert("Text copied to clipboard!");
+        else throw new Error("Copy command unsuccessful");
+    } catch (err) {
+        console.error('Copy failed', err);
+        prompt("Sharing failed. You can copy the text manually:", text);
+    }
+    document.body.removeChild(textArea);
+};
+
+window.updateIcon = function(iconEl, state) {
+    if (!iconEl) return;
+    const isCircle = iconEl.parentElement.classList.contains('listen-btn') || 
+                     iconEl.parentElement.classList.contains('pill') || 
+                     iconEl.classList.contains('ph-play-circle') ||
+                     iconEl.classList.contains('ph-pause-circle');
+
+    const classesToRemove = ['ph-play', 'ph-pause', 'ph-play-circle', 'ph-pause-circle', 'ph-stop-circle', 'ph-spinner-gap', 'ph-spin'];
+    iconEl.classList.remove(...classesToRemove);
+    
+    if (state === 'play') iconEl.classList.add(isCircle ? 'ph-pause-circle' : 'ph-pause');
+    else if (state === 'loading') iconEl.classList.add('ph-spinner-gap', 'ph-spin');
+    else iconEl.classList.add(isCircle ? 'ph-play-circle' : 'ph-play');
+};
+
+window.updatePlayerUI = function(isHidden) {
+    const playerBar = document.getElementById('playerBar');
+    if (!playerBar) return;
+    playerBar.classList.toggle('hidden', isHidden);
+    document.body.classList.toggle('player-hidden', isHidden);
+    localStorage.setItem('playerHidden', isHidden);
+    const toggleBtn = document.getElementById('player-toggle-btn');
+    if (toggleBtn) toggleBtn.classList.toggle('active', !isHidden);
+};
+
+// Global Audio State
+const globalAudio = new Audio();
+let currentAudioIcon = null;
+let currentAudioText = "";
+let isAudioUnlocked = false;
+
+// Progress Bar Sync
+globalAudio.addEventListener('timeupdate', () => {
+    const cur = globalAudio.currentTime;
+    const dur = globalAudio.duration;
+    if (!dur) return;
+    const p = (cur / dur) * 100;
+    const fill = document.getElementById('player-progress-fill');
+    const dot = document.getElementById('player-progress-dot');
+    const timeC = document.getElementById('player-progress-current');
+    if (fill) fill.style.width = `${p}%`;
+    if (dot) dot.style.left = `${p}%`;
+    if (timeC) {
+        const m = Math.floor(cur / 60), s = Math.floor(cur % 60);
+        timeC.textContent = `${m}:${s < 10 ? '0' : ''}${s}`;
+    }
+});
+
+globalAudio.addEventListener('loadedmetadata', () => {
+    const dur = globalAudio.duration;
+    const timeT = document.getElementById('player-progress-total');
+    if (timeT && dur) {
+        const m = Math.floor(dur / 60), s = Math.floor(dur % 60);
+        timeT.textContent = `${m}:${s < 10 ? '0' : ''}${s}`;
+    }
+});
+
+window.toggleSpeech = function(textToRead, playIconElement, lang = 'ar') {
+    if (!textToRead) {
+        window.speechSynthesis.cancel();
+        if (!globalAudio.paused) { globalAudio.pause(); globalAudio.currentTime = 0; }
+        if (currentAudioIcon) window.updateIcon(currentAudioIcon, 'pause');
+        currentAudioText = ""; currentAudioIcon = null;
+        return;
+    }
+    window.updatePlayerUI(false);
+    
+    if (currentAudioText === textToRead) {
+        window.speechSynthesis.cancel();
+        if (!globalAudio.paused) { globalAudio.pause(); globalAudio.currentTime = 0; }
+        window.updateIcon(playIconElement, 'pause');
+        const mainPlay = document.querySelector('.play-main i');
+        if (mainPlay && mainPlay !== playIconElement) window.updateIcon(mainPlay, 'pause');
+        currentAudioText = ""; currentAudioIcon = null;
+        return;
+    }
+    
+    window.speechSynthesis.cancel();
+    if (!globalAudio.paused) { globalAudio.pause(); globalAudio.currentTime = 0; }
+    if (currentAudioIcon) window.updateIcon(currentAudioIcon, 'pause');
+    
+    currentAudioText = textToRead;
+    currentAudioIcon = playIconElement;
+
+    const speed = parseFloat(document.getElementById('speed-select')?.value || "1.0");
+
+    if ((lang === 'en' || lang === 'bn') && 'speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(textToRead);
+        utterance.lang = lang === 'bn' ? 'bn-BD' : 'en-US';
+        utterance.rate = speed;
+        utterance.onstart = () => { window.updateIcon(playIconElement, 'play');
+        const mainPlay = document.querySelector('.play-main i');
+        if (mainPlay && mainPlay !== playIconElement) window.updateIcon(mainPlay, 'play'); };
+        utterance.onend = () => { if (currentAudioText === textToRead) { window.updateIcon(playIconElement, 'pause');
+        const mainPlay = document.querySelector('.play-main i');
+        if (mainPlay && mainPlay !== playIconElement) window.updateIcon(mainPlay, 'pause'); currentAudioText = ""; currentAudioIcon = null; } };
+        window.speechSynthesis.speak(utterance);
+    } else {
+        const encodedText = encodeURIComponent(textToRead.substring(0, 500));
+        globalAudio.src = `https://translate.google.com/translate_tts?ie=UTF-8&tl=${lang}&client=tw-ob&q=${encodedText}`;
+        globalAudio.playbackRate = speed;
+        globalAudio.onended = () => { if (currentAudioIcon) window.updateIcon(currentAudioIcon, 'pause'); currentAudioText = ""; currentAudioIcon = null; };
+        globalAudio.play().then(() => { window.updateIcon(playIconElement, 'play');
+        const mainPlay = document.querySelector('.play-main i');
+        if (mainPlay && mainPlay !== playIconElement) window.updateIcon(mainPlay, 'play'); }).catch(console.error);
+    }
+};
+
+
+window.performShare = async function(btn, data, lang, event) {
+    if (event) { event.preventDefault(); event.stopPropagation(); }
+    const originalContent = btn.innerHTML;
+    btn.innerHTML = '<i class="ph ph-spinner-gap ph-spin"></i>';
+    
+    const { ar, tr, ref } = data;
+    const t = (window.i18n && window.i18n.translations[lang]) || {};
+    const appName = t.brand_name || "NOOR AL-HUDA";
+    const shareText = `${ref}
+
+${ar}
+
+${tr}
+
+Shared from ${appName}`;
+
+    try {
+        const template = document.getElementById('share-card-template');
+        if (!template) throw new Error("Template missing");
+        if (!window.html2canvas) throw new Error("Library missing");
+
+        // Sync Template Data
+        const scAr = document.getElementById('sc-arabic'), scTr = document.getElementById('sc-translation');
+        const scApp = document.getElementById('sc-app-name'), scMeta = document.getElementById('sc-meta'), scUrl = document.getElementById('sc-url');
+
+        if (scAr) scAr.textContent = ar || "";
+        if (scTr) scTr.textContent = tr || "";
+        if (scApp) scApp.textContent = appName;
+        if (scMeta) scMeta.textContent = ref;
+        if (scUrl) scUrl.textContent = window.location.origin + window.location.pathname;
+
+        // Ensure template is visible to html2canvas but not to user
+        template.style.opacity = "1";
+        template.style.top = "0"; // Bring to top for reliable capture
+
+        const canvas = await html2canvas(template, { 
+            scale: 2, 
+            useCORS: true, 
+            allowTaint: true,
+            logging: false,
+            backgroundColor: "#0F4A31",
+            width: 600,
+            height: template.offsetHeight || 800
+        });
+        
+        template.style.top = "-10000px"; // Hide again
+
+        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+        if (!blob) throw new Error("Blob failed");
+
+        const fileName = `NoorAlHuda_${Date.now()}.png`;
+        const file = new File([blob], fileName, { type: 'image/png' });
+
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            await navigator.share({ files: [file], title: appName, text: shareText });
+        } else {
+            const link = document.createElement('a');
+            link.download = fileName; link.href = URL.createObjectURL(blob);
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+            setTimeout(() => alert("Image generated! Check downloads."), 500);
+        }
+    } catch (err) {
+        console.warn("Share engine fallback:", err);
+        if (navigator.share) {
+            try { await navigator.share({ title: appName, text: shareText, url: window.location.href }); }
+            catch (e) { window.copyToClipboard(shareText); }
+        } else {
+            window.copyToClipboard(shareText);
+        }
+    } finally {
+        btn.innerHTML = originalContent;
+    }
+};
+
+
+// --- DOM READY LOGIC ---
 
 if ('scrollRestoration' in history) {
     history.scrollRestoration = 'manual';
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-
-    // --- Language Management ---
     let currentLang = localStorage.getItem('lang') || 'en';
     
-    function initLanguage() {
-        if (window.i18n) {
-            window.i18n.translatePage(currentLang);
-        }
-    }
+    // 1. Language Init
+    if (window.i18n) window.i18n.translatePage(currentLang);
 
-    // Inject Language Modal
+    // 2. Language Modal Injection
     const modalHTML = `
         <div class="lang-modal-overlay" id="langModal">
             <div class="lang-modal">
@@ -27,16 +230,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     <button class="lang-close"><i class="ph ph-x"></i></button>
                 </div>
                 <div class="lang-options">
-                    <div class="lang-option ${currentLang === 'en' ? 'active' : ''}" data-lang="en">
-                        <span class="lang-code">ENG</span>
-                        <span class="lang-name">English</span>
-                        <i class="ph ph-check lang-check"></i>
-                    </div>
-                    <div class="lang-option ${currentLang === 'bn' ? 'active' : ''}" data-lang="bn">
-                        <span class="lang-code">BNG</span>
-                        <span class="lang-name">বাংলা (Bengali)</span>
-                        <i class="ph ph-check lang-check"></i>
-                    </div>
+                    <div class="lang-option ${currentLang === 'en' ? 'active' : ''}" data-lang="en"><span class="lang-code">ENG</span><span class="lang-name">English</span><i class="ph ph-check lang-check"></i></div>
+                    <div class="lang-option ${currentLang === 'bn' ? 'active' : ''}" data-lang="bn"><span class="lang-code">BNG</span><span class="lang-name">বাংলা (Bengali)</span><i class="ph ph-check lang-check"></i></div>
                 </div>
             </div>
         </div>
@@ -45,153 +240,96 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const langModal = document.getElementById('langModal');
     const langBtn = document.querySelector('.lang-btn');
-    const langClose = langModal.querySelector('.lang-close');
-    const langOptions = langModal.querySelectorAll('.lang-option');
-
-    if (langBtn) {
-        langBtn.addEventListener('click', () => {
-            langModal.classList.add('active');
+    if (langBtn) langBtn.onclick = () => langModal.classList.add('active');
+    if (langModal) {
+        langModal.querySelector('.lang-close').onclick = () => langModal.classList.remove('active');
+        langModal.onclick = (e) => { if (e.target === langModal) langModal.classList.remove('active'); };
+        langModal.querySelectorAll('.lang-option').forEach(opt => {
+            opt.onclick = () => {
+                const l = opt.dataset.lang; currentLang = l; localStorage.setItem('lang', l);
+                langModal.querySelectorAll('.lang-option').forEach(o => o.classList.toggle('active', o.dataset.lang === l));
+                if (window.i18n) window.i18n.translatePage(l);
+                document.dispatchEvent(new CustomEvent('languageChanged', { detail: { lang: l } }));
+                setTimeout(() => langModal.classList.remove('active'), 250);
+            };
         });
     }
 
-    if (langClose) {
-        langClose.addEventListener('click', () => {
-            langModal.classList.remove('active');
-        });
-    }
-
-    langModal.addEventListener('click', (e) => {
-        if (e.target === langModal) langModal.classList.remove('active');
-    });
-
-    langOptions.forEach(option => {
-        option.addEventListener('click', () => {
-            const lang = option.dataset.lang;
-            currentLang = lang;
-            localStorage.setItem('lang', currentLang);
-            
-            // Update UI
-            langOptions.forEach(opt => opt.classList.toggle('active', opt.dataset.lang === lang));
-            
-            if (window.i18n) {
-                window.i18n.translatePage(currentLang);
-                document.dispatchEvent(new CustomEvent('languageChanged', { detail: { lang: currentLang } }));
-            }
-            
-            setTimeout(() => langModal.classList.remove('active'), 300);
-        });
-    });
-
-    // Run on load
-    initLanguage();
-
-    // --- Theme Toggle ---
-    const themeToggle = document.getElementById('themeToggle');
+    // 3. Theme
     const body = document.body;
-    
-    // Check for saved theme
     const savedTheme = localStorage.getItem('theme') || 'light';
     body.setAttribute('data-theme', savedTheme);
-    updateThemeIcon(savedTheme);
-
-    themeToggle.addEventListener('click', () => {
-        const currentTheme = body.getAttribute('data-theme');
-        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-        
-        body.setAttribute('data-theme', newTheme);
-        localStorage.setItem('theme', newTheme);
-        updateThemeIcon(newTheme);
-    });
-
-    function updateThemeIcon(theme) {
-        const icon = themeToggle.querySelector('i');
-        if (theme === 'dark') {
-            icon.classList.replace('ph-moon', 'ph-sun');
-        } else {
-            icon.classList.replace('ph-sun', 'ph-moon');
-        }
+    const themeToggle = document.getElementById('themeToggle');
+    if (themeToggle) {
+        themeToggle.onclick = () => {
+            const nt = body.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+            body.setAttribute('data-theme', nt); localStorage.setItem('theme', nt);
+            const icon = themeToggle.querySelector('i');
+            if (nt === 'dark') icon.classList.replace('ph-moon', 'ph-sun');
+            else icon.classList.replace('ph-sun', 'ph-moon');
+        };
     }
 
-    // --- Mobile Menu ---
+    // 4. Mobile Menu
     const menuBtn = document.getElementById('menuBtn');
     const navLinks = document.getElementById('navLinks');
-    
     if (menuBtn) {
-        menuBtn.addEventListener('click', () => {
+        menuBtn.onclick = () => {
             navLinks.classList.toggle('active');
-            const icon = menuBtn.querySelector('i');
-            if (navLinks.classList.contains('active')) {
-                icon.classList.replace('ph-list', 'ph-x');
-            } else {
-                icon.classList.replace('ph-x', 'ph-list');
+            const i = menuBtn.querySelector('i');
+            if (navLinks.classList.contains('active')) i.classList.replace('ph-list', 'ph-x');
+            else i.classList.replace('ph-x', 'ph-list');
+        };
+    }
+
+    // 5. Player Controls & Initial State
+    window.updatePlayerUI(localStorage.getItem('playerHidden') === 'true');
+    const closeP = document.getElementById('player-close');
+    if (closeP) closeP.onclick = () => {
+        if (window.quranAudio) window.quranAudio.pause();
+        window.toggleSpeech("", null);
+        window.updatePlayerUI(true);
+    };
+
+    const speedS = document.getElementById('speed-select');
+    if (speedS) speedS.onchange = (e) => { globalAudio.playbackRate = parseFloat(e.target.value); if(window.quranAudio) window.quranAudio.playbackRate = parseFloat(e.target.value); };
+
+    // 6. Global Listen & Share Listeners
+    document.addEventListener('click', (e) => {
+        const shareBtn = e.target.closest('.share-btn, .share-ayah');
+        if (shareBtn && !shareBtn.querySelector('.ph-spin')) {
+            const isLib = document.querySelector('.quran-layout') || document.getElementById('hadith-container');
+            if (!isLib || (!shareBtn.classList.contains('share-ayah') && !shareBtn.classList.contains('share-btn'))) {
+                const card = shareBtn.closest('section, .ayah-day, .hadith-card, .featured-card');
+                if (card) {
+                    const ar = card.querySelector('.ayah-ar, .hadith-ar, .ayah-text-ar')?.textContent || "";
+                    const tr = card.querySelector('.ayah-tr, .hadith-en, .ayah-text-tr')?.textContent || "";
+                    const ref = card.querySelector('.ayah-ref, .ref')?.textContent || "Revelation";
+                    window.performShare(shareBtn, { ar, tr, ref }, currentLang, e);
+                }
             }
-        });
-    }
-
-    // Close menu when a link is clicked
-    if (navLinks) {
-        navLinks.querySelectorAll('a').forEach(link => {
-            link.addEventListener('click', () => {
-                navLinks.classList.remove('active');
-                if (menuBtn) menuBtn.querySelector('i').classList.replace('ph-x', 'ph-list');
-            });
-        });
-    }
-
-    // --- Prayer Times Auto-Next ---
-    function updateNextPrayer() {
-        const now = new Date();
-        const hour = now.getHours();
-        const items = document.querySelectorAll('.prayer-item');
-        
-        items.forEach(item => item.classList.remove('next'));
-        items.forEach(item => {
-            const nextBadge = item.querySelector('.pt-next');
-            if (nextBadge) nextBadge.remove();
-        });
-
-        let nextIdx = 0;
-        if (hour >= 5 && hour < 12) nextIdx = 1; 
-        else if (hour >= 12 && hour < 16) nextIdx = 2; 
-        else if (hour >= 16 && hour < 19) nextIdx = 3; 
-        else if (hour >= 19 && hour < 21) nextIdx = 4; 
-        else nextIdx = 0; 
-
-        const nextItem = items[nextIdx];
-        if (nextItem) {
-            nextItem.classList.add('next');
-            const span = document.createElement('span');
-            span.className = 'pt-next';
-            span.textContent = 'Next ●';
-            nextItem.appendChild(span);
         }
-    }
-    updateNextPrayer();
 
-    // --- Smooth Scroll ---
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                target.scrollIntoView({ behavior: 'smooth' });
+        const listenBtn = e.target.closest('.listen-btn, .pill:has(.ph-play-circle)');
+        if (listenBtn) {
+            const isLib = document.querySelector('.quran-layout') || document.getElementById('hadith-container');
+            if (!isLib) {
+                const card = listenBtn.closest('section, .ayah-day, .hadith-card, .podcast-card');
+                if (card) {
+                    const ar = card.querySelector('.ayah-ar, .hadith-ar')?.textContent || "";
+                    const tr = card.querySelector('.ayah-tr, .hadith-en')?.textContent || "";
+                    window.toggleSpeech(tr || ar, listenBtn.querySelector('i'), currentLang);
+                }
             }
-        });
+        }
     });
 
-    // --- Global Audio Player ---
-    const synth = new Audio();
-    let currentIcon = null;
-    let currentText = "";
-    let audioUnlocked = false;
-    let playbackSpeed = 1.0;
-    let playbackVolume = 1.0;
-
-    // Inject Toggle Player Button (Skip on Hadith Library and Bookmarks pages)
+    // 7. Toggle Player Button (Floating Headphones)
     let playerToggleBtn = null;
     const path = window.location.pathname;
-    const isExcludedPage = path.endsWith('hadith.html') || path.endsWith('/hadith') || path.endsWith('/hadith/') || 
-                           path.endsWith('bookmarks.html') || path.endsWith('/bookmarks') || path.endsWith('/bookmarks/');
+    // Homepage is root or index.html in the root (no subfolders)
+    const isHomepage = path === '/' || path === '' || (path.endsWith('index.html') && !path.includes('/quran/') && !path.includes('/collection/'));
+    const isExcludedPage = isHomepage || path.includes('hadith.html') || path.includes('bookmarks.html');
     
     if (!isExcludedPage) {
         playerToggleBtn = document.createElement('button');
@@ -201,401 +339,62 @@ document.addEventListener('DOMContentLoaded', () => {
         playerToggleBtn.setAttribute('aria-label', 'Toggle Player');
         document.body.appendChild(playerToggleBtn);
 
-        // Restore Position with Boundary Checks
         const savedPos = JSON.parse(localStorage.getItem('playerTogglePos'));
         if (savedPos) {
-            const padding = 20;
-            const maxX = window.innerWidth - 40 - padding;
-            const maxY = window.innerHeight - 40 - padding;
-            
-            // Ensure the button isn't lost off-screen if window was resized
-            let x = Math.max(padding, Math.min(savedPos.x, maxX));
-            let y = Math.max(70, Math.min(savedPos.y, maxY)); // Ensure it's below navbar (70px)
-
+            let x = Math.max(20, Math.min(savedPos.x, window.innerWidth - 60));
+            let y = Math.max(70, Math.min(savedPos.y, window.innerHeight - 60));
             playerToggleBtn.style.left = `${x}px`;
             playerToggleBtn.style.top = `${y}px`;
             playerToggleBtn.style.bottom = 'auto';
             playerToggleBtn.style.right = 'auto';
         }
 
-        // --- Draggable Logic ---
-        let isDragging = false;
-        let dragStartX, dragStartY;
-        let buttonStartX, buttonStartY;
-        let hasMoved = false;
+        let isDragging = false, dragStartX, dragStartY, buttonStartX, buttonStartY, hasMoved = false;
 
         playerToggleBtn.onpointerdown = (e) => {
-            isDragging = true;
-            hasMoved = false;
-            dragStartX = e.clientX;
-            dragStartY = e.clientY;
+            isDragging = true; hasMoved = false;
+            dragStartX = e.clientX; dragStartY = e.clientY;
             const rect = playerToggleBtn.getBoundingClientRect();
-            buttonStartX = rect.left;
-            buttonStartY = rect.top;
+            buttonStartX = rect.left; buttonStartY = rect.top;
             playerToggleBtn.setPointerCapture(e.pointerId);
-            playerToggleBtn.style.transition = 'none'; // Disable transition while dragging
+            playerToggleBtn.style.transition = 'none';
         };
 
         playerToggleBtn.onpointermove = (e) => {
             if (!isDragging) return;
-            
-            const dx = e.clientX - dragStartX;
-            const dy = e.clientY - dragStartY;
-            
-            if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
-                hasMoved = true;
-            }
-
-            let newX = buttonStartX + dx;
-            let newY = buttonStartY + dy;
-
-            // Boundaries
-            const padding = 10;
-            const maxX = window.innerWidth - playerToggleBtn.offsetWidth - padding;
-            const maxY = window.innerHeight - playerToggleBtn.offsetHeight - padding;
-            
-            newX = Math.max(padding, Math.min(newX, maxX));
-            newY = Math.max(padding, Math.min(newY, maxY));
-
-            playerToggleBtn.style.left = `${newX}px`;
-            playerToggleBtn.style.top = `${newY}px`;
-            playerToggleBtn.style.bottom = 'auto';
-            playerToggleBtn.style.right = 'auto';
+            const dx = e.clientX - dragStartX, dy = e.clientY - dragStartY;
+            if (Math.abs(dx) > 5 || Math.abs(dy) > 5) hasMoved = true;
+            playerToggleBtn.style.left = `${buttonStartX + dx}px`;
+            playerToggleBtn.style.top = `${buttonStartY + dy}px`;
         };
 
         playerToggleBtn.onpointerup = (e) => {
             isDragging = false;
-            playerToggleBtn.style.transition = ''; // Restore transition
-            if (playerToggleBtn.hasPointerCapture(e.pointerId)) {
-                playerToggleBtn.releasePointerCapture(e.pointerId);
-            }
-            
+            playerToggleBtn.style.transition = '';
+            playerToggleBtn.releasePointerCapture(e.pointerId);
             if (hasMoved) {
-                // Save Position
                 const rect = playerToggleBtn.getBoundingClientRect();
                 localStorage.setItem('playerTogglePos', JSON.stringify({ x: rect.left, y: rect.top }));
             } else {
-                togglePlayer();
+                const pb = document.getElementById('playerBar');
+                if (pb) window.updatePlayerUI(pb.classList.contains('hidden') ? false : true);
             }
         };
     }
 
-    function updatePlayerUI(isHidden) {
-        const playerBar = document.getElementById('playerBar');
-        if (!playerBar) return;
-
-        playerBar.classList.toggle('hidden', isHidden);
-        document.body.classList.toggle('player-hidden', isHidden);
-        
-        // Save state to localStorage
-        localStorage.setItem('playerHidden', isHidden);
-        
-        if (playerToggleBtn) {
-            if (isHidden) {
-                playerToggleBtn.classList.remove('active');
-            } else {
-                playerToggleBtn.classList.add('active');
-            }
-        }
+    // 8. Page Cleanups
+    const isBookmarks = path.includes('bookmarks.html');
+    if (isHomepage || isBookmarks) {
+        const pb = document.getElementById('playerBar');
+        if (pb) pb.remove();
     }
 
-    // Initialize Player State from Storage
-    function initPlayerState() {
-        // Default to shown (false) if never set
-        const isHidden = localStorage.getItem('playerHidden') === 'true';
-        updatePlayerUI(isHidden);
-    }
-
-    function togglePlayer() {
-        const playerBar = document.getElementById('playerBar');
-        if (playerBar) {
-            updatePlayerUI(!playerBar.classList.contains('hidden'));
-        }
-    }
-
-    // Call initialization
-    initPlayerState();
-
-    function updateAudioSettings() {
-        synth.volume = playbackVolume;
-        synth.playbackRate = playbackSpeed;
-    }
-
-    window.updateIcon = function(iconEl, state) {
-        if (!iconEl) return;
-        const isCircle = iconEl.parentElement.classList.contains('listen-btn') || 
-                         iconEl.parentElement.classList.contains('pill') || 
-                         iconEl.classList.contains('ph-play-circle') || 
-                         iconEl.classList.contains('ph-pause-circle');
-
-        const classesToRemove = ['ph-play', 'ph-pause', 'ph-play-circle', 'ph-pause-circle', 'ph-stop-circle', 'ph-spinner-gap', 'ph-spin'];
-        iconEl.classList.remove(...classesToRemove);
-        
-        if (state === 'play') iconEl.classList.add(isCircle ? 'ph-pause-circle' : 'ph-pause');
-        else if (state === 'loading') iconEl.classList.add('ph-spinner-gap', 'ph-spin');
-        else iconEl.classList.add(isCircle ? 'ph-play-circle' : 'ph-play');
-    };
-
-    function unlockAudio() {
-        if (audioUnlocked) return;
-        synth.play().then(() => { synth.pause(); audioUnlocked = true; }).catch(() => {});
-    }
-    document.addEventListener('click', unlockAudio, { once: true });
-
-    window.toggleSpeech = function(textToRead, playIconElement, lang = 'ar', callback = null) {
-        const playerBar = document.getElementById('playerBar');
-        const body = document.body;
-
-        if (!textToRead) {
-            window.speechSynthesis.cancel();
-            if (!synth.paused) {
-                synth.pause();
-                synth.currentTime = 0;
-            }
-            if (currentIcon) updateIcon(currentIcon, 'pause');
-            currentText = "";
-            currentIcon = null;
-            return;
-        }
-        unlockAudio();
-
-        // Ensure player bar is shown if it was hidden
-        updatePlayerUI(false);
-
-        // 1. If clicking the SAME button that is already playing, STOP it
-        if (currentText === textToRead) {
-            window.speechSynthesis.cancel();
-            if (!synth.paused) {
-                synth.pause();
-                synth.currentTime = 0;
-            }
-            updateIcon(playIconElement, 'pause');
-            currentText = "";
-            currentIcon = null;
-            return;
-        }
-
-        // 2. If switching to a NEW text, stop current playback first
-        window.speechSynthesis.cancel();
-        if (!synth.paused) {
-            synth.pause();
-            synth.currentTime = 0;
-        }
-        if (currentIcon) updateIcon(currentIcon, 'pause');
-
-        currentText = textToRead;
-        currentIcon = playIconElement;
-
-        // 3. Play the new content
-        if ((lang === 'en' || lang === 'bn') && 'speechSynthesis' in window) {
-            const utterance = new SpeechSynthesisUtterance(textToRead);
-            utterance.lang = lang === 'bn' ? 'bn-BD' : 'en-US';
-            utterance.rate = playbackSpeed;
-            utterance.volume = playbackVolume;
-            utterance.onstart = () => updateIcon(playIconElement, 'play');
-            utterance.onend = () => {
-                if (currentText === textToRead) {
-                    updateIcon(playIconElement, 'pause');
-                    currentText = "";
-                    currentIcon = null;
-                    if (callback) {
-                        callback();
-                    }
-                }
-            };
-            utterance.onerror = (e) => {
-                console.error("SpeechSynthesis error:", e);
-                playWithGoogleTTS(textToRead, playIconElement, lang === 'bn' ? 'bn' : 'en', callback);
-            };
-            window.speechSynthesis.speak(utterance);
-        } else {
-            playWithGoogleTTS(textToRead, playIconElement, lang, callback);
-        }
-    };
-
-    function playWithGoogleTTS(text, icon, lang, callback = null) {
-        const encodedText = encodeURIComponent(text.substring(0, 500));
-        synth.src = `https://translate.google.com/translate_tts?ie=UTF-8&tl=${lang}&client=tw-ob&q=${encodedText}`;
-        synth.playbackRate = playbackSpeed;
-        synth.volume = playbackVolume;
-
-        synth.onended = () => {
-            if (currentIcon) updateIcon(currentIcon, 'pause');
-            currentText = "";
-            currentIcon = null;
-            if (callback) {
-                callback();
-            }
-        };
-
-        synth.play()
-            .then(() => updateIcon(icon, 'play'))
-            .catch(e => {
-                console.error("Audio play failed:", e);
-            });
-    };
-
-    // Close Player Button
-    const playerCloseBtn = document.getElementById('player-close');
-    if (playerCloseBtn) {
-        playerCloseBtn.addEventListener('click', () => {
-            if (window.quranAudio) {
-                window.quranAudio.pause();
-                document.querySelectorAll('.play-ayah i, .play-bismillah i, .play-main i').forEach(i => updateIcon(i, 'pause'));
-            }
-            window.toggleSpeech("", null); 
-            // Update UI
-            updatePlayerUI(true);
-        });
-    }
-
-    const speedSelect = document.getElementById('speed-select');
-    if (speedSelect) {
-        speedSelect.addEventListener('change', (e) => {
-            playbackSpeed = parseFloat(e.target.value);
-            updateAudioSettings();
-        });
-    }
-
-    const volSlider = document.getElementById('volume-slider');
-    const volIcon = document.getElementById('volume-icon');
-    if (volSlider) {
-        volSlider.addEventListener('input', (e) => {
-            playbackVolume = parseFloat(e.target.value);
-            updateAudioSettings();
-            if (volIcon) {
-                if (playbackVolume === 0) volIcon.className = 'ph ph-speaker-slash';
-                else if (playbackVolume < 0.5) volIcon.className = 'ph ph-speaker-low';
-                else volIcon.className = 'ph ph-speaker-high';
-            }
-        });
-    }
-
-    // 1. Bottom Player Button (Non-Quran/Non-Collection Pages)
-    const playBtn = document.querySelector('.play-main');
-    const hasCustomPlayer = document.querySelector('.quran-layout') || document.getElementById('hadith-container');
-    if (playBtn && !hasCustomPlayer) {
-        playBtn.addEventListener('click', () => {
-            const icon = playBtn.querySelector('i');
-            const translationElement = document.querySelector('.ayah-tr') || document.querySelector('.hadith-en');
-            const arabicElement = document.querySelector('.ayah-ar') || document.querySelector('.hadith-ar');
-            if (translationElement) toggleSpeech(translationElement.textContent, icon, currentLang);
-            else if (arabicElement) toggleSpeech(arabicElement.textContent, icon, 'ar');
-            else toggleSpeech("بِسْمِ ٱللَّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ", icon, 'ar');
-        });
-    }
-
-    // 2. Inline Listen Buttons
-    const listenBtns = document.querySelectorAll('.listen-btn, .pill:has(.ph-play-circle)');
-    listenBtns.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            const icon = btn.querySelector('i');
-            const section = btn.closest('section') || btn.closest('.ayah-day') || btn.closest('.hadith-card') || btn.closest('.podcast-card');
-            if (section) {
-                const tr = section.querySelector('.ayah-tr') || section.querySelector('.hadith-en') || section.querySelector('.ayah-text-tr') || section.querySelector('p');
-                const ar = section.querySelector('.ayah-ar') || section.querySelector('.hadith-ar') || section.querySelector('.ayah-text-ar') || section.querySelector('h3');
-                
-                if (section.classList.contains('podcast-card')) {
-                    const title = section.querySelector('h3')?.textContent || "";
-                    const desc = section.querySelector('p')?.textContent || "";
-                    toggleSpeech(`${title}. ${desc}`, icon, currentLang);
-                } else if (tr) {
-                    toggleSpeech(tr.textContent, icon, currentLang);
-                } else if (ar) {
-                    toggleSpeech(ar.textContent, icon, 'ar');
-                }
-            }
-        });
-    });
-
-    // 3. Share Buttons (Global/Homepage)
-    const shareBtns = document.querySelectorAll('.share-btn, .pill:has(.ph-share-network), button:has(.ph-share-network)');
-    shareBtns.forEach(btn => {
-        btn.addEventListener('click', async (e) => {
-            e.preventDefault();
-            const section = btn.closest('section') || btn.closest('.ayah-day') || btn.closest('.hadith-card');
-            if (section) {
-                const tr = section.querySelector('.ayah-tr') || section.querySelector('.hadith-en') || section.querySelector('.ayah-text-tr');
-                const ar = section.querySelector('.ayah-ar') || section.querySelector('.hadith-ar') || section.querySelector('.ayah-text-ar');
-                const title = section.querySelector('.section-label')?.textContent || "Featured Content";
-                const ref = section.querySelector('.ayah-ref') || section.querySelector('.ref');
-                const metaText = `${title} — ${ref ? ref.textContent : 'Noor Al-Huda'}`;
-
-                const originalContent = btn.innerHTML;
-                btn.innerHTML = '<i class="ph ph-spinner-gap ph-spin"></i>';
-
-                const template = document.getElementById('share-card-template');
-                if (template && window.html2canvas) {
-                    document.getElementById('sc-arabic').textContent = ar ? ar.textContent : "";
-                    document.getElementById('sc-translation').textContent = tr ? tr.textContent : "";
-                    document.getElementById('sc-meta').textContent = metaText;
-                    document.getElementById('sc-url').textContent = window.location.origin + window.location.pathname;
-
-                    try {
-                        const canvas = await html2canvas(template, { scale: 2, useCORS: true });
-                        canvas.toBlob(async (blob) => {
-                            const fileName = `NoorAlHuda_Share.png`;
-                            const file = new File([blob], fileName, { type: 'image/png' });
-                            if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                                await navigator.share({ files: [file], title: metaText });
-                            } else {
-                                const link = document.createElement('a'); link.download = fileName;
-                                link.href = URL.createObjectURL(blob); link.click();
-                            }
-                            btn.innerHTML = originalContent;
-                        }, 'image/png');
-                    } catch (err) { btn.innerHTML = originalContent; }
-                } else {
-                    const shareText = `${metaText}\n\n${ar ? ar.textContent : ''}\n\n${tr ? tr.textContent : ''}\n\nShared from Noor Al-Huda`;
-                    if (navigator.share) navigator.share({ title: title, text: shareText, url: window.location.href });
-                    btn.innerHTML = originalContent;
-                }
-            }
-        });
-    });
-
-    // --- Service Worker & PWA Updates ---
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js').then(registration => {
-                console.log('SW Registered');
-
-                // Check for updates periodically
-                registration.onupdatefound = () => {
-                    const installingWorker = registration.installing;
-                    if (installingWorker) {
-                        installingWorker.onstatechange = () => {
-                            if (installingWorker.state === 'installed') {
-                                if (navigator.serviceWorker.controller) {
-                                    // New content available! Force update
-                                    console.log('New content available, refreshing...');
-                                    installingWorker.postMessage('skipWaiting');
-                                }
-                            }
-                        };
-                    }
-                };
-            }).catch(err => {
-                console.log('SW Registration Failed:', err);
-            });
-        });
-
-        // Ensure refresh once the new service worker takes control
-        let refreshing = false;
-        navigator.serviceWorker.addEventListener('controllerchange', () => {
-            if (!refreshing) {
-                window.location.reload();
-                refreshing = true;
-            }
-        });
-    }
-
-    // --- Bookmarks Page Cleanup ---
-    const isBookmarksPage = path.endsWith('bookmarks.html') || path.endsWith('/bookmarks') || path.endsWith('/bookmarks/');
-    if (isBookmarksPage) {
-        const playerBar = document.getElementById('playerBar');
-        if (playerBar) playerBar.remove();
-        // The toggle button is already skipped by the isHadithLibrary check if we expand it
+    // 9. Splash
+    const splash = document.getElementById('splash-screen');
+    if (splash) {
+        setTimeout(() => {
+            splash.classList.add('hidden');
+            setTimeout(() => { splash.style.display = 'none'; }, 600);
+        }, 1500);
     }
 });

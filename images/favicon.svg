@@ -1,57 +1,78 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
   <defs>
-    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#FFD700;stop-opacity:1" />
-      <stop offset="50%" style="stop-color:#E8B84B;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#B8860B;stop-opacity:1" />
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1A6B47" />
+      <stop offset="100%" stop-color="#0F4A31" />
     </linearGradient>
-    <radialGradient id="bgGrad" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" style="stop-color:#1a6b48;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#0F4A31;stop-opacity:1" />
-    </radialGradient>
-    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur in="SourceAlpha" stdDeviation="10" />
-      <feOffset dx="0" dy="10" result="offsetblur" />
-      <feComponentTransfer>
-        <feFuncA type="linear" slope="0.5" />
-      </feComponentTransfer>
-      <feMerge>
-        <feMergeNode />
-        <feMergeNode in="SourceGraphic" />
-      </feMerge>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FDE047" />
+      <stop offset="50%" stop-color="#E8B84B" />
+      <stop offset="100%" stop-color="#C8922A" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
     </filter>
   </defs>
   
-  <!-- Base Background -->
-  <rect width="512" height="512" rx="128" fill="url(#bgGrad)"/>
+  <rect width="512" height="512" rx="128" fill="url(#bg)"/>
   
-  <!-- Subtle Geometric Layer -->
-  <g opacity="0.15" fill="none" stroke="#E8B84B" stroke-width="2" transform="translate(256 256)">
-    <rect x="-200" y="-200" width="400" height="400" rx="40" transform="rotate(15)"/>
-    <rect x="-200" y="-200" width="400" height="400" rx="40" transform="rotate(45)"/>
-    <rect x="-200" y="-200" width="400" height="400" rx="40" transform="rotate(75)"/>
-  </g>
-  
-  <!-- Mosque & Crescent Composition -->
-  <g filter="url(#shadow)">
-    <!-- Crescent Moon -->
-    <path d="M220,100 A140,140 0 1,0 220,412 A120,120 0 1,1 220,100" fill="url(#goldGrad)" />
+  <!-- Subtle Outer Border -->
+  <rect width="450" height="450" x="31" y="31" rx="100" fill="none" stroke="url(#gold)" stroke-width="4" opacity="0.4"/>
+  <rect width="436" height="436" x="38" y="38" rx="88" fill="none" stroke="url(#gold)" stroke-width="1" opacity="0.2"/>
+
+  <!-- Masjid Structure on a Box (Centered) -->
+  <g transform="translate(256, 280) scale(1.7)">
     
-    <!-- Mosque Silhouette -->
-    <g transform="translate(270 240)" fill="url(#goldGrad)">
-      <!-- Central Dome -->
-      <path d="M-50,60 A50,60 0 0,1 50,60 L50,100 L-50,100 Z" />
-      <!-- Left Minaret -->
-      <rect x="-75" y="20" width="12" height="80" />
-      <path d="M-75,20 L-69,5 L-63,20 Z" />
-      <!-- Right Minaret -->
-      <rect x="63" y="20" width="12" height="80" />
-      <path d="M63,20 L69,5 L75,20 Z" />
-      <!-- Base Building -->
-      <rect x="-90" y="100" width="180" height="40" rx="4" />
+    <!-- Main Dome -->
+    <path d="M -35,-10 C -35,-40 -15,-70 0,-85 C 15,-70 35,-40 35,-10 Z" fill="url(#gold)"/>
+    
+    <!-- Center Minaret/Spire on Dome -->
+    <rect x="-2" y="-100" width="4" height="15" fill="url(#gold)"/>
+    <circle cx="0" cy="-92" r="3" fill="#0F4A31"/> <!-- Detail on spire -->
+    
+    <!-- Small Half Moon (Crescent) floating on the left side -->
+    <g transform="translate(-75, -90) scale(0.7) rotate(40)">
+      <path d="M 0,-15 A 15 15 0 1 1 0,15 A 18 18 0 0 0 0,-15 Z" fill="url(#gold)" filter="url(#glow)"/>
     </g>
+
+    <!-- Left Minaret -->
+    <rect x="-60" y="-50" width="10" height="40" fill="url(#gold)"/>
+    <!-- Left Minaret Balconies -->
+    <rect x="-63" y="-50" width="16" height="3" fill="url(#gold)"/>
+    <rect x="-63" y="-30" width="16" height="3" fill="url(#gold)"/>
+    <!-- Left Minaret Spire -->
+    <path d="M -60,-50 L -50,-50 L -55,-70 Z" fill="url(#gold)"/>
+    <circle cx="-55" cy="-70" r="2" fill="url(#gold)"/>
+    
+    <!-- Right Minaret -->
+    <rect x="50" y="-50" width="10" height="40" fill="url(#gold)"/>
+    <!-- Right Minaret Balconies -->
+    <rect x="47" y="-50" width="16" height="3" fill="url(#gold)"/>
+    <rect x="47" y="-30" width="16" height="3" fill="url(#gold)"/>
+    <!-- Right Minaret Spire -->
+    <path d="M 50,-50 L 60,-50 L 55,-70 Z" fill="url(#gold)"/>
+    <circle cx="55" cy="-70" r="2" fill="url(#gold)"/>
+
+    <!-- The Box (Base Structure) -->
+    <rect x="-75" y="-10" width="150" height="90" fill="url(#gold)" rx="4"/>
+    
+    <!-- Decorative Inner Box -->
+    <rect x="-65" y="0" width="130" height="70" fill="#0F4A31" rx="4"/>
+    
+    <!-- Central Doorway on the Box -->
+    <path d="M -15,70 L -15,40 A 15,15 0 0,1 15,40 L 15,70 Z" fill="url(#gold)"/>
+    <!-- Inner Door -->
+    <path d="M -10,70 L -10,40 A 10,10 0 0,1 10,40 L 10,70 Z" fill="#0F4A31"/>
+    
+    <!-- Side Windows on the Box -->
+    <rect x="-40" y="15" width="10" height="25" rx="5" fill="url(#gold)"/>
+    <rect x="30" y="15" width="10" height="25" rx="5" fill="url(#gold)"/>
+    
+    <!-- Star on the Box (Above door) -->
+    <g transform="translate(0, 15) scale(0.4)">
+      <polygon points="0,-25 8,-8 25,-8 11,3 16,20 0,10 -16,20 -11,3 -25,-8 -8,-8" fill="url(#gold)"/>
+    </g>
+
   </g>
-  
-  <!-- Ornamental Frame -->
-  <rect x="32" y="32" width="448" height="448" rx="96" fill="none" stroke="url(#goldGrad)" stroke-width="8" opacity="0.2"/>
 </svg>

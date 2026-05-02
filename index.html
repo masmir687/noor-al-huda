@@ -18,6 +18,15 @@
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 </head>
 <body data-page-title="site_title">
+    <!-- Splash Screen -->
+    <div id="splash-screen" class="splash-screen">
+        <div class="splash-content">
+            <img src="images/favicon.svg" alt="Noor Al-Huda Logo" class="splash-logo">
+            <h1 class="splash-title">Noor Al-Huda</h1>
+            <p class="splash-subtitle" data-t="site_tagline">Light of Guidance</p>
+        </div>
+    </div>
+
     <!-- Navbar -->
     <nav class="nav">
         <div class="container">
@@ -297,6 +306,7 @@
                         <div class="fill" id="player-progress-fill" style="width: 0%"></div>
                         <div class="dot" id="player-progress-dot" style="left: 0%"></div>
                     </div>
+
                     <span class="time" id="player-progress-total">0:00</span>
                 </div>
                 <div class="player-extra">
@@ -319,10 +329,14 @@
     </div>
 
     <!-- Hidden Share Canvas Template -->
-    <div id="share-card-template" style="position: fixed; top: -2000px; left: -2000px; width: 600px; padding: 40px; background: linear-gradient(135deg, #0F4A31 0%, #1A7B8A 100%); color: white; font-family: 'DM Sans', sans-serif; border: 15px solid #C5A059; border-image: url('https://www.transparenttextures.com/patterns/arabesque.png') 30 repeat; box-shadow: 0 20px 40px rgba(0,0,0,0.3);">
-        <div style="text-align: center; margin-bottom: 30px;">
-            <span style="font-family: 'Noto Naskh Arabic', serif; font-size: 24px; color: #C5A059; display: block; margin-bottom: 10px;">নূর আল-হুদা</span>
-            <span style="letter-spacing: 3px; font-size: 14px; font-weight: 700; color: #F5E6D3; border-top: 1px solid rgba(197, 160, 89, 0.3); border-bottom: 1px solid rgba(197, 160, 89, 0.3); padding: 5px 20px; display: inline-block;">NOOR AL-HUDA</span>
+        <!-- Hidden Share Canvas Template -->
+        <!-- Hidden Share Canvas Template -->
+    <div id="share-card-template" style="position: absolute; left: 0; top: -9999px; width: 600px; opacity: 1; z-index: -1000;">
+        <div style="text-align: center; margin-bottom: 30px; display: flex; flex-direction: column; align-items: center;">
+            <div style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 10px;">
+                <span style="font-family: 'Noto Naskh Arabic', serif; font-size: 26px; color: #C5A059;">نور الهدى</span>
+            </div>
+            <span id="sc-app-name" style="letter-spacing: 3px; font-size: 14px; font-weight: 700; color: #F5E6D3; border-top: 1px solid rgba(197, 160, 89, 0.3); border-bottom: 1px solid rgba(197, 160, 89, 0.3); padding: 5px 20px; display: inline-block;">NOOR AL-HUDA</span>
         </div>
         
         <div id="sc-arabic" dir="rtl" style="font-family: 'Noto Naskh Arabic', serif; font-size: 26px; line-height: 1.8; text-align: center; margin-bottom: 30px; color: #FFFFFF; text-shadow: 0 2px 4px rgba(0,0,0,0.2);"></div>
