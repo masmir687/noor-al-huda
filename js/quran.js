@@ -207,13 +207,24 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="ayah-header">
                         <div class="ayah-badge">${i+1}</div>
                         <div class="ayah-actions">
-                            <button class="ayah-btn play-ayah" data-surah="${surahNumber}" data-ayah="${i+1}"><i class="ph ph-play"></i></button>
-                            <button class="ayah-btn share-ayah" data-surah="${surahNumber}" data-ayah="${i+1}"><i class="ph ph-share-network"></i></button>
-                            <button class="ayah-btn bookmark-btn" data-id="quran_${surahNumber}_${i+1}"><i class="ph ph-bookmark-simple"></i></button>
+                            <button class="ayah-btn play-ayah" data-surah="${surahNumber}" data-ayah="${i+1}" title="Play Audio"><i class="ph ph-play"></i></button>
+                            <button class="ayah-btn context-btn" data-surah="${surahNumber}" data-ayah="${i+1}" title="Read Context"><i class="ph ph-book-open"></i></button>
+                            <button class="ayah-btn tafsir-btn" data-surah="${surahNumber}" data-ayah="${i+1}" title="View Tafsir"><i class="ph ph-eye"></i></button>
+                            <button class="ayah-btn share-ayah" data-surah="${surahNumber}" data-ayah="${i+1}" title="Share Ayah"><i class="ph ph-share-network"></i></button>
+                            <button class="ayah-btn bookmark-btn" data-id="quran_${surahNumber}_${i+1}" title="Bookmark Ayah"><i class="ph ph-bookmark-simple"></i></button>
                         </div>
                     </div>
                     <div class="ayah-text-ar">${arText}</div>
                     <div class="ayah-text-tr">${surahTr.ayahs[i].text}</div>
+                    <div class="tafsir-container" id="tafsir-${surahNumber}-${i+1}">
+                        <div class="tafsir-header">
+                            <span class="tafsir-title">Tafsir</span>
+                            <button class="ayah-btn close-tafsir"><i class="ph ph-x"></i></button>
+                        </div>
+                        <div class="tafsir-content">
+                            <!-- Content loaded via JS -->
+                        </div>
+                    </div>
                 </section>`;
             }
             quranContainer.innerHTML = html;
@@ -297,6 +308,12 @@ document.addEventListener('DOMContentLoaded', () => {
             quranAudio.pause();
             if (mainPlayIcon) mainPlayIcon.className = 'ph ph-play';
         } else {
+            if (window.globalAudio) {
+                window.globalAudio.pause();
+                window.globalAudio.currentTime = 0;
+            }
+            if (window.toggleSpeech) window.toggleSpeech("", null);
+
             quranAudio.src = `https://everyayah.com/data/${currentReciter}/${surah}${ayah}.mp3`;
             
             // Sync settings after setting src

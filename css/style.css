@@ -1218,6 +1218,22 @@ body.player-hidden .quran-sidebar {
     word-wrap: break-word; overflow-wrap: break-word;
 }
 
+.tafsir-container {
+    margin-top: 20px; padding: 20px; background-color: rgba(197, 160, 89, 0.05); border-left: 3px solid var(--gold); border-radius: 8px; display: none;
+}
+.tafsir-container.active { display: block; animation: slideDown 0.3s ease-out; }
+.tafsir-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid rgba(197, 160, 89, 0.2); padding-bottom: 10px; }
+.tafsir-title { font-weight: 700; color: var(--gold); font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
+.tafsir-content { font-size: 15px; color: var(--ink); line-height: 1.8; }
+.tafsir-content sup { font-size: 10px; color: var(--gold); font-weight: 700; }
+[data-theme='dark'] .tafsir-container { background-color: rgba(255, 255, 255, 0.03); border-left-color: var(--goldl); }
+[data-theme='dark'] .tafsir-content { color: var(--parch); }
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
 /* Dynamic Font Sizes */
 #quran-container.font-small .ayah-text-ar { font-size: 20px; }
 #quran-container.font-small .ayah-text-tr { font-size: 13px; }

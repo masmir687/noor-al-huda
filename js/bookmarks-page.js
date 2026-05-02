@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const content = currentLang === 'bn' && item.textBn ? item.textBn : (item.textEn || item.english || "");
             
             html += `
-                <div class="hadith-card" data-id="${item.id}" style="margin-bottom: 25px; cursor: pointer;">
+                <div class="hadith-card" data-id="${item.id}" data-surah="${item.surah || ''}" data-ayah="${item.ayah || ''}" style="margin-bottom: 25px; cursor: pointer;">
                     <div class="qa-tag" style="margin-bottom: 10px; background-color: var(--parch); color: var(--gold); border: 1px solid var(--sand);">${typeLabel}</div>
                     <p class="hadith-ar" dir="rtl">${item.textAr}</p>
                     <p class="hadith-en">${content}</p>
@@ -49,9 +49,22 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                         <div class="hadith-btns" style="margin-top: 15px;">
                             <button class="btn-sm listen-btn"><i class="ph ph-play-circle"></i> <span data-t="listen">Listen</span></button>
+                            ${!isHadith ? `
+                                <button class="btn-sm context-btn" data-surah="${item.surah}" data-ayah="${item.ayah}"><i class="ph ph-book-open"></i> <span data-t="read_context">Context</span></button>
+                                <button class="btn-sm tafsir-btn" data-surah="${item.surah}" data-ayah="${item.ayah}"><i class="ph ph-eye"></i> <span data-t="tafsir">Tafsir</span></button>
+                            ` : ''}
                             <button class="btn-sm remove-btn outline" style="color: var(--error); border-color: rgba(220, 38, 38, 0.2);"><i class="ph ph-trash"></i></button>
                         </div>
                     </div>
+                    ${!isHadith ? `
+                        <div class="tafsir-container" id="tafsir-${item.surah}-${item.ayah}">
+                            <div class="tafsir-header">
+                                <span class="tafsir-title">Tafsir</span>
+                                <button class="ayah-btn close-tafsir"><i class="ph ph-x"></i></button>
+                            </div>
+                            <div class="tafsir-content"></div>
+                        </div>
+                    ` : ''}
                 </div>
             `;
         });

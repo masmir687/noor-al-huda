@@ -91,6 +91,7 @@ window.toggleSpeech = function(textToRead, playIconElement, lang = 'ar') {
     if (!textToRead) {
         window.speechSynthesis.cancel();
         if (!globalAudio.paused) { globalAudio.pause(); globalAudio.currentTime = 0; }
+        if (window.quranAudio) window.quranAudio.pause();
         if (currentAudioIcon) window.updateIcon(currentAudioIcon, 'pause');
         currentAudioText = ""; currentAudioIcon = null;
         return;
@@ -109,6 +110,7 @@ window.toggleSpeech = function(textToRead, playIconElement, lang = 'ar') {
     
     window.speechSynthesis.cancel();
     if (!globalAudio.paused) { globalAudio.pause(); globalAudio.currentTime = 0; }
+    if (window.quranAudio) window.quranAudio.pause();
     if (currentAudioIcon) window.updateIcon(currentAudioIcon, 'pause');
     
     currentAudioText = textToRead;
@@ -386,7 +388,73 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         }
+
+        const tafsirBtn = e.target.closest('.tafsir-btn, .context-btn');
+        if (tafsirBtn) {
+            const surah = tafsirBtn.dataset.surah;
+            const ayah = tafsirBtn.dataset.ayah;
+            if (surah && ayah) {
+                window.toggleTafsir(surah, ayah, tafsirBtn);
+            }
+        }
+
+        const closeTafsir = e.target.closest('.close-tafsir');
+        if (closeTafsir) {
+            const container = closeTafsir.closest('.tafsir-container');
+            if (container) container.classList.remove('active');
+        }
     });
+
+    window.toggleTafsir = async function(surah, ayah, btn) {
+        const container = document.getElementById(`tafsir-${surah}-${ayah}`);
+        if (!container) return;
+
+        const isContext = btn.classList.contains('context-btn');
+        const type = isContext ? 'context' : 'tafsir';
+
+        if (container.classList.contains('active') && container.dataset.activeType === type) {
+            container.classList.remove('active');
+            return;
+        }
+
+        container.classList.add('active');
+        container.dataset.activeType = type;
+        const contentDiv = container.querySelector('.tafsir-content');
+        const titleSpan = container.querySelector('.tafsir-title');
+        
+        const lang = localStorage.getItem('lang') || 'en';
+        
+        let tafsirId, tafsirName;
+
+        if (isContext) {
+            tafsirId = lang === 'bn' ? 165 : 168; // Ahsanul Bayaan (Bn) / Ma'arif al-Qur'an (En)
+            tafsirName = lang === 'bn' ? "প্রেক্ষাপট (Ahsanul Bayaan)" : "Context (Ma'arif al-Qur'an)";
+        } else {
+            tafsirId = lang === 'bn' ? 166 : 169; // Abu Bakr Zakaria (Bn) / Ibn Kathir (En)
+            tafsirName = lang === 'bn' ? "তাফসীর আবু বকর যাকারিয়া" : "Tafsir Ibn Kathir";
+        }
+
+        titleSpan.textContent = tafsirName;
+        
+        if (container.dataset.loadedType === type && container.dataset.loadedId === tafsirId.toString()) return;
+
+        contentDiv.innerHTML = `<div style="padding: 20px; text-align: center;"><i class="ph ph-spinner-gap ph-spin" style="font-size: 24px; color: var(--gold);"></i></div>`;
+
+        try {
+            const res = await fetch(`https://api.quran.com/api/v4/tafsirs/${tafsirId}/by_ayah/${surah}:${ayah}`);
+            const data = await res.json();
+            
+            if (data.tafsir && data.tafsir.text) {
+                contentDiv.innerHTML = data.tafsir.text;
+                container.dataset.loadedType = type;
+                container.dataset.loadedId = tafsirId.toString();
+            } else {
+                throw new Error("Content not available");
+            }
+        } catch (err) {
+            contentDiv.innerHTML = `<div style="padding: 10px; color: var(--error); font-size: 14px;">Information not available for this Ayah yet.</div>`;
+        }
+    };
 
     // 7. Toggle Player Button (Floating Headphones)
     let playerToggleBtn = null;
