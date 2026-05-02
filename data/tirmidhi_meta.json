@@ -1,0 +1,66 @@
+{
+  "id": "tirmidhi",
+  "titleEn": "Jami At-Tirmidhi",
+  "titleAr": "جامع الترمذي",
+  "titleBn": "জামি আত-তিরমিযী",
+  "author": "Imam Abu Isa Muhammad at-Tirmidhi",
+  "books": [
+    {
+      "number": 1,
+      "nameEn": "Volume 1 (1-500)",
+      "nameBn": "খণ্ড 1 (1-500)",
+      "nameAr": "الجزء 1",
+      "file": "tirmidhi_v1.json"
+    },
+    {
+      "number": 2,
+      "nameEn": "Volume 2 (501-1000)",
+      "nameBn": "খণ্ড 2 (501-1000)",
+      "nameAr": "الجزء 2",
+      "file": "tirmidhi_v2.json"
+    },
+    {
+      "number": 3,
+      "nameEn": "Volume 3 (1001-1500)",
+      "nameBn": "খণ্ড 3 (1001-1500)",
+      "nameAr": "الجزء 3",
+      "file": "tirmidhi_v3.json"
+    },
+    {
+      "number": 4,
+      "nameEn": "Volume 4 (1501-2000)",
+      "nameBn": "খণ্ড 4 (1501-2000)",
+      "nameAr": "الجزء 4",
+      "file": "tirmidhi_v4.json"
+    },
+    {
+      "number": 5,
+      "nameEn": "Volume 5 (2001-2500)",
+      "nameBn": "খণ্ড 5 (2001-2500)",
+      "nameAr": "الجزء 5",
+      "file": "tirmidhi_v5.json"
+    },
+    {
+      "number": 6,
+      "nameEn": "Volume 6 (2501-3000)",
+      "nameBn": "খণ্ড 6 (2501-3000)",
+      "nameAr": "الجزء 6",
+      "file": "tirmidhi_v6.json"
+    },
+    {
+      "number": 7,
+      "nameEn": "Volume 7 (3001-3500)",
+      "nameBn": "খণ্ড 7 (3001-3500)",
+      "nameAr": "الجزء 7",
+      "file": "tirmidhi_v7.json"
+    },
+    {
+      "number": 8,
+      "nameEn": "Volume 8 (3501-3956)",
+      "nameBn": "খণ্ড 8 (3501-3956)",
+      "nameAr": "الجزء 8",
+      "file": "tirmidhi_v8.json"
+    }
+  ],
+  "indexFile": "tirmidhi_index.json"
+}

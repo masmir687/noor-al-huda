@@ -1,0 +1,122 @@
+{
+  "id": "bukhari",
+  "titleEn": "Sahih Al-Bukhari",
+  "titleAr": "صحيح البخاري",
+  "titleBn": "সহীহ আল-বুখারী",
+  "author": "Imam Muhammad al-Bukhari",
+  "books": [
+    {
+      "number": 1,
+      "nameEn": "Volume 1 (1-500)",
+      "nameBn": "খণ্ড 1 (1-500)",
+      "nameAr": "الجزء 1",
+      "file": "bukhari_v1.json"
+    },
+    {
+      "number": 2,
+      "nameEn": "Volume 2 (501-1000)",
+      "nameBn": "খণ্ড 2 (501-1000)",
+      "nameAr": "الجزء 2",
+      "file": "bukhari_v2.json"
+    },
+    {
+      "number": 3,
+      "nameEn": "Volume 3 (1001-1500)",
+      "nameBn": "খণ্ড 3 (1001-1500)",
+      "nameAr": "الجزء 3",
+      "file": "bukhari_v3.json"
+    },
+    {
+      "number": 4,
+      "nameEn": "Volume 4 (1501-2000)",
+      "nameBn": "খণ্ড 4 (1501-2000)",
+      "nameAr": "الجزء 4",
+      "file": "bukhari_v4.json"
+    },
+    {
+      "number": 5,
+      "nameEn": "Volume 5 (2001-2500)",
+      "nameBn": "খণ্ড 5 (2001-2500)",
+      "nameAr": "الجزء 5",
+      "file": "bukhari_v5.json"
+    },
+    {
+      "number": 6,
+      "nameEn": "Volume 6 (2501-3000)",
+      "nameBn": "খণ্ড 6 (2501-3000)",
+      "nameAr": "الجزء 6",
+      "file": "bukhari_v6.json"
+    },
+    {
+      "number": 7,
+      "nameEn": "Volume 7 (3001-3500)",
+      "nameBn": "খণ্ড 7 (3001-3500)",
+      "nameAr": "الجزء 7",
+      "file": "bukhari_v7.json"
+    },
+    {
+      "number": 8,
+      "nameEn": "Volume 8 (3501-4000)",
+      "nameBn": "খণ্ড 8 (3501-4000)",
+      "nameAr": "الجزء 8",
+      "file": "bukhari_v8.json"
+    },
+    {
+      "number": 9,
+      "nameEn": "Volume 9 (4001-4500)",
+      "nameBn": "খণ্ড 9 (4001-4500)",
+      "nameAr": "الجزء 9",
+      "file": "bukhari_v9.json"
+    },
+    {
+      "number": 10,
+      "nameEn": "Volume 10 (4501-5000)",
+      "nameBn": "খণ্ড 10 (4501-5000)",
+      "nameAr": "الجزء 10",
+      "file": "bukhari_v10.json"
+    },
+    {
+      "number": 11,
+      "nameEn": "Volume 11 (5001-5500)",
+      "nameBn": "খণ্ড 11 (5001-5500)",
+      "nameAr": "الجزء 11",
+      "file": "bukhari_v11.json"
+    },
+    {
+      "number": 12,
+      "nameEn": "Volume 12 (5501-6000)",
+      "nameBn": "খণ্ড 12 (5501-6000)",
+      "nameAr": "الجزء 12",
+      "file": "bukhari_v12.json"
+    },
+    {
+      "number": 13,
+      "nameEn": "Volume 13 (6001-6500)",
+      "nameBn": "খণ্ড 13 (6001-6500)",
+      "nameAr": "الجزء 13",
+      "file": "bukhari_v13.json"
+    },
+    {
+      "number": 14,
+      "nameEn": "Volume 14 (6501-7000)",
+      "nameBn": "খণ্ড 14 (6501-7000)",
+      "nameAr": "الجزء 14",
+      "file": "bukhari_v14.json"
+    },
+    {
+      "number": 15,
+      "nameEn": "Volume 15 (7001-7500)",
+      "nameBn": "খণ্ড 15 (7001-7500)",
+      "nameAr": "الجزء 15",
+      "file": "bukhari_v15.json"
+    },
+    {
+      "number": 16,
+      "nameEn": "Volume 16 (7501-7563)",
+      "nameBn": "খণ্ড 16 (7501-7563)",
+      "nameAr": "الجزء 16",
+      "file": "bukhari_v16.json"
+    }
+  ],
+  "indexFile": "bukhari_index.json"
+}

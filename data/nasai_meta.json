@@ -1,0 +1,94 @@
+{
+  "id": "nasai",
+  "titleEn": "Sunan An-Nasai",
+  "titleAr": "سنن النسائي",
+  "titleBn": "সুনান আন-নাসায়ী",
+  "author": "Imam Ahmad an-Nasai",
+  "books": [
+    {
+      "number": 1,
+      "nameEn": "Volume 1 (1-500)",
+      "nameBn": "খণ্ড 1 (1-500)",
+      "nameAr": "الجزء 1",
+      "file": "nasai_v1.json"
+    },
+    {
+      "number": 2,
+      "nameEn": "Volume 2 (501-1000)",
+      "nameBn": "খণ্ড 2 (501-1000)",
+      "nameAr": "الجزء 2",
+      "file": "nasai_v2.json"
+    },
+    {
+      "number": 3,
+      "nameEn": "Volume 3 (1001-1500)",
+      "nameBn": "খণ্ড 3 (1001-1500)",
+      "nameAr": "الجزء 3",
+      "file": "nasai_v3.json"
+    },
+    {
+      "number": 4,
+      "nameEn": "Volume 4 (1501-2000)",
+      "nameBn": "খণ্ড 4 (1501-2000)",
+      "nameAr": "الجزء 4",
+      "file": "nasai_v4.json"
+    },
+    {
+      "number": 5,
+      "nameEn": "Volume 5 (2001-2500)",
+      "nameBn": "খণ্ড 5 (2001-2500)",
+      "nameAr": "الجزء 5",
+      "file": "nasai_v5.json"
+    },
+    {
+      "number": 6,
+      "nameEn": "Volume 6 (2501-3000)",
+      "nameBn": "খণ্ড 6 (2501-3000)",
+      "nameAr": "الجزء 6",
+      "file": "nasai_v6.json"
+    },
+    {
+      "number": 7,
+      "nameEn": "Volume 7 (3001-3500)",
+      "nameBn": "খণ্ড 7 (3001-3500)",
+      "nameAr": "الجزء 7",
+      "file": "nasai_v7.json"
+    },
+    {
+      "number": 8,
+      "nameEn": "Volume 8 (3501-4000)",
+      "nameBn": "খণ্ড 8 (3501-4000)",
+      "nameAr": "الجزء 8",
+      "file": "nasai_v8.json"
+    },
+    {
+      "number": 9,
+      "nameEn": "Volume 9 (4001-4500)",
+      "nameBn": "খণ্ড 9 (4001-4500)",
+      "nameAr": "الجزء 9",
+      "file": "nasai_v9.json"
+    },
+    {
+      "number": 10,
+      "nameEn": "Volume 10 (4501-5000)",
+      "nameBn": "খণ্ড 10 (4501-5000)",
+      "nameAr": "الجزء 10",
+      "file": "nasai_v10.json"
+    },
+    {
+      "number": 11,
+      "nameEn": "Volume 11 (5001-5500)",
+      "nameBn": "খণ্ড 11 (5001-5500)",
+      "nameAr": "الجزء 11",
+      "file": "nasai_v11.json"
+    },
+    {
+      "number": 12,
+      "nameEn": "Volume 12 (5501-5758)",
+      "nameBn": "খণ্ড 12 (5501-5758)",
+      "nameAr": "الجزء 12",
+      "file": "nasai_v12.json"
+    }
+  ],
+  "indexFile": "nasai_index.json"
+}
