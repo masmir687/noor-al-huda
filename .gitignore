@@ -37,6 +37,7 @@ package-lock.json
 yarn.lock
 
 # Temporary files
+scripts/
 tmp/
 temp/
 dist/
