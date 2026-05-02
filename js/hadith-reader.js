@@ -194,6 +194,12 @@ document.addEventListener('DOMContentLoaded', () => {
             updateDocumentTitle();
             renderSidebar();
             
+            // Set Initial Player Content
+            const pTitle = document.querySelector('.player-title');
+            const pSub = document.querySelector('.player-sub');
+            if (pTitle) pTitle.textContent = currentLang === 'bn' ? collectionMeta.titleBn : collectionMeta.titleEn;
+            if (pSub) pSub.textContent = currentLang === 'bn' ? "হাদিস সংগ্রহ" : "Hadith Collection";
+
             if (numberParam || specificIdParam) {
                 if (indexPromise) await indexPromise;
                 if (globalData && globalData.hadiths) {
@@ -240,6 +246,18 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         if (headerMeta) headerMeta.textContent = currentLang === 'bn' ? collectionMeta.titleBn : collectionMeta.titleEn;
+
+        // Update Player Content for the current Book
+        const pTitle = document.querySelector('.player-title');
+        const pSub = document.querySelector('.player-sub');
+        if (pTitle) pTitle.textContent = currentLang === 'bn' ? collectionMeta.titleBn : collectionMeta.titleEn;
+        if (pSub) {
+            if (bookNumber === 0) pSub.textContent = (window.i18n && window.i18n.translations[currentLang].global_search) || "Global Search";
+            else {
+                const b = collectionMeta.books.find(b => b.number === bookNumber);
+                pSub.textContent = currentLang === 'bn' ? b.nameBn : b.nameEn;
+            }
+        }
 
         try {
             if (bookNumber === 0) {

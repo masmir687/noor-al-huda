@@ -185,7 +185,12 @@ document.addEventListener('DOMContentLoaded', () => {
             surahHeaderMeta.textContent = `${surahAr.revelationType} · ${surahAr.numberOfAyahs} Ayahs`;
             
             const playerTitle = document.querySelector('.player-title');
+            const playerSub = document.querySelector('.player-sub');
+            const reciterName = reciterSelect?.options[reciterSelect.selectedIndex]?.text || "Recitation";
+            
             if (playerTitle) playerTitle.textContent = `${t.surah} ${displayTitle}`;
+            if (playerSub) playerSub.textContent = reciterName;
+            
             document.title = `${t.surah} ${displayTitle} — Noor Al-Huda`;
 
             let html = '';
