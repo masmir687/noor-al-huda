@@ -1561,3 +1561,88 @@ body.player-hidden .quran-sidebar {
         height: calc(100vh - 60px) !important;
     }
 }
+
+/* --- Update Notification --- */
+.update-notification {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--gold);
+    color: var(--obsidian);
+    padding: 12px 24px;
+    border-radius: 50px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-weight: 600;
+    animation: slideUp 0.5s ease;
+}
+
+.update-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+@keyframes slideUp {
+    from { transform: translate(-50%, 100px); opacity: 0; }
+    to { transform: translate(-50%, 0); opacity: 1; }
+}
+
+/* --- Bookmark Enhancements --- */
+.hadith-card {
+    transition: transform 0.3s ease, opacity 0.3s ease, background-color 0.2s ease;
+}
+
+.bookmark-tools .btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    padding: 8px 15px;
+}
+
+#import-input:focus + label {
+    outline: 2px solid var(--gold);
+}
+
+/* --- Privacy Notice Box --- */
+.privacy-notice-box {
+    margin-top: 25px;
+    padding: 15px;
+    background: rgba(197, 160, 89, 0.1);
+    border: 1px solid rgba(197, 160, 89, 0.2);
+    border-radius: 8px;
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.privacy-notice-box i {
+    font-size: 24px;
+    color: var(--gold);
+    flex-shrink: 0;
+}
+
+.privacy-notice-text {
+    font-size: 13px;
+    color: var(--stone);
+    line-height: 1.5;
+    margin: 0;
+}
+
+[data-theme='dark'] .privacy-notice-text {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+[data-theme='dark'] .privacy-notice-box {
+    background: rgba(200, 146, 42, 0.05);
+    border-color: rgba(200, 146, 42, 0.15);
+}
+
+[data-theme='dark'] .privacy-notice-text strong {
+    color: var(--goldl) !important;
+}

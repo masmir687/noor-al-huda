@@ -289,6 +289,59 @@ Shared from ${appName}`;
 };
 
 
+// --- SERVICE WORKER REGISTRATION & UPDATES ---
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').then(reg => {
+            console.log('SW Registered with scope:', reg.scope);
+
+            // Check for updates periodically (Lazy background check)
+            setInterval(() => {
+                reg.update();
+            }, 60 * 60 * 1000); // Every hour
+
+            reg.addEventListener('updatefound', () => {
+                const newWorker = reg.installing;
+                newWorker.addEventListener('statechange', () => {
+                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                        // New version available!
+                        showUpdateNotification();
+                    }
+                });
+            });
+        }).catch(err => {
+            console.error('SW Registration failed:', err);
+        });
+    });
+}
+
+function showUpdateNotification() {
+    const lang = localStorage.getItem('lang') || 'en';
+    const msg = lang === 'bn' ? 'নূর আল-হুদা আপডেট হয়েছে! নতুন ফিচার দেখতে রিলোড করুন।' : 'Noor Al-Huda has been updated! Please reload to see the latest version.';
+    const btnText = lang === 'bn' ? 'রিলোড' : 'Reload Now';
+    
+    const div = document.createElement('div');
+    div.className = 'update-notification';
+    div.innerHTML = `
+        <div class="update-content">
+            <i class="ph ph-sparkle"></i>
+            <span>${msg}</span>
+            <button id="reload-app-btn" class="btn btn-gold btn-sm">${btnText}</button>
+        </div>
+    `;
+    document.body.appendChild(div);
+    
+    const btn = document.getElementById('reload-app-btn');
+    if (btn) {
+        btn.onclick = () => {
+            if (navigator.serviceWorker.controller) {
+                navigator.serviceWorker.controller.postMessage('skipWaiting');
+            }
+            window.location.reload();
+        };
+    }
+}
+
 // --- DOM READY LOGIC ---
 
 if ('scrollRestoration' in history) {

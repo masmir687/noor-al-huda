@@ -97,6 +97,78 @@ const BookmarkDB = {
             request.onsuccess = () => resolve(request.result);
             request.onerror = () => resolve([]);
         });
+    },
+
+    async export() {
+        const data = await this.getAll();
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        const date = new Date().toISOString().split('T')[0];
+        a.href = url;
+        a.download = `NoorAlHuda_Bookmarks_${date}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    },
+
+    async import(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onerror = () => reject('Failed to read file');
+            reader.onload = async (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (!Array.isArray(data)) {
+                        throw new Error('Invalid backup file format. Expected an array of bookmarks.');
+                    }
+                    
+                    await this.ensureDB();
+                    const transaction = this.db.transaction([this.storeName], 'readwrite');
+                    const store = transaction.objectStore(this.storeName);
+                    
+                    let count = 0;
+                    data.forEach(item => {
+                        if (item && item.id) {
+                            // Use put to overwrite duplicates or add new ones
+                            store.put(item);
+                            count++;
+                        }
+                    });
+                    
+                    transaction.oncomplete = () => {
+                        console.log(`Import successful: ${count} items processed.`);
+                        resolve(count);
+                    };
+                    
+                    transaction.onerror = (event) => {
+                        console.error("Import transaction error:", event.target.error);
+                        reject('Database error during import: ' + event.target.error);
+                    };
+
+                    transaction.onabort = (event) => {
+                        console.warn("Import transaction aborted:", event.target.error);
+                        reject('Import aborted');
+                    };
+                } catch (err) {
+                    console.error("Import parsing error:", err);
+                    reject('Failed to parse backup file: ' + err.message);
+                }
+            };
+            reader.readAsText(file);
+        });
+    },
+
+    async clearAll() {
+        await this.ensureDB();
+        return new Promise((resolve, reject) => {
+            const transaction = this.db.transaction([this.storeName], 'readwrite');
+            const store = transaction.objectStore(this.storeName);
+            const request = store.clear();
+            request.onsuccess = () => resolve(true);
+            request.onerror = () => reject(false);
+        });
     }
 };
 

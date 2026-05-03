@@ -42,8 +42,32 @@
 
     <header class="page-header">
         <div class="container">
-            <h1 class="page-title" data-t="bookmarks">My Bookmarks</h1>
-            <p class="page-subtitle">Your personal collection of saved Quran verses and Hadiths.</p>
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+                <div>
+                    <h1 class="page-title" data-t="bookmarks">My Bookmarks</h1>
+                    <p class="page-subtitle">Your personal collection of saved Quran verses and Hadiths.</p>
+                </div>
+                <div class="bookmark-tools" style="display: flex; gap: 10px;">
+                    <button id="export-btn" class="btn btn-outline" style="background: rgba(255,255,255,0.05); color: white; border-color: rgba(255,255,255,0.2);">
+                        <i class="ph ph-export"></i> <span data-t="export">Export Backup</span>
+                    </button>
+                    <label for="import-input" class="btn btn-outline" style="background: rgba(255,255,255,0.05); color: white; border-color: rgba(255,255,255,0.2); cursor: pointer;">
+                        <i class="ph ph-import"></i> <span data-t="import">Import Backup</span>
+                    </label>
+                    <input type="file" id="import-input" accept=".json" style="display: none;">
+                    <button id="clear-all-btn" class="btn btn-outline" style="background: rgba(220, 38, 38, 0.1); color: #ef4444; border-color: rgba(220, 38, 38, 0.2);">
+                        <i class="ph ph-trash"></i> <span data-t="clear_all">Clear All</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Backup Warning -->
+            <div class="privacy-notice-box">
+                <i class="ph ph-warning-circle"></i>
+                <p class="privacy-notice-text">
+                    <strong style="color: var(--gold);">Data Privacy Notice:</strong> Bookmarks are stored locally on your device. Clearing browser data or changing browsers may result in loss. We recommend exporting a backup periodically to keep your collection safe.
+                </p>
+            </div>
         </div>
     </header>
 

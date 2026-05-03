@@ -77,7 +77,68 @@ document.addEventListener('DOMContentLoaded', () => {
         if (window.i18n) window.i18n.translatePage(currentLang);
     }
 
+    function initGlobalTools() {
+        const exportBtn = document.getElementById('export-btn');
+        const importInput = document.getElementById('import-input');
+        const clearBtn = document.getElementById('clear-all-btn');
+
+        if (exportBtn) {
+            exportBtn.onclick = () => {
+                window.BookmarkDB.getAll().then(data => {
+                    if (data.length === 0) {
+                        alert("No bookmarks to export.");
+                        return;
+                    }
+                    window.BookmarkDB.export();
+                });
+            };
+        }
+
+        if (importInput) {
+            importInput.onchange = async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                if (confirm(`Do you want to import bookmarks from "${file.name}"? This will add them to your current collection.`)) {
+                    try {
+                        const count = await window.BookmarkDB.import(file);
+                        alert(`Successfully imported ${count} bookmarks.`);
+                        loadBookmarks();
+                    } catch (err) {
+                        alert(`Import failed: ${err}`);
+                    }
+                }
+                importInput.value = ''; // Reset
+            };
+        }
+
+        if (clearBtn) {
+            clearBtn.onclick = async () => {
+                const data = await window.BookmarkDB.getAll();
+                if (data.length === 0) {
+                    alert("No bookmarks to clear.");
+                    return;
+                }
+
+                const msg1 = "DANGER: You are about to DELETE ALL your bookmarks! This cannot be undone unless you have a backup.";
+                const msg2 = "To proceed with TOTAL DELETION, please type 'DELETE' in the next prompt.";
+                
+                if (confirm(msg1)) {
+                    const verification = prompt(msg2);
+                    if (verification === 'DELETE') {
+                        await window.BookmarkDB.clearAll();
+                        loadBookmarks();
+                        alert("All bookmarks have been cleared.");
+                    } else if (verification !== null) {
+                        alert("Deletion cancelled. Verification failed.");
+                    }
+                }
+            };
+        }
+    }
+
     function attachListeners(bookmarks) {
+        // --- Card Listeners ---
         container.querySelectorAll('.hadith-card').forEach(card => {
             const id = card.dataset.id;
             const item = bookmarks.find(b => b.id === id);
@@ -88,12 +149,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (e.target.closest('button')) return;
 
                 if (item.type === 'quran') {
-                    // Navigate to Quran with Directory-based Surah context
                     const s = item.surah || 1;
                     const a = item.ayah || 1;
                     window.location.href = `quran/${s}/?ayah=${a}#ayah-${a}`;
                 } else if (item.type === 'hadith') {
-                    // Navigate to specific collection page with Hadith Number and unique ID
                     const collectionPath = `collection/${item.collectionId}/`;
                     const uniqueId = item.id.split('_').slice(1).join('_') || item.number;
                     window.location.href = `${collectionPath}?number=${item.number}&id=${uniqueId}#hadith-${uniqueId}`;
@@ -102,7 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Listen
             card.querySelector('.listen-btn').addEventListener('click', (e) => {
-                e.stopPropagation(); // Prevent card click
+                e.stopPropagation();
                 const icon = e.currentTarget.querySelector('i');
                 const content = currentLang === 'bn' && item.textBn ? item.textBn : (item.textEn || item.english || "");
                 window.toggleSpeech(content, icon, currentLang);
@@ -129,19 +188,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
 
-            // Remove
+            // Remove (with simple confirmation)
             card.querySelector('.remove-btn').addEventListener('click', async (e) => {
-                e.stopPropagation(); // Prevent card click
-                if (confirm('Remove this bookmark?')) {
+                e.stopPropagation();
+                if (confirm('Are you sure you want to remove this bookmark?')) {
                     await window.BookmarkDB.remove(id);
-                    card.remove();
-                    if (container.querySelectorAll('.hadith-card').length === 0) {
-                        loadBookmarks();
-                    }
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateX(20px)';
+                    setTimeout(() => {
+                        card.remove();
+                        if (container.querySelectorAll('.hadith-card').length === 0) {
+                            loadBookmarks();
+                        }
+                    }, 300);
                 }
             });
         });
     }
+
+    initGlobalTools();
 
     // Handle language changes
     document.addEventListener('languageChanged', (e) => {
