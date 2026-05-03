@@ -1001,11 +1001,11 @@ body.player-hidden .quran-sidebar {
 .setting-label {
     font-size: 12px; color: rgba(255,255,255,0.7);
 }
-.setting-select, .per-page-select {
+.setting-select {
     background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); color: var(--white); padding: 8px; border-radius: 6px; font-family: inherit; font-size: 13px; outline: none; width: 100%;
 }
-.setting-select:focus, .per-page-select:focus { border-color: var(--gold); }
-.setting-select option, .per-page-select option { background: var(--emd); color: var(--white); }
+.setting-select:focus { border-color: var(--gold); }
+.setting-select option { background: var(--emd); color: var(--white); }
 
 .quran-content {
         background-color: var(--cream); 
