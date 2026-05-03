@@ -159,6 +159,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
+            // Set active state color
+            const bookmarkBtn = card.querySelector('.remove-btn');
+            if (bookmarkBtn) bookmarkBtn.style.color = 'var(--em)';
+
             // Listen
             card.querySelector('.listen-btn').addEventListener('click', (e) => {
                 e.stopPropagation();

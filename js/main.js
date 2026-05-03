@@ -132,6 +132,20 @@ globalAudio.addEventListener('loadedmetadata', () => {
     if (speedS) globalAudio.playbackRate = parseFloat(speedS.value);
 });
 
+globalAudio.addEventListener('play', () => {
+    const playMainBtn = document.querySelector('.play-main i');
+    if (playMainBtn && currentAudioIcon && playMainBtn !== currentAudioIcon) {
+        window.updateIcon(playMainBtn, 'play');
+    }
+});
+
+globalAudio.addEventListener('pause', () => {
+    const playMainBtn = document.querySelector('.play-main i');
+    if (playMainBtn) {
+        window.updateIcon(playMainBtn, 'pause');
+    }
+});
+
 window.toggleSpeech = function(textToRead, playIconElement, lang = 'ar', onEnd = null) {
     if (!textToRead) {
         window.speechSynthesis.cancel();
@@ -347,14 +361,20 @@ function showUpdateNotification() {
 // Global Selection Fix: Clear selection on single tap to prevent accidental highlights/popups
 // This ensures that only long-press or double-tap triggers selection mode.
 document.addEventListener('click', (e) => {
-    if (e.detail === 1) { // Single click
+    // detail === 1 means a single click. 
+    // Double clicks (detail === 2) and long presses (no click event) are preserved.
+    if (e.detail === 1 && !['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) {
         const sel = window.getSelection();
-        if (sel && sel.type === 'Range' && !['INPUT', 'TEXTAREA'].includes(e.target.tagName)) {
-            // Check if the target or its parent is a selectable content area
-            const isContent = e.target.closest('.ayah-text-ar, .ayah-text-tr, .hadith-ar, .hadith-en, .tafsir-content, .learn-desc, .qa-answer');
-            if (!isContent) {
-                sel.removeAllRanges();
-            }
+        if (sel) {
+            // Use a tiny timeout to ensure we catch selection that happens 
+            // slightly after the click event in some mobile browsers.
+            setTimeout(() => {
+                if (window.getSelection().type === 'Range') {
+                    // Only clear if it looks like a single-tap selection (short text)
+                    // and not a long-press selection (which doesn't trigger detail 1 click usually)
+                    window.getSelection().removeAllRanges();
+                }
+            }, 0);
         }
     }
 }, true);

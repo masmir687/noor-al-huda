@@ -1647,6 +1647,21 @@ body.player-hidden .quran-sidebar {
     color: var(--goldl) !important;
 }
 
+.bookmark-btn.active {
+    background-color: var(--em) !important;
+    color: var(--white) !important;
+    border-color: var(--emd) !important;
+    box-shadow: 0 2px 8px rgba(26, 107, 71, 0.2);
+}
+
+.bookmark-btn.active i {
+    color: var(--white) !important;
+}
+
+.bookmark-btn.active:hover {
+    background-color: var(--eml) !important;
+}
+
 /* --- UX Selection Improvements --- */
 /* Completely disable selection globally by default */
 html, body {

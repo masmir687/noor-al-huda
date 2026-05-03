@@ -277,8 +277,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const id = btn.dataset.id;
             window.BookmarkDB?.get(id).then(exists => {
                 if (exists) {
-                    btn.querySelector('i').className = 'ph ph-bookmark-simple-fill';
-                    btn.style.color = 'var(--gold)';
                     btn.classList.add('active');
                 }
             });
@@ -293,9 +291,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     title: surahHeaderEn.textContent.split('(')[0].trim()
                 };
                 const added = await window.BookmarkDB.toggle(item);
-                const icon = btn.querySelector('i');
-                icon.className = added ? 'ph ph-bookmark-simple-fill' : 'ph ph-bookmark-simple';
-                btn.style.color = added ? 'var(--gold)' : '';
                 btn.classList.toggle('active', added);
             };
         });
@@ -323,15 +318,39 @@ document.addEventListener('DOMContentLoaded', () => {
     
 
     // --- Audio Logic ---
+    function updateAllAudioButtons() {
+        const isPaused = quranAudio.paused;
+        
+        // Reset all buttons first
+        document.querySelectorAll('.play-ayah i, .play-bismillah i').forEach(i => {
+            i.className = 'ph ph-play';
+        });
+
+        // Update the active one if playing
+        if (!isPaused) {
+            if (isBismillahPlaying && bismillahBtn) {
+                bismillahBtn.querySelector('i').className = 'ph ph-pause';
+            } else if (currentAyahBtn) {
+                currentAyahBtn.querySelector('i').className = 'ph ph-pause';
+            }
+        }
+
+        // Update main player icon
+        if (mainPlayIcon) {
+            mainPlayIcon.className = isPaused ? 'ph ph-play' : 'ph ph-pause';
+        }
+    }
+
+    quranAudio.addEventListener('play', updateAllAudioButtons);
+    quranAudio.addEventListener('pause', updateAllAudioButtons);
+
     function playAyah(btn, index) {
         currentAyahIndex = index;
         const surah = btn.dataset.surah.padStart(3, '0');
         const ayah = btn.dataset.ayah.padStart(3, '0');
-        document.querySelectorAll('.play-ayah i, .play-bismillah i').forEach(i => i.className = 'ph ph-play');
         
         if (currentAyahBtn === btn && !quranAudio.paused) {
             quranAudio.pause();
-            if (mainPlayIcon) mainPlayIcon.className = 'ph ph-play';
         } else {
             if (window.globalAudio) {
                 window.globalAudio.pause();
@@ -347,11 +366,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (speed) quranAudio.playbackRate = parseFloat(speed.value);
             if (vol) quranAudio.volume = parseFloat(vol.value);
 
-            quranAudio.play().catch(console.error);
-            btn.querySelector('i').className = 'ph ph-pause';
-            if (mainPlayIcon) mainPlayIcon.className = 'ph ph-pause';
             currentAyahBtn = btn;
             isBismillahPlaying = false;
+            quranAudio.play().catch(console.error);
             scrollToElement(`ayah-${btn.dataset.ayah}`);
             if (window.updatePlayerUI) window.updatePlayerUI(false);
         }
@@ -359,11 +376,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function playBismillah() {
         if (!bismillahBtn) return;
-        document.querySelectorAll('.play-ayah i').forEach(i => i.className = 'ph ph-play');
         if (isBismillahPlaying && !quranAudio.paused) {
             quranAudio.pause();
-            bismillahBtn.querySelector('i').className = 'ph ph-play';
-            if (mainPlayIcon) mainPlayIcon.className = 'ph ph-play';
         } else {
             quranAudio.src = `https://everyayah.com/data/${currentReciter}/001001.mp3`;
             
@@ -373,11 +387,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (speed) quranAudio.playbackRate = parseFloat(speed.value);
             if (vol) quranAudio.volume = parseFloat(vol.value);
 
-            quranAudio.play().catch(console.error);
-            bismillahBtn.querySelector('i').className = 'ph ph-pause';
-            if (mainPlayIcon) mainPlayIcon.className = 'ph ph-pause';
             isBismillahPlaying = true;
             currentAyahBtn = null;
+            quranAudio.play().catch(console.error);
         }
     }
 
@@ -401,7 +413,6 @@ document.addEventListener('DOMContentLoaded', () => {
             else if (quranAudio.src) quranAudio.play();
             else if (bismillahBtn) playBismillah();
             else if (allAyahButtons.length > 0) playAyah(allAyahButtons[0], 0);
-            if (mainPlayIcon) mainPlayIcon.className = quranAudio.paused ? 'ph ph-play' : 'ph ph-pause';
         };
     }
 

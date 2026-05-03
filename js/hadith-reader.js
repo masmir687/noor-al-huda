@@ -579,8 +579,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             window.BookmarkDB?.get(bookmarkBtn.dataset.id).then(exists => {
                 if (exists) {
-                    bookmarkBtn.querySelector('i').className = 'ph ph-bookmark-simple-fill';
-                    bookmarkBtn.style.color = 'var(--gold)';
                     bookmarkBtn.classList.add('active');
                 }
             });
@@ -594,8 +592,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     title: (currentLang === 'bn' ? collectionMeta?.titleBn : collectionMeta?.titleEn)
                 };
                 const added = await window.BookmarkDB.toggle(item);
-                bookmarkBtn.querySelector('i').className = added ? 'ph ph-bookmark-simple-fill' : 'ph ph-bookmark-simple';
-                bookmarkBtn.style.color = added ? 'var(--gold)' : '';
                 bookmarkBtn.classList.toggle('active', added);
             };
 
