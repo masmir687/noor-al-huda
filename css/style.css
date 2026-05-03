@@ -1648,46 +1648,54 @@ body.player-hidden .quran-sidebar {
 }
 
 /* --- UX Selection Improvements --- */
-/* Prevent accidental text selection on single clicks for the whole app */
-body {
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    -webkit-tap-highlight-color: transparent;
-}
-
-/* Allow selection on actual content areas where user might want to copy text */
-/* Modern browsers will still allow selection via long-press even if single click selection is deterred */
-.quran-content,
-#hadith-container,
-.hadith-card,
-.ayah-row,
-.tafsir-content,
-.learn-content,
-.qa-answer,
-.page-header,
-.footer,
-.splash-content {
-    -webkit-user-select: text;
-    -moz-user-select: text;
-    -ms-user-select: text;
-    user-select: text;
-}
-
-/* Buttons and interactive elements should never be selectable */
-button, 
-.btn, 
-.nav-links a, 
-.surah-item, 
-.setting-label, 
-.lang-btn, 
-.pc-btn,
-.ayah-badge,
-.qa-tag,
-.surah-number {
+/* Completely disable selection globally by default */
+html, body {
     -webkit-user-select: none !important;
     -moz-user-select: none !important;
     -ms-user-select: none !important;
+    user-select: none !important;
+    -webkit-tap-highlight-color: transparent !important;
+}
+
+/* Interactive elements: ensure NO selection happens on click/tap */
+/* We target the containers and then aggressively disable their children */
+a, button, select, 
+.btn, .btn-sm, .pc-btn, .nav-icon-btn, .lang-btn, .mobile-menu-btn,
+.surah-item, .pill, .mod-card, .qa-card, .vid-card, .collection-card,
+.ayah-btn, .sidebar-toggle-btn, .player-toggle-btn,
+.remove-btn, .listen-btn, .share-btn, .bookmark-btn {
+    -webkit-user-select: none !important;
+    user-select: none !important;
+    -webkit-touch-callout: none !important;
+    cursor: pointer;
+    touch-action: manipulation; /* Prevents double-tap zoom which triggers selection */
+}
+
+/* Critical fix: Children of buttons/links (icons, spans) often trigger browser selection */
+/* pointer-events: none ensures the tap is handled by the parent button only */
+button *, .btn *, .nav-links a *, .surah-item *, .pill *, .pc-btn *, .ayah-btn * {
+    -webkit-user-select: none !important;
+    user-select: none !important;
+    pointer-events: none !important; 
+}
+
+/* Allow selection ONLY on actual content areas */
+/* Using specific leaf classes to prevent "selection leakage" */
+.ayah-text-ar, .ayah-text-tr, 
+.hadith-ar, .hadith-en, 
+.tafsir-content, .tafsir-content *,
+.learn-desc, .qa-answer, .qa-answer *,
+.page-title, .page-subtitle,
+.footer p, .privacy-notice-text {
+    -webkit-user-select: text !important;
+    user-select: text !important;
+    /* Allow the system context menu (copy/paste) on long-press only */
+    -webkit-touch-callout: default !important;
+    cursor: default !important;
+}
+
+/* Prevent accidental highlights during fast scrolling */
+.quran-sidebar, .nav, .player-bar {
+    -webkit-user-select: none !important;
     user-select: none !important;
 }

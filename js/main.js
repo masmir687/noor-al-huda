@@ -344,6 +344,21 @@ function showUpdateNotification() {
 
 // --- DOM READY LOGIC ---
 
+// Global Selection Fix: Clear selection on single tap to prevent accidental highlights/popups
+// This ensures that only long-press or double-tap triggers selection mode.
+document.addEventListener('click', (e) => {
+    if (e.detail === 1) { // Single click
+        const sel = window.getSelection();
+        if (sel && sel.type === 'Range' && !['INPUT', 'TEXTAREA'].includes(e.target.tagName)) {
+            // Check if the target or its parent is a selectable content area
+            const isContent = e.target.closest('.ayah-text-ar, .ayah-text-tr, .hadith-ar, .hadith-en, .tafsir-content, .learn-desc, .qa-answer');
+            if (!isContent) {
+                sel.removeAllRanges();
+            }
+        }
+    }
+}, true);
+
 if ('scrollRestoration' in history) {
     history.scrollRestoration = 'manual';
 }
