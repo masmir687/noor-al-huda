@@ -364,6 +364,9 @@ Shared from ${appName}`;
 let deferredPrompt;
 
 function createInstallButton() {
+    // Only show the install button on the homepage
+    if (document.body.getAttribute('data-page-title') !== 'site_title') return;
+
     const navRight = document.querySelector('.nav-right');
     if (!navRight || document.getElementById('install-app-btn')) return;
 
