@@ -26,6 +26,7 @@ html, body {
     --sand: #E2D9CC;
     --stone: #6B6560;
     --ink: #1C1C1E;
+    --obsidian: #0A0A0A;
     --warm: #F0ECE4;
     --white: #FFFFFF;
     /* Arabic Text Colors */
@@ -1571,30 +1572,72 @@ body.player-hidden .quran-sidebar {
 /* --- Update Notification --- */
 .update-notification {
     position: fixed;
-    bottom: 20px;
+    bottom: 30px;
     left: 50%;
     transform: translateX(-50%);
-    background: var(--gold);
-    color: var(--obsidian);
-    padding: 12px 24px;
-    border-radius: 50px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    background: var(--emd);
+    color: var(--white);
+    padding: 16px 24px;
+    border-radius: 16px;
+    box-shadow: 0 15px 50px rgba(0,0,0,0.5);
     z-index: 10000;
     display: flex;
+    flex-direction: column;
     align-items: center;
     gap: 15px;
-    font-weight: 600;
-    animation: slideUp 0.5s ease;
+    font-weight: 500;
+    animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    border: 1px solid rgba(200, 146, 42, 0.3);
+    max-width: 400px;
+    width: 90vw;
+    text-align: center;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+@media (min-width: 768px) {
+    .update-notification {
+        flex-direction: row;
+        max-width: 600px;
+        text-align: left;
+        justify-content: space-between;
+    }
 }
 
 .update-content {
     display: flex;
     align-items: center;
     gap: 12px;
+    flex: 1;
+}
+
+.update-content i {
+    color: var(--goldl);
+    font-size: 24px;
+    flex-shrink: 0;
+}
+
+.update-content span {
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+#reload-app-btn {
+    background-color: var(--gold) !important;
+    color: var(--white) !important;
+    border: none !important;
+    white-space: nowrap;
+    padding: 10px 20px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+#reload-app-btn:hover {
+    background-color: var(--goldl) !important;
+    transform: translateY(-2px);
 }
 
 @keyframes slideUp {
-    from { transform: translate(-50%, 100px); opacity: 0; }
+    from { transform: translate(-50%, 150px); opacity: 0; }
     to { transform: translate(-50%, 0); opacity: 1; }
 }
 
@@ -1762,6 +1805,247 @@ button *, .btn *, .nav-links a *, .surah-item *, .pill *, .pc-btn *, .ayah-btn *
 
 .bismillah-container {
     transition: all 0.3s ease;
+}
+
+.container-wide {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+
+@media (max-width: 480px) {
+    .container-wide {
+        padding: 0 15px;
+    }
+}
+
+/* --- Full-Width Learn Layout --- */
+.learn-viewport {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--parch);
+}
+
+@media (min-width: 992px) {
+    .learn-viewport {
+        flex-direction: row;
+        height: calc(100vh - 60px - 90px); 
+        overflow: hidden;
+    }
+    
+    body.player-hidden .learn-viewport {
+        height: calc(100vh - 60px);
+    }
+}
+
+.learn-sidebar {
+    width: 100%;
+    background-color: var(--emd);
+    color: var(--white);
+    padding: 20px;
+}
+
+@media (min-width: 992px) {
+    .learn-sidebar {
+        width: 280px;
+        height: 100%;
+        overflow-y: auto;
+        border-right: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 30px 20px;
+    }
+}
+
+[data-theme='dark'] .learn-sidebar {
+    background-color: #061A12;
+}
+
+.learn-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    background-color: var(--cream);
+    min-width: 0;
+}
+
+[data-theme='dark'] .learn-content {
+    background-color: #0A0C12;
+}
+
+@media (min-width: 992px) {
+    .learn-content {
+        padding: 40px;
+    }
+}
+
+.learn-tabs {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+    scrollbar-width: none;
+}
+
+@media (min-width: 992px) {
+    .learn-tabs {
+        flex-direction: column;
+        overflow-x: visible;
+        gap: 5px;
+    }
+}
+
+.learn-tab {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 18px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+@media (min-width: 992px) {
+    .learn-tab {
+        background: transparent;
+        border: none;
+        border-radius: 8px;
+        padding: 10px 15px;
+        color: rgba(255, 255, 255, 0.8);
+    }
+    
+    .learn-tab:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--white);
+    }
+}
+
+.learn-tab.active {
+    background: var(--gold) !important;
+    color: var(--white) !important;
+    border-color: var(--gold);
+}
+
+@media (min-width: 992px) {
+    .learn-tab.active {
+        background: rgba(255, 255, 255, 0.15) !important;
+        border-left: 3px solid var(--gold);
+        border-radius: 0 8px 8px 0;
+        margin-left: -20px;
+        padding-left: 17px;
+    }
+}
+
+.learn-tab i {
+    font-size: 18px;
+}
+
+/* --- Learn Card Redesign (Horizontal on Desktop) --- */
+.learn-card {
+    background-color: var(--cream);
+    border: 1px solid var(--sand);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-decoration: none;
+    color: var(--ink);
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+
+[data-theme='dark'] .learn-card {
+    background-color: #141721;
+    border-color: #1E2235;
+}
+
+@media (min-width: 992px) {
+    .learn-card {
+        flex-direction: row;
+        align-items: stretch;
+        min-height: 140px;
+        border-radius: 12px;
+    }
+    
+    .learn-card:hover {
+        transform: translateX(10px);
+        border-color: var(--gold);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+}
+
+.learn-img {
+    height: 140px;
+    background-color: var(--emd);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--white);
+    font-size: 42px;
+    flex-shrink: 0;
+}
+
+@media (min-width: 992px) {
+    .learn-img {
+        width: 140px;
+        height: auto;
+        font-size: 48px;
+    }
+}
+
+.learn-card .learn-content {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    background: transparent; /* Reset from .learn-content global */
+}
+
+@media (min-width: 992px) {
+    .learn-card .learn-content {
+        padding: 24px 30px;
+    }
+}
+
+.learn-tag {
+    display: inline-block;
+    background-color: rgba(200, 146, 42, 0.1);
+    color: var(--gold);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    align-self: flex-start;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.learn-title {
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    line-height: 1.3;
+}
+
+.learn-desc {
+    font-size: 14px;
+    color: var(--stone);
+    margin-bottom: 0;
+    line-height: 1.7;
+}
+
+@media (min-width: 992px) {
+    .learn-desc {
+        font-size: 15px;
+    }
 }
 
 /* --- Learn Tabs UI --- */

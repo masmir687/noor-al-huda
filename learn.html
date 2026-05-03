@@ -46,23 +46,37 @@
 
     <header class="page-header">
         <div class="container">
-            <h1 class="page-title">Learning Center</h1>
-            <p class="page-subtitle">Structured Islamic tutorials ranging from the foundational pillars of faith for beginners to advanced studies in Fiqh and Aqeedah.</p>
+            <h1 class="page-title" data-t="learn">Learning Center</h1>
+            <p class="page-subtitle" data-t="learn_subtitle">Structured Islamic tutorials ranging from the foundational pillars of faith for beginners to advanced studies.</p>
         </div>
     </header>
 
-    <main style="background-color: var(--parch); min-height: 60vh;">
-        <div class="container">
-            <!-- Tabs -->
-            <div class="learn-tabs" style="display: flex; gap: 10px; overflow-x: auto; margin-bottom: 30px; padding-bottom: 10px; scrollbar-width: none;">
-                <button class="btn btn-gold learn-tab active" data-category="faith">Faith & Pillars</button>
-                <button class="btn btn-outline learn-tab" data-category="salah">Salah & Wudu</button>
-                <button class="btn btn-outline learn-tab" data-category="adab">Life & Adab</button>
-            </div>
+    <main>
+        <div class="learn-viewport">
+            <!-- Sidebar (Desktop) / Top Tabs (Mobile) -->
+            <aside class="learn-sidebar">
+                <div class="sidebar-heading" data-t="categories">Categories</div>
+                <div class="learn-tabs">
+                    <button class="learn-tab active" data-category="faith">
+                        <i class="ph ph-shield-check"></i>
+                        <span data-t="faith_pillars">Faith & Pillars</span>
+                    </button>
+                    <button class="learn-tab" data-category="salah">
+                        <i class="ph ph-mosque"></i>
+                        <span data-t="salah_wudu">Salah & Wudu</span>
+                    </button>
+                    <button class="learn-tab" data-category="adab">
+                        <i class="ph ph-heart"></i>
+                        <span data-t="life_adab">Life & Adab</span>
+                    </button>
+                </div>
+            </aside>
 
             <!-- Content Area -->
-            <div class="collection-grid" id="learn-grid">
-                <div style="text-align: center; width: 100%; color: var(--stone); font-size: 12px; grid-column: 1 / -1;">Loading Tutorials...</div>
+            <div class="learn-content">
+                <div id="learn-grid">
+                    <div style="text-align: center; width: 100%; color: var(--stone); font-size: 12px;">Loading Tutorials...</div>
+                </div>
             </div>
         </div>
     </main>

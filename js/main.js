@@ -447,8 +447,8 @@ function showUpdateNotification() {
         <div class="update-content">
             <i class="ph ph-sparkle"></i>
             <span>${msg}</span>
-            <button id="reload-app-btn" class="btn btn-gold btn-sm">${btnText}</button>
         </div>
+        <button id="reload-app-btn" class="btn btn-gold btn-sm">${btnText}</button>
     `;
     document.body.appendChild(div);
     
