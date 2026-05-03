@@ -64,6 +64,19 @@ window.updatePlayerUI = function(isHidden) {
     if (toggleBtn) toggleBtn.classList.toggle('active', !isHidden);
 };
 
+window.toggleSidebar = function(forceOpen) {
+    const sidebar = document.querySelector('.quran-sidebar');
+    const overlay = document.getElementById('quran-sidebar-overlay');
+    if (!sidebar) return;
+
+    const isOpen = sidebar.classList.contains('open');
+    const newState = forceOpen !== undefined ? forceOpen : !isOpen;
+
+    sidebar.classList.toggle('open', newState);
+    if (overlay) overlay.classList.toggle('open', newState);
+    document.body.style.overflow = newState ? 'hidden' : '';
+};
+
 // Global Audio State
 const globalAudio = new Audio();
 window.globalAudio = globalAudio;
@@ -459,6 +472,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (btn.querySelector('.ph-skip-forward')) {
             btn.onclick = () => { if (window.onPlayerSkipForward) window.onPlayerSkipForward(); };
+        }
+        if (btn.id === 'player-playlist-btn' || btn.querySelector('.ph-list-bullets')) {
+            btn.onclick = () => { if (window.toggleSidebar) window.toggleSidebar(); };
         }
     });
 

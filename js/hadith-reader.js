@@ -104,13 +104,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (sub) sub.textContent = `Hadith ${currentBatch[currentPlayingIndex].number}`;
     }
 
-    window.playHadith = async function(index) {
+    window.playHadith = async function(index, sequential = true) {
         if (index < 0 || index >= currentBatch.length) {
             stopSequentialPlay();
             return;
         }
         currentPlayingIndex = index;
-        isSequentialActive = true;
+        isSequentialActive = sequential;
         
         const h = currentBatch[index];
 
@@ -424,9 +424,29 @@ document.addEventListener('DOMContentLoaded', () => {
         attachCardListeners(batch);
         renderPagination();
         resumePlaybackState();
+        initScrollObserver();
 
         // 3. Patch missing from Mirror (Background)
         patchFromMirror(batch);
+    }
+
+    function initScrollObserver() {
+        const options = {
+            root: window.innerWidth > 769 ? document.querySelector('.quran-content') : null,
+            rootMargin: '-45% 0px -45% 0px',
+            threshold: 0
+        };
+        const observer = new IntersectionObserver((entries) => {
+            if (isSystemScrolling) return;
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.dataset.id;
+                    const hash = `#hadith-${id}`;
+                    if (window.location.hash !== hash) history.replaceState(null, null, hash);
+                }
+            });
+        }, options);
+        document.querySelectorAll('.hadith-card').forEach(card => observer.observe(card));
     }
 
     async function patchFromMirror(batch) {
@@ -506,7 +526,7 @@ document.addEventListener('DOMContentLoaded', () => {
             listenBtn.onclick = (e) => {
                 e.stopPropagation();
                 scrollToElement(`hadith-${hData.id}`);
-                window.playHadith(index);
+                window.playHadith(index, false); // Single play
             };
 
             // Share (Robust Implementation)
@@ -640,8 +660,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (mainPlayBtn) {
         mainPlayBtn.onclick = () => {
-            const firstListenBtn = hadithContainer.querySelector('.listen-btn');
-            if (firstListenBtn) firstListenBtn.click();
+            const startIndex = currentPlayingIndex >= 0 ? currentPlayingIndex : 0;
+            window.playHadith(startIndex, true); // Sequential mode
         };
     }
 
