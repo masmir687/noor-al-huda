@@ -440,7 +440,10 @@ document.addEventListener('DOMContentLoaded', () => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     const hash = `#ayah-${entry.target.dataset.ayah}`;
-                    if (window.location.hash !== hash) history.replaceState(null, null, hash);
+                    if (window.location.hash !== hash) {
+                        const newUrl = window.location.pathname + window.location.search + hash;
+                        history.replaceState(null, null, newUrl);
+                    }
                 }
             });
         }, options);

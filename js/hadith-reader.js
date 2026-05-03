@@ -31,6 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Pagination
     let currentPage = 1;
+    let totalPages = 1;
     let itemsPerPage = 50;
     // Language
     let currentLang = localStorage.getItem('lang') || 'en';
@@ -195,18 +196,56 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const getBasePath = () => {
-        if (window.location.pathname.includes('/collection/')) return '../../data/';
+        const path = window.location.pathname;
+        if (path.includes('/collection/') || path.includes('/quran/') || window.COLLECTION_ID || window.SURAH_ID) {
+            return '../../data/';
+        }
         return 'data/';
     };
+
+    // Handle URL changes via hash (Smooth navigation)
+    window.addEventListener('hashchange', async () => {
+        if (isSystemScrolling) return;
+        const hash = window.location.hash;
+        if (hash.startsWith('#hadith-')) {
+            const id = hash.replace('#hadith-', '');
+            if (id !== specificIdParam) {
+                specificIdParam = id;
+                // If ID is in current collection/book, just jump
+                const idx = filteredHadiths.findIndex(h => h.id == id);
+                if (idx >= 0) {
+                    const targetPage = Math.floor(idx / itemsPerPage) + 1;
+                    if (targetPage !== currentPage) {
+                        await renderPage(targetPage);
+                    }
+                    scrollToElement(`hadith-${id}`);
+                } else {
+                    // Need to find which book it's in
+                    if (globalData && globalData.hadiths) {
+                        const target = globalData.hadiths.find(h => h.id == id);
+                        if (target) {
+                            await loadBook(target.vol);
+                            scrollToElement(`hadith-${target.id}`);
+                        }
+                    }
+                }
+            }
+        }
+    });
 
     // --- Initialization ---
     async function init() {
         const basePath = getBasePath();
         try {
             const res = await fetch(`${basePath}${collectionId}_meta.json`);
-            if (!res.ok) throw new Error(`Metadata not found`);
+            if (!res.ok) throw new Error(`Metadata not found: ${collectionId}_meta.json at ${basePath}`);
             collectionMeta = await res.json();
             
+            // Set Initial UI based on Meta (Immediate Feedback)
+            if (headerMeta) headerMeta.textContent = currentLang === 'bn' ? collectionMeta.titleBn : collectionMeta.titleEn;
+            if (headerEn) headerEn.textContent = currentLang === 'bn' ? collectionMeta.titleBn : collectionMeta.titleEn;
+            if (headerAr) headerAr.textContent = collectionMeta.titleAr;
+
             // Start loading index early for filters
             if (collectionMeta.indexFile) loadIndexInBackground();
 
@@ -221,7 +260,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (pSub) pSub.textContent = currentLang === 'bn' ? "হাদিস সংগ্রহ" : "Hadith Collection";
 
             if (numberParam || specificIdParam) {
-                if (indexPromise) await indexPromise;
+                // Wait for index if we need to find a specific hadith
+                if (indexPromise) {
+                    try { await indexPromise; } catch(e) { console.warn("Index load failed, falling back to book 1"); }
+                }
+                
                 if (globalData && globalData.hadiths) {
                     const target = specificIdParam 
                         ? globalData.hadiths.find(h => h.id == specificIdParam)
@@ -229,13 +272,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     if (target) {
                         await loadBook(target.vol);
-                        scrollToElement(`hadith-${target.id}`);
+                        // Double check if rendered (loadBook calls applyFilters -> renderPage)
+                        await scrollToElement(`hadith-${target.id}`);
                     } else await loadBook(1);
                 } else await loadBook(1);
             } else await loadBook(1);
         } catch (error) {
             console.error("Hadith Init Failed:", error);
             if (headerEn) headerEn.textContent = "Load Error";
+            hadithContainer.innerHTML = `<div style="text-align: center; padding: 40px; color: var(--error);">${error.message}</div>`;
         }
     }
 
@@ -245,10 +290,23 @@ document.addEventListener('DOMContentLoaded', () => {
         document.title = `${title || collectionMeta.titleEn} — Noor Al-Huda`;
     }
 
+    function updateSidebarSelection() {
+        document.querySelectorAll('.surah-item').forEach(el => {
+            const num = parseInt(el.dataset.number);
+            // Handle Global (0) and specific volumes
+            if (currentBook === 0) {
+                el.classList.toggle('active', !el.dataset.number); // Global item has no data-number
+            } else {
+                el.classList.toggle('active', num === currentBook);
+            }
+        });
+    }
+
     // --- Data Loading ---
     async function loadBook(bookNumber) {
         if (!collectionMeta) return;
         currentBook = bookNumber;
+        updateSidebarSelection();
         const basePath = getBasePath();
         const loadingText = (window.i18n && window.i18n.translations[currentLang].loading) || "Loading Hadiths...";
         hadithContainer.innerHTML = `<div style="text-align: center; padding: 40px; color: var(--gold);"><i class="ph ph-spinner-gap ph-spin" style="font-size: 32px;"></i><p>${loadingText}</p></div>`;
@@ -295,7 +353,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     return { ...meta, ...h };
                 });
             }
-            applyFilters();
+            await applyFilters();
         } catch (error) {
             hadithContainer.innerHTML = `<div style="text-align: center; padding: 40px; color: var(--error);">Error loading data.</div>`;
         }
@@ -312,6 +370,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 isIndexLoaded = true;
                 populateFilters(globalData.hadiths);
                 return data;
+            })
+            .catch(e => {
+                console.error("Index Load Failed:", e);
+                isIndexLoaded = false;
+                throw e;
             });
     }
 
@@ -338,7 +401,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (tf) tf.innerHTML = `<option value="all">${t.all_tags || 'All Tags'}</option>` + Array.from(tags).sort().map(t => `<option value="${t}">${t}</option>`).join('');
     }
 
-    function applyFilters() {
+    async function applyFilters() {
         const query = document.getElementById('global-search')?.value.toLowerCase() || '';
         const cat = document.getElementById('category-filter')?.value || 'all';
         const nar = document.getElementById('narrator-filter')?.value || 'all';
@@ -353,13 +416,23 @@ document.addEventListener('DOMContentLoaded', () => {
             return mCat && mNar && mTag && mQuery;
         });
 
-        currentPage = 1;
         totalPages = Math.ceil(filteredHadiths.length / itemsPerPage);
+        
+        // Jump to correct page if specific ID is present
+        let targetPage = 1;
+        if (specificIdParam) {
+            const idx = filteredHadiths.findIndex(h => h.id == specificIdParam);
+            if (idx >= 0) {
+                targetPage = Math.floor(idx / itemsPerPage) + 1;
+            }
+        }
+
+        currentPage = targetPage;
         if (resultsMeta) {
             resultsMeta.style.display = 'flex';
             matchCountSpan.textContent = filteredHadiths.length;
         }
-        renderPage(1);
+        await renderPage(targetPage);
     }
 
     async function renderPage(page) {
@@ -442,7 +515,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (entry.isIntersecting) {
                     const id = entry.target.dataset.id;
                     const hash = `#hadith-${id}`;
-                    if (window.location.hash !== hash) history.replaceState(null, null, hash);
+                    if (window.location.hash !== hash) {
+                        const newUrl = window.location.pathname + window.location.search + hash;
+                        history.replaceState(null, null, newUrl);
+                    }
                 }
             });
         }, options);
@@ -561,7 +637,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function scrollToElement(elementId) {
-        if (isSystemScrolling) return;
         isSystemScrolling = true;
         let targetEl = null;
         for (let a = 0; a < 30; a++) {
@@ -675,8 +750,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const itemsPerPageSelect = document.getElementById('items-per-page');
     if (itemsPerPageSelect) {
         itemsPerPageSelect.onchange = (e) => {
-            itemsPerPagePerPage = parseInt(e.target.value);
-            itemsPerPage = itemsPerPagePerPage; // local var update
+            itemsPerPage = parseInt(e.target.value);
             applyFilters();
         };
     }
