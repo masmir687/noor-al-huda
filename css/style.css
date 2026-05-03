@@ -775,7 +775,8 @@ body.player-hidden .collection-grid {
     .player-controls {
         width: 100%;
         justify-content: center;
-        gap: 35px;
+        gap: 20px; /* Reduced from 35px for 4 buttons */
+        transform: translateX(-12px); /* Shift left to balance the Playlist button */
     }
     .player-extra {
         display: flex !important; /* Force visible on mobile */

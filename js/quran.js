@@ -109,10 +109,15 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if (translationSelect) {
                 const lang = localStorage.getItem('lang') || 'en';
-                if (lang === 'bn' && currentTranslation.startsWith('en.')) {
+                // Sync translation with global language choice
+                if (lang === 'bn' && !currentTranslation.startsWith('bn.')) {
                     currentTranslation = 'bn.bengali';
+                } else if (lang === 'en' && !currentTranslation.startsWith('en.')) {
+                    currentTranslation = 'en.sahih';
                 }
                 translationSelect.value = currentTranslation;
+                localStorage.setItem('quran-translation', currentTranslation);
+                
                 translationSelect.onchange = (e) => {
                     currentTranslation = e.target.value;
                     localStorage.setItem('quran-translation', currentTranslation);
@@ -285,10 +290,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 e.stopPropagation();
                 const row = btn.closest('.ayah-row');
                 const item = {
-                    id: id, type: 'quran', surah: currentSurah, ayah: row.dataset.ayah,
-                    textAr: row.querySelector('.ayah-text-ar').textContent,
-                    textTr: row.querySelector('.ayah-text-tr').textContent,
-                    title: surahHeaderEn.textContent.split('(')[0].trim()
+                    id: id, 
+                    type: 'quran', 
+                    surah: currentSurah, 
+                    ayah: row.dataset.ayah
                 };
                 const added = await window.BookmarkDB.toggle(item);
                 btn.classList.toggle('active', added);

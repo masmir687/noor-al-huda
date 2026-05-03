@@ -579,17 +579,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
             window.BookmarkDB?.get(bookmarkBtn.dataset.id).then(exists => {
                 if (exists) {
-                    bookmarkBtn.classList.add('active');
+                    btn.classList.add('active');
                 }
             });
 
             bookmarkBtn.onclick = async (e) => {
                 e.stopPropagation();
                 const item = {
-                    id: bookmarkBtn.dataset.id, type: 'hadith', collectionId,
-                    number: hData.number, textAr: hData.arabic, textEn: hData.english, textBn: hData.bengali,
-                    narrator: hData.narrator, grade: hData.grade,
-                    title: (currentLang === 'bn' ? collectionMeta?.titleBn : collectionMeta?.titleEn)
+                    id: bookmarkBtn.dataset.id, 
+                    type: 'hadith', 
+                    collectionId,
+                    number: hData.number, 
+                    vol: hData.vol
                 };
                 const added = await window.BookmarkDB.toggle(item);
                 bookmarkBtn.classList.toggle('active', added);

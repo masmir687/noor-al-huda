@@ -384,6 +384,9 @@ if ('scrollRestoration' in history) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Block Google Touch to Search globally
+    document.body.setAttribute('data-nosnippet', '');
+
     let currentLang = localStorage.getItem('lang') || 'en';
     const path = window.location.pathname;
     
