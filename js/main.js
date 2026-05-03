@@ -578,14 +578,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const val = parseFloat(e.target.value);
             globalAudio.playbackRate = val;
             if (window.quranAudio) window.quranAudio.playbackRate = val;
-            localStorage.setItem('playbackSpeed', val);
+            localStorage.setItem('playbackSpeed', e.target.value);
         });
         // Restore saved speed
-        const savedSpeed = localStorage.getItem('playbackSpeed');
-        if (savedSpeed) {
-            speedS.value = savedSpeed;
-            globalAudio.playbackRate = parseFloat(savedSpeed);
-        }
+        const savedSpeed = localStorage.getItem('playbackSpeed') || "1";
+        speedS.value = savedSpeed;
+        globalAudio.playbackRate = parseFloat(savedSpeed);
     }
 
     // Skip Hooks & State Management
@@ -632,11 +630,9 @@ document.addEventListener('DOMContentLoaded', () => {
         volSlider.addEventListener('input', (e) => updateVol(parseFloat(e.target.value)));
         
         // Restore saved volume
-        const savedVol = localStorage.getItem('playbackVolume');
-        if (savedVol) {
-            volSlider.value = savedVol;
-            updateVol(parseFloat(savedVol));
-        }
+        const savedVol = localStorage.getItem('playbackVolume') || "1";
+        volSlider.value = savedVol;
+        updateVol(parseFloat(savedVol));
     }
 
     const playMainBtn = document.querySelector('.play-main');

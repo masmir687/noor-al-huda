@@ -323,6 +323,8 @@ document.addEventListener('DOMContentLoaded', () => {
     
 
     // --- Audio Logic ---
+    let isGlobalPlay = false;
+
     function updateAllAudioButtons() {
         const isPaused = quranAudio.paused;
         
@@ -349,8 +351,9 @@ document.addEventListener('DOMContentLoaded', () => {
     quranAudio.addEventListener('play', updateAllAudioButtons);
     quranAudio.addEventListener('pause', updateAllAudioButtons);
 
-    function playAyah(btn, index) {
+    function playAyah(btn, index, isGlobal = false) {
         currentAyahIndex = index;
+        isGlobalPlay = isGlobal;
         const surah = btn.dataset.surah.padStart(3, '0');
         const ayah = btn.dataset.ayah.padStart(3, '0');
         
@@ -379,8 +382,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function playBismillah() {
+    function playBismillah(isGlobal = true) {
         if (!bismillahBtn) return;
+        isGlobalPlay = isGlobal;
         if (isBismillahPlaying && !quranAudio.paused) {
             quranAudio.pause();
         } else {
@@ -395,29 +399,40 @@ document.addEventListener('DOMContentLoaded', () => {
             isBismillahPlaying = true;
             currentAyahBtn = null;
             quranAudio.play().catch(console.error);
+            scrollToElement(`ayah-1`);
         }
     }
 
     quranAudio.onended = () => {
         if (isBismillahPlaying) {
             isBismillahPlaying = false;
-            if (allAyahButtons.length > 0) playAyah(allAyahButtons[0], 0);
+            if (allAyahButtons.length > 0) playAyah(allAyahButtons[0], 0, isGlobalPlay);
         } else {
             currentAyahIndex++;
             if (currentAyahIndex < allAyahButtons.length) {
-                playAyah(allAyahButtons[currentAyahIndex], currentAyahIndex);
+                playAyah(allAyahButtons[currentAyahIndex], currentAyahIndex, isGlobalPlay);
             } else {
-                if (mainPlayIcon) mainPlayIcon.className = 'ph ph-play';
+                if (isGlobalPlay && currentSurah < 114) {
+                    // Global play continues to the next Surah automatically
+                    if (window.onPlayerSkipForward) window.onPlayerSkipForward();
+                } else {
+                    if (mainPlayIcon) mainPlayIcon.className = 'ph ph-play';
+                }
             }
         }
     };
 
     if (mainPlayBtn) {
         mainPlayBtn.onclick = () => {
-            if (quranAudio.src && !quranAudio.paused) quranAudio.pause();
-            else if (quranAudio.src) quranAudio.play();
-            else if (bismillahBtn) playBismillah();
-            else if (allAyahButtons.length > 0) playAyah(allAyahButtons[0], 0);
+            if (quranAudio.src && !quranAudio.paused) {
+                quranAudio.pause();
+            } else if (quranAudio.src && quranAudio.paused && isGlobalPlay) {
+                quranAudio.play();
+            } else {
+                isGlobalPlay = true;
+                if (bismillahBtn) playBismillah(true);
+                else if (allAyahButtons.length > 0) playAyah(allAyahButtons[0], 0, true);
+            }
         };
     }
 
