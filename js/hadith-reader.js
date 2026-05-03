@@ -284,7 +284,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function loadIndexInBackground() {
         if (indexPromise || !collectionMeta.indexFile) return;
         const basePath = getBasePath();
-        indexPromise = fetch(`${basePath}${collectionId}/${collectionMeta.indexFile}`)
+        // Add cache buster to ensure metadata updates are reflected immediately
+        indexPromise = fetch(`${basePath}${collectionId}/${collectionMeta.indexFile}?v=${Date.now()}`)
             .then(res => res.json())
             .then(data => {
                 globalData = data;
@@ -295,19 +296,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function populateFilters(hadiths) {
-        if (!hadiths) return;
+        if (!hadiths || !Array.isArray(hadiths)) return;
         const cats = new Set(), nars = new Set(), tags = new Set();
         const placeholders = ["Narrated by Prophet's Companion", "Prophet's Companion", "Unknown", "his father", "the same chain of transmitters", "this hadith"];
         
         hadiths.forEach(h => {
-            if (h.category) cats.add(h.category);
+            if (h.category) cats.add(h.category.trim());
             if (h.narrator && !placeholders.some(p => h.narrator.includes(p))) {
                 nars.add(h.narrator.trim());
             }
-            if (h.tags) h.tags.split(',').forEach(t => tags.add(t.trim()));
+            if (h.tags) h.tags.split(',').forEach(t => {
+                const trimmed = t.trim();
+                if (trimmed) tags.add(trimmed);
+            });
         });
         const t = (window.i18n && window.i18n.translations[currentLang]) || {};
         const cf = document.getElementById('category-filter'), nf = document.getElementById('narrator-filter'), tf = document.getElementById('tag-filter');
+        
         if (cf) cf.innerHTML = `<option value="all">${t.all_categories || 'All Categories'}</option>` + Array.from(cats).sort().map(c => `<option value="${c}">${c}</option>`).join('');
         if (nf) nf.innerHTML = `<option value="all">${t.all_narrators || 'All Narrators'}</option>` + Array.from(nars).sort().map(n => `<option value="${n}">${n}</option>`).join('');
         if (tf) tf.innerHTML = `<option value="all">${t.all_tags || 'All Tags'}</option>` + Array.from(tags).sort().map(t => `<option value="${t}">${t}</option>`).join('');
@@ -345,7 +350,7 @@ document.addEventListener('DOMContentLoaded', () => {
         currentBatch = batch; 
 
         // 1. Fetch missing from local volumes
-        const missing = batch.filter(h => !h.english || h.english.includes("No text available"));
+        const missing = batch.filter(h => !h.english || h.english.includes("No text available") || h.english.includes("Loading from mirror"));
         if (missing.length > 0) {
             const vols = [...new Set(missing.map(h => h.vol))];
             const basePath = getBasePath();
@@ -362,7 +367,7 @@ document.addEventListener('DOMContentLoaded', () => {
             batch.forEach(h => { 
                 if (h.vol && volumeCache[h.vol]) {
                     const full = volumeCache[h.vol].find(c => c.id === h.id);
-                    if (full && (!h.english || h.english.includes("No text available"))) Object.assign(h, full);
+                    if (full && (!h.english || h.english.includes("No text available") || h.english.includes("Loading from mirror"))) Object.assign(h, full);
                 }
             });
         }
@@ -373,7 +378,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const grade = (h.grade || '').toLowerCase();
             const gradeClass = grade === 'sahih' ? 'badge-sah' : grade === 'hasan' ? 'badge-has' : 'badge-daif';
             
-            const isMissing = !h.english || h.english.includes("No text available");
+            const isMissing = !h.english || h.english.includes("No text available") || h.english.includes("Loading from mirror");
             const displayEn = isMissing ? `<span class="missing-text" data-idx="${idx}"><i class="ph ph-spinner-gap ph-spin"></i> Loading from mirror...</span>` : h.english;
             const displayBn = isMissing ? displayEn : (h.bengali || h.english);
 
@@ -405,7 +410,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function patchFromMirror(batch) {
-        const toPatch = batch.filter(h => !h.english || h.english.includes("No text available"));
+        const toPatch = batch.filter(h => !h.english || h.english.includes("No text available") || h.english.includes("Loading from mirror"));
         if (toPatch.length === 0) return;
 
         for (const h of toPatch) {
@@ -544,6 +549,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateDocumentTitle();
         renderSidebar();
         loadBook(currentBook);
+        if (globalData) populateFilters(globalData.hadiths);
     });
 
     function openSidebar() {
