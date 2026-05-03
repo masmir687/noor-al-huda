@@ -198,7 +198,8 @@ document.addEventListener('DOMContentLoaded', () => {
             e.stopPropagation();
             const icon = e.currentTarget.querySelector('i');
             const content = currentLang === 'bn' && item.textBn ? item.textBn : (item.textEn || item.textTr || "");
-            window.toggleSpeech(content, icon, currentLang);
+            const textEl = card.querySelector('.hadith-en');
+            window.toggleSpeech(content, icon, currentLang, null, textEl);
         };
 
         // Share

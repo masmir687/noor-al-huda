@@ -56,16 +56,15 @@ document.addEventListener('DOMContentLoaded', () => {
             index: currentPlayingIndex,
             active: isSequentialActive
         };
-        localStorage.setItem('hadith_playback_state', JSON.stringify(state));
+        localStorage.setItem(`hadith_playback_state_${collectionId}`, JSON.stringify(state));
     }
 
     function resumePlaybackState() {
-        const saved = localStorage.getItem('hadith_playback_state');
+        const saved = localStorage.getItem(`hadith_playback_state_${collectionId}`);
         if (!saved) return;
         const state = JSON.parse(saved);
         if (state.collectionId === collectionId && state.currentBook === currentBook && state.currentPage === currentPage) {
             if (state.active && state.index >= 0) {
-                // We don't auto-start audio, but we set the UI
                 currentPlayingIndex = state.index;
                 updateSequentialUI();
             }
@@ -112,14 +111,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         currentPlayingIndex = index;
         isSequentialActive = sequential;
-        
+
         const h = currentBatch[index];
 
         // If still patching, wait briefly
         if (!h.english || h.english.includes("No text available") || h.english.includes("Loading from mirror")) {
             const card = document.getElementById(`hadith-${h.id}`);
             if (card) card.querySelector('.hadith-en').innerHTML = `<i class="ph ph-spinner-gap ph-spin"></i> Preparing audio...`;
-            
+
             // Wait up to 5 seconds for background patch
             for (let i = 0; i < 50; i++) {
                 if (h.english && !h.english.includes("No text available") && !h.english.includes("Loading from mirror")) break;
@@ -130,16 +129,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const content = currentLang === 'bn' && h.bengali ? h.bengali : h.english;
         const card = document.getElementById(`hadith-${h.id}`);
         const icon = card?.querySelector('.listen-btn i');
-        
+        const textEl = card?.querySelector('.hadith-en');
+
         if (window.toggleSpeech) {
             window.toggleSpeech(content, icon || null, currentLang, () => {
                 if (isSequentialActive) window.playHadith(currentPlayingIndex + 1);
-            });
+            }, textEl);
             updateSequentialUI();
             savePlaybackState();
         }
     };
-
     function stopSequentialPlay() {
         isSequentialActive = false;
         window.hadithPlaybackActive = false;

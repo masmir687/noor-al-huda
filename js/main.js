@@ -84,6 +84,18 @@ let currentAudioIcon = null;
 let currentAudioText = "";
 let isAudioUnlocked = false;
 
+// TTS Highlight State
+let currentTextElement = null;
+let currentOriginalHTML = "";
+
+function restoreHighlight() {
+    if (currentTextElement && currentOriginalHTML) {
+        currentTextElement.innerHTML = currentOriginalHTML;
+        currentTextElement = null;
+        currentOriginalHTML = "";
+    }
+}
+
 // Progress Bar Sync
 window.updateProgressBar = function(percent) {
     const fill = document.getElementById('player-progress-fill');
@@ -146,7 +158,9 @@ globalAudio.addEventListener('pause', () => {
     }
 });
 
-window.toggleSpeech = function(textToRead, playIconElement, lang = 'ar', onEnd = null) {
+window.toggleSpeech = function(textToRead, playIconElement, lang = 'ar', onEnd = null, textElement = null) {
+    restoreHighlight();
+
     if (!textToRead) {
         window.speechSynthesis.cancel();
         if (!globalAudio.paused) { globalAudio.pause(); globalAudio.currentTime = 0; }
@@ -175,6 +189,11 @@ window.toggleSpeech = function(textToRead, playIconElement, lang = 'ar', onEnd =
     currentAudioText = textToRead;
     currentAudioIcon = playIconElement;
 
+    if (textElement) {
+        currentTextElement = textElement;
+        currentOriginalHTML = textElement.innerHTML;
+    }
+
     const speed = parseFloat(document.getElementById('speed-select')?.value || "1.0");
     const vol = parseFloat(document.getElementById('volume-slider')?.value || "1.0");
     globalAudio.volume = vol;
@@ -184,6 +203,37 @@ window.toggleSpeech = function(textToRead, playIconElement, lang = 'ar', onEnd =
         utterance.lang = lang === 'bn' ? 'bn-BD' : 'en-US';
         utterance.rate = speed;
         utterance.volume = vol;
+        
+        utterance.onboundary = (event) => {
+            if (event.name === 'word' && currentTextElement) {
+                const charIndex = event.charIndex;
+                let wordCount = 0;
+                let endIndex = charIndex;
+                while (wordCount < 10 && endIndex < textToRead.length) {
+                    if (textToRead[endIndex] === ' ') wordCount++;
+                    endIndex++;
+                }
+                if (wordCount < 10) endIndex = textToRead.length;
+
+                const before = textToRead.substring(0, charIndex);
+                const highlighted = textToRead.substring(charIndex, endIndex);
+                const after = textToRead.substring(endIndex);
+                
+                currentTextElement.innerHTML = `${before}<span class="tts-highlight">${highlighted}</span>${after}`;
+                
+                // Scroll into view
+                const highlightEl = currentTextElement.querySelector('.tts-highlight');
+                if (highlightEl) {
+                    // Try to avoid excessive scrolling by only scrolling if it's out of view, or just smoothly scroll
+                    const rect = highlightEl.getBoundingClientRect();
+                    const isVisible = (rect.top >= 0) && (rect.bottom <= window.innerHeight);
+                    if (!isVisible) {
+                        highlightEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }
+            }
+        };
+
         utterance.onstart = () => { 
             window.updateIcon(playIconElement, 'play');
             const mainPlay = document.querySelector('.play-main i');
@@ -191,6 +241,7 @@ window.toggleSpeech = function(textToRead, playIconElement, lang = 'ar', onEnd =
         };
         utterance.onend = () => { 
             if (currentAudioText === textToRead) { 
+                restoreHighlight();
                 window.updateIcon(playIconElement, 'pause');
                 const mainPlay = document.querySelector('.play-main i');
                 if (mainPlay && mainPlay !== playIconElement) window.updateIcon(mainPlay, 'pause'); 
@@ -198,23 +249,29 @@ window.toggleSpeech = function(textToRead, playIconElement, lang = 'ar', onEnd =
                 if (onEnd) onEnd();
             } 
         };
+        utterance.onerror = () => restoreHighlight();
         window.speechSynthesis.speak(utterance);
     } else {
         const encodedText = encodeURIComponent(textToRead.substring(0, 500));
         globalAudio.src = `https://translate.google.com/translate_tts?ie=UTF-8&tl=${lang}&client=tw-ob&q=${encodedText}`;
         globalAudio.playbackRate = speed;
         globalAudio.onended = () => { 
+            restoreHighlight();
             if (currentAudioIcon) window.updateIcon(currentAudioIcon, 'pause');
             const mainPlay = document.querySelector('.play-main i');
             if (mainPlay && mainPlay !== currentAudioIcon) window.updateIcon(mainPlay, 'pause');
             currentAudioText = ""; currentAudioIcon = null; 
             if (onEnd) onEnd();
         };
+        globalAudio.onerror = () => restoreHighlight();
         globalAudio.play().then(() => { 
             window.updateIcon(playIconElement, 'play');
             const mainPlay = document.querySelector('.play-main i');
             if (mainPlay && mainPlay !== playIconElement) window.updateIcon(mainPlay, 'play'); 
-        }).catch(console.error);
+        }).catch(err => {
+            console.error(err);
+            restoreHighlight();
+        });
     }
 };
 
@@ -578,12 +635,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const val = parseFloat(e.target.value);
             globalAudio.playbackRate = val;
             if (window.quranAudio) window.quranAudio.playbackRate = val;
-            localStorage.setItem('playbackSpeed', e.target.value);
+            localStorage.setItem('playbackSpeed', val.toString());
         });
         // Restore saved speed
-        const savedSpeed = localStorage.getItem('playbackSpeed') || "1";
+        const rawSpeed = localStorage.getItem('playbackSpeed') || "1";
+        const savedSpeed = parseFloat(rawSpeed).toString();
         speedS.value = savedSpeed;
-        globalAudio.playbackRate = parseFloat(savedSpeed);
+        if (!isNaN(parseFloat(savedSpeed))) globalAudio.playbackRate = parseFloat(savedSpeed);
     }
 
     // Skip Hooks & State Management

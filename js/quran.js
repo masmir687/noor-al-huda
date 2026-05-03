@@ -94,10 +94,13 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             updateSkipUI();
             // Restore saved settings
-            const savedSpeed = localStorage.getItem('playbackSpeed') || "1.0";
-            const savedVol = localStorage.getItem('playbackVolume') || "1.0";
-            quranAudio.playbackRate = parseFloat(savedSpeed);
-            quranAudio.volume = parseFloat(savedVol);
+            const rawSpeed = localStorage.getItem('playbackSpeed') || "1";
+            const rawVol = localStorage.getItem('playbackVolume') || "1";
+            const savedSpeed = parseFloat(rawSpeed).toString();
+            const savedVol = parseFloat(rawVol).toString();
+            
+            if (!isNaN(parseFloat(savedSpeed))) quranAudio.playbackRate = parseFloat(savedSpeed);
+            if (!isNaN(parseFloat(savedVol))) quranAudio.volume = parseFloat(savedVol);
 
             const speedS = document.getElementById('speed-select');
             if (speedS) speedS.value = savedSpeed;
@@ -139,6 +142,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 quranContainer.className = `font-${fontSizeSelect.value}`;
             }
 
+            // Restore last played Surah if landing on Surah 1 from a general link
+            const urlParams = new URLSearchParams(window.location.search);
+            let shouldRestore = false;
+            
+            if (window.SURAH_ID === 1 && !urlParams.has('ayah') && !window.location.hash.startsWith('#ayah-')) {
+                shouldRestore = true;
+            }
+            if (!window.SURAH_ID && !urlParams.has('surah')) {
+                shouldRestore = true;
+            }
+
+            if (shouldRestore) {
+                const savedState = localStorage.getItem('quran_playback_state');
+                if (savedState) {
+                    try {
+                        const state = JSON.parse(savedState);
+                        if (state && state.surah && parseInt(state.surah) !== 1) {
+                            // Redirect to the saved surah instead of staying on Surah 1
+                            window.location.replace(`../../quran/${state.surah}/`);
+                            return; // Stop execution
+                        }
+                    } catch(e) {}
+                }
+            }
+
             document.querySelectorAll('.surah-item').forEach(el => {
                 el.classList.toggle('active', parseInt(el.dataset.number) === currentSurah);
             });
@@ -147,6 +175,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (ayahParam) {
                 scrollToElement(`ayah-${ayahParam}`);
+            } else {
+                // If there's a saved ayah for this surah, scroll to it automatically
+                const savedState = localStorage.getItem('quran_playback_state');
+                if (savedState) {
+                    try {
+                        const state = JSON.parse(savedState);
+                        if (state && parseInt(state.surah) === currentSurah && state.ayahIndex !== undefined) {
+                            scrollToElement(`ayah-${parseInt(state.ayahIndex) + 1}`);
+                        }
+                    } catch(e) {}
+                }
             }
         } catch (err) {
             console.error("Quran Init Failed:", err);
@@ -192,7 +231,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const lang = localStorage.getItem('lang') || 'en';
         const loadingText = (window.i18n && window.i18n.translations[lang].loading_revelation) || "Loading Revelation...";
         quranContainer.innerHTML = `<div style="text-align: center; padding: 40px; color: var(--gold);"><i class="ph ph-spinner-gap ph-spin" style="font-size: 32px;"></i><p>${loadingText}</p></div>`;
-        
+
         try {
             const [arRes, trRes] = await Promise.all([
                 fetch(`https://api.alquran.cloud/v1/surah/${surahNumber}`),
@@ -221,7 +260,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let html = '';
             if (surahNumber !== 1 && surahNumber !== 9) {
                 html += `
-                <div class="bismillah-container">
+                <div class="bismillah-container" id="bismillah-container">
                     <button class="ayah-btn play-bismillah"><i class="ph ph-play"></i></button>
                     <div class="bismillah">بِسْمِ ٱللَّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ</div>
                 </div>`;
@@ -328,17 +367,35 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateAllAudioButtons() {
         const isPaused = quranAudio.paused;
         
-        // Reset all buttons first
+        // Reset all buttons and styles first
         document.querySelectorAll('.play-ayah i, .play-bismillah i').forEach(i => {
             i.className = 'ph ph-play';
+        });
+        document.querySelectorAll('.ayah-row, .bismillah-container').forEach(el => {
+            el.classList.remove('active-playing');
         });
 
         // Update the active one if playing
         if (!isPaused) {
             if (isBismillahPlaying && bismillahBtn) {
                 bismillahBtn.querySelector('i').className = 'ph ph-pause';
+                const container = bismillahBtn.closest('.bismillah-container');
+                if (container) container.classList.add('active-playing');
             } else if (currentAyahBtn) {
                 currentAyahBtn.querySelector('i').className = 'ph ph-pause';
+                const row = currentAyahBtn.closest('.ayah-row');
+                if (row) row.classList.add('active-playing');
+            }
+        } else if (currentAyahBtn || (isBismillahPlaying && bismillahBtn)) {
+            // Even if paused, keep the active-playing style until a new ayah plays or it resets completely
+            // Wait, the user wants "don't remove the green theme until the full section... read or played or completed"
+            // If it's paused, keep it green. It only removes on complete or switch.
+            if (isBismillahPlaying && bismillahBtn) {
+                const container = bismillahBtn.closest('.bismillah-container');
+                if (container) container.classList.add('active-playing');
+            } else if (currentAyahBtn) {
+                const row = currentAyahBtn.closest('.ayah-row');
+                if (row) row.classList.add('active-playing');
             }
         }
 
@@ -357,6 +414,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const surah = btn.dataset.surah.padStart(3, '0');
         const ayah = btn.dataset.ayah.padStart(3, '0');
         
+        // Save current Ayah index to state for resuming later
+        localStorage.setItem('quran_playback_state', JSON.stringify({ surah: currentSurah, ayahIndex: index }));
+
         if (currentAyahBtn === btn && !quranAudio.paused) {
             quranAudio.pause();
         } else {
@@ -399,14 +459,31 @@ document.addEventListener('DOMContentLoaded', () => {
             isBismillahPlaying = true;
             currentAyahBtn = null;
             quranAudio.play().catch(console.error);
-            scrollToElement(`ayah-1`);
+            scrollToElement('bismillah-container');
         }
     }
 
     quranAudio.onended = () => {
         if (isBismillahPlaying) {
             isBismillahPlaying = false;
-            if (allAyahButtons.length > 0) playAyah(allAyahButtons[0], 0, isGlobalPlay);
+            // When Bismillah finishes during global play, resume from saved Ayah if available
+            let targetIndex = 0;
+            if (isGlobalPlay) {
+                const savedState = localStorage.getItem('quran_playback_state');
+                if (savedState) {
+                    try {
+                        const state = JSON.parse(savedState);
+                        if (state && parseInt(state.surah) === currentSurah && state.ayahIndex !== undefined) {
+                            targetIndex = parseInt(state.ayahIndex);
+                        }
+                    } catch(e) {}
+                }
+            }
+            if (allAyahButtons.length > targetIndex) {
+                playAyah(allAyahButtons[targetIndex], targetIndex, isGlobalPlay);
+            } else if (allAyahButtons.length > 0) {
+                playAyah(allAyahButtons[0], 0, isGlobalPlay);
+            }
         } else {
             currentAyahIndex++;
             if (currentAyahIndex < allAyahButtons.length) {
@@ -417,6 +494,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (window.onPlayerSkipForward) window.onPlayerSkipForward();
                 } else {
                     if (mainPlayIcon) mainPlayIcon.className = 'ph ph-play';
+                    currentAyahBtn = null;
+                    updateAllAudioButtons();
                 }
             }
         }
@@ -426,12 +505,29 @@ document.addEventListener('DOMContentLoaded', () => {
         mainPlayBtn.onclick = () => {
             if (quranAudio.src && !quranAudio.paused) {
                 quranAudio.pause();
-            } else if (quranAudio.src && quranAudio.paused && isGlobalPlay) {
+            } else if (quranAudio.src && quranAudio.paused) {
+                // Resume exactly where we paused on the same page, even if it was started individually
+                isGlobalPlay = true; // Convert to global session
                 quranAudio.play();
             } else {
+                // Fresh start from global player
                 isGlobalPlay = true;
-                if (bismillahBtn) playBismillah(true);
-                else if (allAyahButtons.length > 0) playAyah(allAyahButtons[0], 0, true);
+                if (bismillahBtn) {
+                    playBismillah(true);
+                } else {
+                    let targetIndex = 0;
+                    const savedState = localStorage.getItem('quran_playback_state');
+                    if (savedState) {
+                        try {
+                            const state = JSON.parse(savedState);
+                            if (state && parseInt(state.surah) === currentSurah && state.ayahIndex !== undefined) {
+                                targetIndex = parseInt(state.ayahIndex);
+                            }
+                        } catch(e) {}
+                    }
+                    if (allAyahButtons.length > targetIndex) playAyah(allAyahButtons[targetIndex], targetIndex, true);
+                    else if (allAyahButtons.length > 0) playAyah(allAyahButtons[0], 0, true);
+                }
             }
         };
     }
