@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Bookmarks — Noor Al-Huda</title>
+    <title>Contact Us — Noor Al-Huda</title>
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,21 +11,24 @@
     <!-- Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <link rel="icon" type="image/svg+xml" href="images/favicon.svg">
+    <link rel="apple-touch-icon" href="images/icon-192.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0F4A31">
     <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
+<body data-page-title="contact">
     <!-- Navbar -->
     <nav class="nav">
         <div class="container">
             <div class="nav-content">
                 <a href="./" class="nav-logo">
                     <span class="ar">نور الهدى</span>
-                    <span class="en">NOOR AL-HUDA</span>
+                    <span class="en" data-t="brand_name">NOOR AL-HUDA</span>
                 </a>
                 <div class="nav-links" id="navLinks">
                     <a href="quran/1/" data-t="quran">Quran</a>
                     <a href="hadith.html" data-t="hadith">Hadith</a>
-                    <a href="bookmarks.html" style="color: var(--goldl)" data-t="bookmarks">Bookmarks</a>
+                    <a href="bookmarks.html" data-t="bookmarks">Bookmarks</a>
                     <a href="learn.html" data-t="learn">Learn</a>
                     <a href="qa.html" data-t="qa">Q&A</a>
                     <a href="videos.html" data-t="videos">Videos</a>
@@ -42,41 +45,21 @@
 
     <header class="page-header">
         <div class="container">
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
-                <div>
-                    <h1 class="page-title" data-t="bookmarks">My Bookmarks</h1>
-                    <p class="page-subtitle">Your personal collection of saved Quran verses and Hadiths.</p>
-                </div>
-                <div class="bookmark-tools" style="display: flex; gap: 10px;">
-                    <button id="export-btn" class="btn btn-outline" style="background: rgba(255,255,255,0.05); color: white; border-color: rgba(255,255,255,0.2);">
-                        <i class="ph ph-export"></i> <span data-t="export">Export Backup</span>
-                    </button>
-                    <label for="import-input" class="btn btn-outline" style="background: rgba(255,255,255,0.05); color: white; border-color: rgba(255,255,255,0.2); cursor: pointer;">
-                        <i class="ph ph-import"></i> <span data-t="import">Import Backup</span>
-                    </label>
-                    <input type="file" id="import-input" accept=".json" style="display: none;">
-                    <button id="clear-all-btn" class="btn btn-outline" style="background: rgba(220, 38, 38, 0.1); color: #ef4444; border-color: rgba(220, 38, 38, 0.2);">
-                        <i class="ph ph-trash"></i> <span data-t="clear_all">Clear All</span>
-                    </button>
-                </div>
-            </div>
-            
-            <!-- Backup Warning -->
-            <div class="privacy-notice-box">
-                <i class="ph ph-warning-circle"></i>
-                <p class="privacy-notice-text">
-                    <strong style="color: var(--gold);">Data Privacy Notice:</strong> Bookmarks are stored locally on your device. Clearing browser data or changing browsers may result in loss. We recommend exporting a backup periodically to keep your collection safe.
-                </p>
-            </div>
+            <h1 class="page-title" data-t="contact">Contact Us</h1>
+            <p class="page-subtitle">Get in touch with the developers of Noor Al-Huda.</p>
         </div>
     </header>
 
     <main style="background-color: var(--parch); min-height: 70vh; padding: 40px 0;">
-        <div class="container" style="max-width: 900px;">
-            <div id="bookmarks-container">
-                <div style="text-align: center; color: var(--stone); padding: 50px;">
-                    <i class="ph ph-spinner-gap ph-spin" style="font-size: 32px; display: block; margin: 0 auto 15px;"></i>
-                    <p>Loading your bookmarks...</p>
+        <div class="container" style="max-width: 600px; color: var(--ink); text-align: center;">
+            <div class="qa-card" style="padding: 40px;">
+                <i class="ph ph-envelope-simple" style="font-size: 48px; color: var(--gold); margin-bottom: 20px; display: inline-block;"></i>
+                <h2 style="color: var(--obsidian); margin-bottom: 15px;">Reach Out</h2>
+                <p style="margin-bottom: 20px; line-height: 1.6;">For feedback, bug reports, or inquiries, please reach out to our development team. We appreciate your contributions to making this platform better.</p>
+                <p style="font-weight: 600; color: var(--stone);">Email: <a href="mailto:contact@nooralhuda.example.com" style="color: var(--em); text-decoration: none;">contact@nooralhuda.example.com</a></p>
+                
+                <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--sand);">
+                    <p style="font-size: 14px; color: var(--stone);"><em>Note: This is a static application. We do not process support tickets through automated systems. We will try our best to respond to your emails directly.</em></p>
                 </div>
             </div>
         </div>
@@ -88,7 +71,7 @@
             <div class="footer-grid">
                 <div class="footer-brand">
                     <div class="nav-logo">
-                        <span class="ar">নূর আল-হুদা</span>
+                        <span class="ar">نور الهدى</span>
                         <span class="en">NOOR AL-HUDA</span>
                     </div>
                     <p>Invite to the way of your Lord with wisdom and good instruction.</p>
@@ -98,6 +81,7 @@
                     <a href="quran/1/" data-t="quran">Quran</a>
                     <a href="hadith.html" data-t="hadith">Hadith</a>
                     <a href="bookmarks.html" data-t="bookmarks">Bookmarks</a>
+                    <a href="learn.html" data-t="learn">Learn</a>
                 </div>
                 <div class="footer-links">
                     <h4 data-t="resources">Resources</h4>
@@ -120,8 +104,6 @@
     </footer>
 
     <script src="js/i18n.js"></script>
-    <script src="js/bookmarks.js"></script>
     <script src="js/main.js"></script>
-    <script src="js/bookmarks-page.js"></script>
 </body>
 </html>
