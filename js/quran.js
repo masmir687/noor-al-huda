@@ -70,9 +70,29 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     currentSurah = parseInt(surahParam) || 1;
 
+    // Handle Global Player Skips (Surah level)
+    window.onPlayerSkipBack = () => {
+        if (currentSurah > 1) navigateToSurah(currentSurah - 1);
+    };
+    window.onPlayerSkipForward = () => {
+        if (currentSurah < 114) navigateToSurah(currentSurah + 1);
+    };
+
+    function navigateToSurah(num) {
+        const target = window.SURAH_ID ? `../../quran/${num}/` : `?surah=${num}`;
+        window.location.href = target;
+    }
+
+    function updateSkipUI() {
+        if (window.updateSkipButtons) {
+            window.updateSkipButtons(currentSurah > 1, currentSurah < 114);
+        }
+    }
+
     // --- Initialization ---
     async function init() {
         try {
+            updateSkipUI();
             // Restore saved settings
             const savedSpeed = localStorage.getItem('playbackSpeed') || "1.0";
             const savedVol = localStorage.getItem('playbackVolume') || "1.0";

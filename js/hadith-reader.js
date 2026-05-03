@@ -83,6 +83,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (window.updateProgressBar) window.updateProgressBar(percent);
         if (window.updateProgressTime) window.updateProgressTime(`${current}`, `${total}`);
 
+        // Update Skip Buttons
+        if (window.updateSkipButtons) {
+            const canBack = currentPage > 1 || currentPlayingIndex > 0;
+            const canForward = currentPage < totalPages || currentPlayingIndex < currentBatch.length - 1;
+            window.updateSkipButtons(canBack, canForward);
+        }
+
         // Highlight active card
         hadithContainer.querySelectorAll('.hadith-card').forEach(c => c.classList.remove('active-playing'));
         const activeCard = document.getElementById(`hadith-${currentBatch[currentPlayingIndex].id}`);
@@ -142,17 +149,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Handle Skip Buttons
     window.onPlayerSkipBack = () => {
-        if (isSequentialActive) window.playHadith(currentPlayingIndex - 1);
+        if (currentPlayingIndex > 0) {
+            window.playHadith(currentPlayingIndex - 1);
+        } else if (currentPage > 1) {
+            renderPage(currentPage - 1).then(() => {
+                window.playHadith(currentBatch.length - 1);
+            });
+        }
     };
     window.onPlayerSkipForward = () => {
-        if (isSequentialActive) window.playHadith(currentPlayingIndex + 1);
+        if (currentPlayingIndex < currentBatch.length - 1) {
+            window.playHadith(currentPlayingIndex + 1);
+        } else if (currentPage < totalPages) {
+            renderPage(currentPage + 1).then(() => {
+                window.playHadith(0);
+            });
+        }
     };
 
     // Handle Progress Bar Click (Seeking by Hadith Index)
     const progressBar = document.querySelector('.player-progress .bar');
     if (progressBar) {
         progressBar.addEventListener('click', (e) => {
-            if (!isSequentialActive) return;
+            if (!isSequentialActive && !window.hadithPlaybackActive) return;
             const rect = progressBar.getBoundingClientRect();
             const x = e.clientX - rect.left;
             const width = rect.width;
@@ -167,6 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
         window.hadithPlaybackActive = false;
         hadithContainer.querySelectorAll('.hadith-card').forEach(c => c.classList.remove('active-playing'));
         savePlaybackState();
+        if (window.updateSkipButtons) window.updateSkipButtons(true, true); // Reset
     };
 
     // --- Initialization ---

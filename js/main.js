@@ -437,7 +437,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Skip Hooks
+    // Skip Hooks & State Management
+    window.updateSkipButtons = function(canBack, canForward) {
+        document.querySelectorAll('.pc-btn').forEach(btn => {
+            const isBack = btn.querySelector('.ph-skip-back');
+            const isForward = btn.querySelector('.ph-skip-forward');
+            if (isBack) {
+                btn.style.opacity = canBack ? '1' : '0.3';
+                btn.style.pointerEvents = canBack ? 'auto' : 'none';
+            }
+            if (isForward) {
+                btn.style.opacity = canForward ? '1' : '0.3';
+                btn.style.pointerEvents = canForward ? 'auto' : 'none';
+            }
+        });
+    };
+
     document.querySelectorAll('.pc-btn').forEach(btn => {
         if (btn.querySelector('.ph-skip-back')) {
             btn.onclick = () => { if (window.onPlayerSkipBack) window.onPlayerSkipBack(); };
