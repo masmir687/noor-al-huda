@@ -304,6 +304,53 @@ Shared from ${appName}`;
 
 
 // --- SERVICE WORKER REGISTRATION & UPDATES ---
+let deferredPrompt;
+
+function createInstallButton() {
+    const navRight = document.querySelector('.nav-right');
+    if (!navRight || document.getElementById('install-app-btn')) return;
+
+    const btn = document.createElement('button');
+    btn.id = 'install-app-btn';
+    btn.className = 'lang-btn';
+    btn.style.backgroundColor = 'var(--gold)';
+    btn.style.borderColor = 'var(--gold)';
+    btn.style.color = 'var(--white)';
+    btn.style.display = 'flex';
+    btn.style.alignItems = 'center';
+    btn.style.gap = '5px';
+    btn.style.marginLeft = '5px';
+    btn.innerHTML = '<i class="ph ph-download-simple" style="font-size:14px;"></i> <span data-t="install">App</span>';
+    
+    btn.onclick = async () => {
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') btn.remove();
+        deferredPrompt = null;
+    };
+    
+    const mobileBtn = document.querySelector('.mobile-menu-btn');
+    if (mobileBtn) navRight.insertBefore(btn, mobileBtn);
+    else navRight.appendChild(btn);
+}
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    // The event can fire before or after DOMContentLoaded
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', createInstallButton);
+    } else {
+        createInstallButton();
+    }
+});
+
+window.addEventListener('appinstalled', () => {
+    const btn = document.getElementById('install-app-btn');
+    if (btn) btn.remove();
+});
+
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js').then(reg => {

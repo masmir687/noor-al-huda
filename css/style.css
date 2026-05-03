@@ -887,6 +887,11 @@ body.player-hidden .collection-grid {
     width: 70px; padding: 4px; margin: 0; color: var(--ink); border: 1px solid var(--sand); background-color: var(--white); border-radius: 4px; font-size: 12px; outline: none; cursor: pointer;
 }
 
+.per-page-select option {
+    background-color: var(--white);
+    color: var(--ink);
+}
+
 [data-theme='dark'] .per-page-select {
     background-color: var(--sand); color: var(--white); border-color: rgba(255,255,255,0.1);
 }

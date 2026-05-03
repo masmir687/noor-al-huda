@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'v1.3.8';
+const CACHE_VERSION = 'v1.4.0';
 const CACHE_NAME = `noor-al-huda-${CACHE_VERSION}`;
 
 // Assets to pre-cache immediately
@@ -15,14 +15,16 @@ const CORE_ASSETS = [
     './css/style.css',
     './js/main.js',
     './js/quran.js',
-    './js/data-loader.js',
     './js/hadith-reader.js',
+    './js/data-loader.js',
     './js/bookmarks.js',
     './js/bookmarks-page.js',
     './js/i18n.js',
-    './images/favicon.svg'
+    './images/favicon.svg',
+    './images/icon-192.png',
+    './images/icon-512.png',
+    './manifest.json'
 ];
-
 // Install Event
 self.addEventListener('install', event => {
     event.waitUntil(
