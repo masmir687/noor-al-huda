@@ -1646,3 +1646,48 @@ body.player-hidden .quran-sidebar {
 [data-theme='dark'] .privacy-notice-text strong {
     color: var(--goldl) !important;
 }
+
+/* --- UX Selection Improvements --- */
+/* Prevent accidental text selection on single clicks for the whole app */
+body {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Allow selection on actual content areas where user might want to copy text */
+/* Modern browsers will still allow selection via long-press even if single click selection is deterred */
+.quran-content,
+#hadith-container,
+.hadith-card,
+.ayah-row,
+.tafsir-content,
+.learn-content,
+.qa-answer,
+.page-header,
+.footer,
+.splash-content {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+}
+
+/* Buttons and interactive elements should never be selectable */
+button, 
+.btn, 
+.nav-links a, 
+.surah-item, 
+.setting-label, 
+.lang-btn, 
+.pc-btn,
+.ayah-badge,
+.qa-tag,
+.surah-number {
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+    user-select: none !important;
+}
