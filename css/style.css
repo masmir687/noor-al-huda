@@ -1763,3 +1763,26 @@ button *, .btn *, .nav-links a *, .surah-item *, .pill *, .pc-btn *, .ayah-btn *
 .bismillah-container {
     transition: all 0.3s ease;
 }
+
+/* --- Learn Tabs UI --- */
+.learn-tabs .btn-outline {
+    background-color: transparent;
+    border: 1px solid var(--sand);
+    color: var(--ink);
+}
+
+.learn-tabs .btn-outline:hover {
+    background-color: rgba(197, 160, 89, 0.1);
+    border-color: var(--gold);
+    color: var(--gold);
+}
+
+[data-theme='dark'] .learn-tabs .btn-outline {
+    border-color: rgba(255, 255, 255, 0.2);
+    color: var(--stone);
+}
+
+[data-theme='dark'] .learn-tabs .btn-outline:hover {
+    border-color: var(--gold);
+    color: var(--goldl);
+}

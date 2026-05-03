@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'v1.6.0';
+const CACHE_VERSION = 'v1.6.1';
 const CACHE_NAME = `noor-al-huda-${CACHE_VERSION}`;
 
 // Assets to pre-cache immediately
@@ -19,7 +19,11 @@ const CORE_ASSETS = [
     './js/data-loader.js',
     './js/bookmarks.js',
     './js/bookmarks-page.js',
+    './js/learn.js',
     './js/i18n.js',
+    './data/learn/faith.json',
+    './data/learn/salah.json',
+    './data/learn/adab.json',
     './images/favicon.svg',
     './images/icon-192.png',
     './images/icon-512.png',
