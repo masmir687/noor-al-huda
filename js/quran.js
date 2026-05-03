@@ -591,6 +591,15 @@ document.addEventListener('DOMContentLoaded', () => {
         if (window.innerWidth <= 768) window.scrollTo({ top: window.pageYOffset + rect.top - 100, behavior: 'smooth' });
         else if(container) container.scrollTo({ top: container.scrollTop + rect.top - 200, behavior: 'smooth' });
         
+        // Update URL hash directly since observer is paused
+        if (elementId.startsWith('ayah-')) {
+            const hash = `#${elementId}`;
+            if (window.location.hash !== hash) {
+                const newUrl = window.location.pathname + window.location.search + hash;
+                history.replaceState(null, null, newUrl);
+            }
+        }
+
         targetEl.classList.add('highlight-pulse');
         setTimeout(() => { isSystemScrolling = false; targetEl.classList.remove('highlight-pulse'); }, 3000);
     }

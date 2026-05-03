@@ -651,6 +651,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const relativeTop = rect.top - containerRect.top;
             container.scrollTo({ top: container.scrollTop + relativeTop - 150, behavior: 'smooth' });
         }
+
+        // Update URL hash directly since observer is paused
+        if (elementId.startsWith('hadith-')) {
+            const hash = `#${elementId}`;
+            if (window.location.hash !== hash) {
+                const newUrl = window.location.pathname + window.location.search + hash;
+                history.replaceState(null, null, newUrl);
+            }
+        }
+
         targetEl.classList.add('highlight-pulse');
         setTimeout(() => { isSystemScrolling = false; targetEl.classList.remove('highlight-pulse'); }, 3000);
     }
