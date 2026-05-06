@@ -272,58 +272,18 @@
         </div>
     </main>
 
-    <!-- Player Bar -->
-    <div class="player-bar hidden" id="playerBar">
-        <div class="container">
-            <div class="player-content">
-                <div class="player-info">
-                    <span class="player-title" id="pb-title">Media Audio</span>
-                    <span class="player-sub" id="pb-sub">Noor Al-Huda</span>
-                </div>
-                <div class="player-controls">
-                    <button class="pc-btn" id="player-playlist-btn" title="Toggle List" style="visibility: hidden;"><i class="ph ph-list-bullets"></i></button>
-                    <button class="pc-btn"><i class="ph ph-skip-back"></i></button>
-                    <button class="pc-btn play-main"><i class="ph ph-play"></i></button>
-                    <button class="pc-btn"><i class="ph ph-skip-forward"></i></button>
-                </div>
-                <div class="player-progress">
-                    <span class="time" id="player-progress-current">0:00</span>
-                    <div class="bar">
-                        <div class="fill" id="player-progress-fill" style="width: 0%"></div>
-                        <div class="dot" id="player-progress-dot" style="left: 0%"></div>
-                    </div>
-                    <span class="time" id="player-progress-total">0:00</span>
-                </div>
-                <div class="player-extra">
-                    <select id="speed-select">
-                        <option value="0.5" style="color: black;">0.5x</option>
-                        <option value="0.75" style="color: black;">0.75x</option>
-                        <option value="1" selected style="color: black;">1x</option>
-                        <option value="1.25" style="color: black;">1.25x</option>
-                        <option value="1.5" style="color: black;">1.5x</option>
-                        <option value="2" style="color: black;">2x</option>
-                    </select>
-                    <div class="volume-control" style="display: flex; align-items: center; gap: 8px;">
-                        <i class="ph ph-speaker-high" id="volume-icon"></i>
-                        <input type="range" id="volume-slider" min="0" max="1" step="0.1" value="1" style="width: 80px; height: 4px; accent-color: var(--gold); cursor: pointer;">
-                    </div>
-                    <button id="player-close" class="player-close" aria-label="Close Player"><i class="ph ph-x"></i></button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <script src="js/i18n.js"></script>
     <script src="js/bookmarks.js"></script>
     <script src="js/main.js"></script>
     
     <script>
         /**
-         * Media Center Logic - Connects to Global Audio Player
+         * Media Center Logic - Consists of In-Card Player Controls
          */
         let allMedia = [];
         let currentFilteredMedia = [];
         let currentCategory = localStorage.getItem('media-last-cat') || 'all';
+        let currentMediaId = null;
 
         async function init() {
             try {
@@ -336,21 +296,12 @@
                 // Load last session
                 const lastUrl = localStorage.getItem('media-last-url');
                 const lastTime = parseFloat(localStorage.getItem('media-last-time') || "0");
-                const lastTitle = localStorage.getItem('media-last-title');
-                const lastSpeaker = localStorage.getItem('media-last-speaker');
                 const lastId = parseInt(localStorage.getItem('media-last-id'));
 
                 if (lastUrl && lastUrl !== "") {
                     window.globalAudio.src = lastUrl;
                     window.globalAudio.currentTime = lastTime;
                     currentMediaId = lastId || null;
-                    
-                    const pbTitle = document.getElementById('pb-title');
-                    const pbSub = document.getElementById('pb-sub');
-                    if (pbTitle) pbTitle.textContent = lastTitle;
-                    if (pbSub) pbSub.textContent = lastSpeaker;
-                    
-                    window.updatePlayerUI(false); // Show player
                     syncCardState();
                 }
                 
@@ -441,7 +392,7 @@
                     const id = parseInt(card.dataset.id);
                     const item = allMedia.find(m => m.id === id);
                     if (item) {
-                        playMedia(item, btn.querySelector('i'), card);
+                        playMedia(item);
                     }
                 };
             });
@@ -462,15 +413,11 @@
                 if (speed) speed.onchange = (e) => {
                     window.globalAudio.playbackRate = parseFloat(e.target.value);
                     localStorage.setItem('playbackSpeed', e.target.value);
-                    const globalSpeed = document.getElementById('speed-select');
-                    if (globalSpeed) globalSpeed.value = e.target.value;
                 };
 
                 if (vol) vol.oninput = (e) => {
                     const v = parseFloat(e.target.value);
                     window.globalAudio.volume = v;
-                    const globalVol = document.getElementById('volume-slider');
-                    if (globalVol) globalVol.value = v;
                     localStorage.setItem('playbackVolume', v);
                 };
 
@@ -503,13 +450,6 @@
             const cardEl = document.getElementById(`card-${item.id}`);
             if (cardEl) cardEl.classList.add('playing');
 
-            // Sync Player Bar
-            const pbTitle = document.getElementById('pb-title');
-            const pbSub = document.getElementById('pb-sub');
-            if (pbTitle) pbTitle.textContent = item.title;
-            if (pbSub) pbSub.textContent = item.speaker;
-            window.updatePlayerUI(false);
-
             // Start Audio
             window.globalAudio.src = item.url;
             const savedSpeed = localStorage.getItem('playbackSpeed') || "1";
@@ -517,11 +457,16 @@
             
             window.globalAudio.play().then(() => {
                 syncCardIcons();
-                const gs = document.getElementById('speed-select');
-                if (gs) gs.value = savedSpeed;
                 if (cardEl) {
                     const cs = cardEl.querySelector('.cp-speed');
                     if (cs) cs.value = savedSpeed;
+                }
+                
+                if (window.updateMediaSession) {
+                    window.updateMediaSession({
+                        title: item.title,
+                        artist: item.speaker
+                    });
                 }
             }).catch(e => {
                 console.error("Playback failed:", e);
@@ -537,8 +482,6 @@
                     btn.className = isPaused ? 'ph ph-play-circle' : 'ph ph-pause-circle';
                 }
             });
-            const mainPlay = document.querySelector('.play-main i');
-            if (mainPlay) window.updateIcon(mainPlay, isPaused ? 'pause' : 'play');
         }
 
         function syncCardState() {
@@ -564,8 +507,8 @@
             if (Math.floor(cur) % 5 === 0) {
                 localStorage.setItem('media-last-url', window.globalAudio.src);
                 localStorage.setItem('media-last-time', cur);
-                localStorage.setItem('media-last-title', document.getElementById('pb-title')?.textContent || "");
-                localStorage.setItem('media-last-speaker', document.getElementById('pb-sub')?.textContent || "");
+                localStorage.setItem('media-last-title', allMedia.find(m => m.id === currentMediaId)?.title || "");
+                localStorage.setItem('media-last-speaker', allMedia.find(m => m.id === currentMediaId)?.speaker || "");
             }
 
             const p = (cur / dur) * 100;

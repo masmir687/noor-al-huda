@@ -584,9 +584,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // 5. Floating Player Button (Created early so UI sync works)
     let playerToggleBtn = null;
     const isQuran = path.includes('/quran/') || path.includes('quran.html') || window.SURAH_ID;
-    const isHadith = path.includes('/collection/') || path.includes('hadith.html');
-    const isMedia = path.includes('media.html');
-    const shouldShowPlayer = isQuran || isHadith || isMedia;
+    const isHadith = path.includes('/collection/');
+    const isMedia = false; // Excluded as requested
+    const shouldShowPlayer = isQuran || isHadith;
     const isExcludedPage = !shouldShowPlayer;
     
     if (!isExcludedPage) {
