@@ -16,35 +16,161 @@
     <meta name="theme-color" content="#0F4A31">
     <link rel="stylesheet" href="css/style.css">
     <style>
-        .vid-grid-page {
+        /* Cinema Mode Layout */
+        body.video-page {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            padding-top: 60px; /* Navbar */
+        }
+
+        .video-page .page-header {
+            flex-shrink: 0;
+            padding: 8px 0;
+        }
+
+        .video-player-layout {
+            flex: 1;
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 25px;
-            padding: 40px 0;
+            grid-template-columns: 1fr 350px;
+            overflow: hidden;
+            background-color: var(--obsidian);
         }
-        .vid-thumb-large {
-            height: 180px;
+
+        .main-player-area {
+            display: flex;
+            flex-direction: column;
+            background: #000;
+            overflow-y: auto; /* For details below player */
         }
-        .speaker-badge {
+
+        .video-container {
+            width: 100%;
+            /* Calculate height based on available space to avoid scrolling if possible */
+            max-height: 70vh; 
+            aspect-ratio: 16/9;
+            background: #000;
+            flex-shrink: 0;
+        }
+
+        .video-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .video-details {
+            padding: 20px 30px;
+            background-color: var(--cream);
+            border-top: 1px solid var(--sand);
+            flex: 1;
+        }
+
+        [data-theme='dark'] .video-details {
             background-color: var(--parch);
-            border: 1px solid var(--sand);
-            font-size: 10px;
-            padding: 4px 8px;
-            border-radius: 4px;
-            display: inline-block;
-            margin-top: 8px;
+            border-color: rgba(255,255,255,0.05);
+        }
+
+        .playlist-sidebar {
+            background-color: var(--parch);
+            border-left: 1px solid var(--sand);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        [data-theme='dark'] .playlist-sidebar {
+            background-color: #0d1117;
+            border-color: rgba(255,255,255,0.05);
+        }
+
+        .playlist-tabs {
+            display: flex;
+            overflow-x: auto;
+            padding: 12px 10px;
+            gap: 8px;
+            background: rgba(0,0,0,0.03);
+            border-bottom: 1px solid var(--sand);
+            scrollbar-width: none;
+            flex-shrink: 0;
+        }
+
+        .playlist-tab {
+            padding: 6px 14px;
+            font-size: 11px;
             font-weight: 700;
-            color: var(--emd);
+            border-radius: 20px;
+            white-space: nowrap;
+            cursor: pointer;
+            color: var(--stone);
+            background: var(--white);
+            border: 1px solid var(--sand);
+            transition: all 0.2s;
+        }
+
+        .playlist-tab.active {
+            background-color: var(--gold) !important;
+            color: white !important;
+            border-color: var(--gold) !important;
+        }
+
+        .playlist-items {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            scrollbar-width: thin;
+        }
+
+        .playlist-item {
+            display: flex;
+            gap: 12px;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 5px;
+            border: 1px solid transparent;
+        }
+
+        .playlist-item:hover { background-color: rgba(0,0,0,0.03); }
+        .playlist-item.active { background-color: rgba(200, 146, 42, 0.1); border-color: var(--gold); }
+
+        .pi-thumb {
+            width: 90px;
+            aspect-ratio: 16/9;
+            border-radius: 4px;
+            background-size: cover;
+            background-position: center;
+            flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.2);
+        }
+
+        .pi-thumb i { color: white; font-size: 16px; opacity: 0.9; }
+
+        .pi-info { flex: 1; min-width: 0; }
+        .pi-title { font-size: 12px; font-weight: 700; line-height: 1.4; margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; color: var(--ink); }
+        .pi-meta { font-size: 10px; color: var(--stone); display: flex; justify-content: space-between; }
+
+        .current-video-title { font-size: 20px; font-weight: 700; margin-bottom: 5px; color: var(--emd); }
+        [data-theme='dark'] .current-video-title { color: var(--goldl); }
+        .current-video-speaker { font-weight: 600; color: var(--gold); margin-bottom: 10px; display: block; font-size: 13px; }
+
+        @media (max-width: 992px) {
+            body.video-page { overflow-y: auto; height: auto; }
+            .video-player-layout { grid-template-columns: 1fr; display: flex; flex-direction: column; }
+            .playlist-sidebar { height: 500px; border-left: none; border-top: 1px solid var(--sand); }
         }
     </style>
 </head>
-<body>
+<body class="video-page" data-page-title="videos">
     <!-- Navbar -->
     <nav class="nav">
         <div class="container">
             <div class="nav-content">
                 <a href="./" class="nav-logo">
-                    <span class="ar">نور الهدى</span>
+                    <span class="ar">নূর আল-হুদা</span>
                     <span class="en">NOOR AL-HUDA</span>
                 </a>
                 <div class="nav-links" id="navLinks">
@@ -57,7 +183,6 @@
                     <a href="media.html" data-t="media">Media</a>
                 </div>
                 <div class="nav-right">
-                    
                     <button class="nav-icon-btn" id="themeToggle" aria-label="Toggle Theme"><i class="ph ph-moon"></i></button>
                     <button class="lang-btn" data-t="lang-btn">EN</button>
                     <button class="mobile-menu-btn" id="menuBtn"><i class="ph ph-list"></i></button>
@@ -68,60 +193,223 @@
 
     <header class="page-header">
         <div class="container">
-            <h1 class="page-title">Video Library</h1>
-            <p class="page-subtitle">Curated Islamic lectures, Dawah training, and scholarly debates from renowned speakers worldwide.</p>
+            <h1 class="page-title" data-t="video_library_title" style="font-size: 1.2rem; margin-bottom: 2px;">Video Library</h1>
+            <p class="page-subtitle" data-t="video_library_subtitle" style="font-size: 0.8rem;">Curated Islamic lectures and stories.</p>
         </div>
     </header>
 
-    <main style="background-color: var(--parch); min-height: 60vh;">
-        <div class="container">
-            <div class="vid-grid-page" id="videos-grid">
-                <div style="text-align: center; width: 100%; color: var(--stone); font-size: 12px; grid-column: 1 / -1;">Loading Videos...</div>
+    <main class="video-player-layout">
+        <!-- Left: Player -->
+        <div class="main-player-area">
+            <div class="video-container" id="player-container">
+                <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: var(--stone);">
+                    <i class="ph ph-spinner-gap ph-spin" style="font-size: 40px;"></i>
+                </div>
+            </div>
+            <div class="video-details">
+                <h2 class="current-video-title" id="current-title">Loading...</h2>
+                <span class="current-video-speaker" id="current-speaker"></span>
+                <div id="current-description" style="font-size: 14px; color: var(--stone); line-height: 1.5;">
+                    Select a video from the playlist to begin your learning journey.
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Playlist -->
+        <div class="playlist-sidebar">
+            <div class="playlist-tabs" id="category-tabs">
+                <div class="playlist-tab active" data-cat="all">All</div>
+                <div class="playlist-tab" data-cat="lectures">Lectures</div>
+                <div class="playlist-tab" data-cat="new-muslims">Stories of New Muslims</div>
+                <div class="playlist-tab" data-cat="dawah">Dawah</div>
+                <div class="playlist-tab" data-cat="stories">Stories</div>
+                <div class="playlist-tab" data-cat="lives-of-sahaba">Lives of the Sahaba</div>
+                <div class="playlist-tab" data-cat="quran">Quran</div>
+            </div>
+            <div class="playlist-items" id="playlist-container">
+                <!-- Items injected here -->
             </div>
         </div>
     </main>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-grid">
-                <div class="footer-brand">
-                    <div class="nav-logo">
-                        <span class="ar">نور الهدى</span>
-                        <span class="en">NOOR AL-HUDA</span>
-                    </div>
-                    <p>Invite to the way of your Lord with wisdom and good instruction.</p>
-                </div>
-                <div class="footer-links">
-                    <h4 data-t="platform">Platform</h4>
-                    <a href="quran/1/" data-t="quran">Quran</a>
-                    <a href="hadith.html" data-t="hadith">Hadith</a>
-                    <a href="bookmarks.html" data-t="bookmarks">Bookmarks</a>
-                    <a href="learn.html" data-t="learn">Learn</a>
-                </div>
-                <div class="footer-links">
-                    <h4 data-t="resources">Resources</h4>
-                    <a href="videos.html" data-t="videos">Videos</a>
-                    <a href="media.html" data-t="media">Media</a>
-                    <a href="qa.html" data-t="qa">Q&A</a>
-                </div>
-                <div class="footer-links">
-                    <h4 data-t="legal">Legal</h4>
-                    <a href="privacy.html" data-t="privacy">Privacy</a>
-                    <a href="terms.html" data-t="terms">Terms</a>
-                    <a href="contact.html" data-t="contact">Contact</a>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2026 Noor Al-Huda Islamic Platform. <span data-t="all_rights_reserved">All rights reserved.</span></p>
-                <span class="blessing">بَارَكَ اللَّهُ فِيكُمْ — <span data-t="may_allah_bless_your_work">May Allah bless your work</span></span>
-            </div>
-        </div>
-    </footer>
-
     <script src="js/i18n.js"></script>
     <script src="js/bookmarks.js"></script>
     <script src="js/main.js"></script>
-    <script src="js/data-loader.js"></script>
+    
+    <script>
+        /**
+         * Enhanced Video Library Logic - Integrated Player, State, and Scrolling
+         */
+        let player;
+        let allVideos = [];
+        let currentFilteredVideos = [];
+        let currentCategory = localStorage.getItem('video-last-cat') || 'all';
+        // Ensure ID is treated as a number for consistency
+        let currentVideoId = parseInt(localStorage.getItem('video-last-id')) || null;
+
+        // Load YouTube IFrame API
+        const tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        const firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        function onYouTubeIframeAPIReady() {
+            init();
+        }
+
+        async function init() {
+            try {
+                const res = await fetch('data/videos.json');
+                allVideos = await res.json();
+                
+                setupTabs();
+                renderPlaylist(currentCategory);
+                
+                const startVideo = allVideos.find(v => v.id == currentVideoId) || allVideos[0];
+                if (startVideo) loadPlayer(startVideo, false);
+                
+            } catch (e) {
+                console.error("Failed to load video library", e);
+            }
+        }
+
+        function setupTabs() {
+            const tabContainer = document.getElementById('category-tabs');
+            tabContainer.querySelectorAll('.playlist-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.cat === currentCategory);
+                tab.onclick = () => {
+                    currentCategory = tab.dataset.cat;
+                    localStorage.setItem('video-last-cat', currentCategory);
+                    tabContainer.querySelectorAll('.playlist-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    renderPlaylist(currentCategory);
+                };
+            });
+        }
+
+        function renderPlaylist(cat) {
+            const playlistContainer = document.getElementById('playlist-container');
+            currentFilteredVideos = cat === 'all' 
+                ? allVideos 
+                : allVideos.filter(v => v.category === cat);
+
+            const lang = localStorage.getItem('lang') || 'en';
+
+            playlistContainer.innerHTML = currentFilteredVideos.map(vid => `
+                <div class="playlist-item ${vid.id == currentVideoId ? 'active' : ''}" data-id="${vid.id}">
+                    <div class="pi-thumb" style="background: ${vid.gradient}">
+                        <i class="ph ph-play-circle"></i>
+                    </div>
+                    <div class="pi-info">
+                        <div class="pi-title">${lang === 'bn' && vid.titleBn ? vid.titleBn : vid.title}</div>
+                        <div class="pi-meta">
+                            <span>${vid.duration}</span>
+                            <span>${lang === 'bn' && vid.speakerBn ? vid.speakerBn : vid.speaker}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            playlistContainer.querySelectorAll('.playlist-item').forEach(item => {
+                item.onclick = () => {
+                    const vid = allVideos.find(v => v.id == item.dataset.id);
+                    if (vid) loadPlayer(vid, true);
+                };
+            });
+        }
+
+        function loadPlayer(video, shouldAutoplay) {
+            currentVideoId = video.id;
+            localStorage.setItem('video-last-id', currentVideoId);
+            
+            // Sync UI items
+            document.querySelectorAll('.playlist-item').forEach(item => {
+                item.classList.toggle('active', item.dataset.id == currentVideoId);
+            });
+
+            const lang = localStorage.getItem('lang') || 'en';
+            document.getElementById('current-title').textContent = lang === 'bn' && video.titleBn ? video.titleBn : video.title;
+            document.getElementById('current-speaker').textContent = lang === 'bn' && video.speakerBn ? video.speakerBn : video.speaker;
+
+            const isPlaylist = video.duration && video.duration.toLowerCase() === 'playlist' && video.url.includes('list=');
+
+            let yId = "";
+            let listId = "";
+
+            if (isPlaylist) {
+                listId = video.url.split('list=')[1].split('&')[0];
+            }
+            
+            if (video.url.includes('v=')) yId = video.url.split('v=')[1].split('&')[0];
+            else if (video.url.includes('youtu.be/')) yId = video.url.split('youtu.be/')[1].split('?')[0];
+
+            // Always destroy the player to force a clean reload, especially when switching between single video and playlist
+            if (player && typeof player.destroy === 'function') {
+                player.destroy();
+                player = null;
+            }
+
+            // Restore the container div if it was replaced by an iframe
+            const playerArea = document.querySelector('.main-player-area');
+            let container = document.getElementById('player-container');
+            if (!container || container.tagName === 'IFRAME') {
+                if (container) container.remove();
+                container = document.createElement('div');
+                container.id = 'player-container';
+                container.className = 'video-container';
+                playerArea.insertBefore(container, document.querySelector('.video-details'));
+            }
+
+            let playerVars = { 
+                'autoplay': shouldAutoplay ? 1 : 0, 
+                'origin': window.location.origin, 
+                'enablejsapi': 1,
+                'rel': 0,
+                'modestbranding': 1
+            };
+
+            if (isPlaylist) {
+                playerVars.listType = 'playlist';
+                playerVars.list = listId;
+            }
+
+            player = new YT.Player('player-container', {
+                height: '100%',
+                width: '100%',
+                videoId: yId,
+                playerVars: playerVars,
+                events: {
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+
+            // Scroll playlist to active item
+            const activeItem = document.querySelector('.playlist-item.active');
+            if (activeItem) activeItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function onPlayerStateChange(event) {
+            if (event.data === YT.PlayerState.ENDED) {
+                playNext();
+            }
+        }
+
+        function playNext() {
+            const index = currentFilteredVideos.findIndex(v => v.id == currentVideoId);
+            if (index !== -1 && index < currentFilteredVideos.length - 1) {
+                loadPlayer(currentFilteredVideos[index + 1], true);
+            }
+        }
+
+        document.addEventListener('languageChanged', () => {
+            renderPlaylist(currentCategory);
+            const current = allVideos.find(v => v.id == currentVideoId);
+            if (current) {
+                const lang = localStorage.getItem('lang') || 'en';
+                document.getElementById('current-title').textContent = lang === 'bn' && current.titleBn ? current.titleBn : current.title;
+                document.getElementById('current-speaker').textContent = lang === 'bn' && current.speakerBn ? current.speakerBn : current.speaker;
+            }
+        });
+    </script>
 </body>
 </html>

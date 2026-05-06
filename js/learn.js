@@ -74,15 +74,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
         grid.innerHTML = html;
 
-        // Attach listen button functionality
+        // Attach listen button functionality (Card level only)
         grid.querySelectorAll('.learn-card').forEach(card => {
             const listenBtn = card.querySelector('.listen-btn');
             const desc = card.querySelector('.learn-desc');
+            
             if (listenBtn && desc) {
                 listenBtn.onclick = (e) => {
                     e.preventDefault();
                     const icon = listenBtn.querySelector('i');
-                    const text = desc.innerText;
+                    
+                    // Clone to exclude arabic and pronunciation from main reading to keep it clean
+                    const clone = desc.cloneNode(true);
+                    clone.querySelectorAll('.tutorial-arabic, .tutorial-pronunciation').forEach(el => el.remove());
+                    const text = clone.innerText.trim();
+                    
                     window.toggleSpeech(text, icon, currentLang);
                 };
             }

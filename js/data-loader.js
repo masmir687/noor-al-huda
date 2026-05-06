@@ -100,7 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(res => res.json())
             .then(data => {
                 const html = data.map(vid => `
-                    <div class="vid-card">
+                    <div class="vid-card" onclick="window.openVideo('${vid.url}')">
                         <div class="vid-thumb vid-thumb-large" style="background: ${vid.gradient}">
                             <div class="play-btn"><i class="ph ph-play"></i></div>
                             <span class="vid-dur">${vid.duration}</span>
@@ -133,7 +133,10 @@ document.addEventListener('DOMContentLoaded', () => {
                             <p style="font-size: 13px; color: var(--stone); margin-bottom: 20px;">${lang === 'bn' && pod.descriptionBn ? pod.descriptionBn : pod.description}</p>
                             <div style="display: flex; align-items: center; justify-content: space-between; margin-top: auto;">
                                 <span style="font-size: 11px; font-weight: 700; color: var(--emd);">${pod.series}</span>
-                                <button class="btn btn-gold listen-btn" style="padding: 6px 16px; font-size: 12px; display: flex; align-items: center; gap: 8px;" data-t="play_episode"><i class="ph ph-play-circle" style="font-size: 16px;"></i> ${t.play_episode || 'Play Episode'}</button>
+                                <button onclick="window.openVideo('${pod.url}')" class="btn btn-gold listen-btn" style="padding: 6px 16px; font-size: 12px; display: flex; align-items: center; gap: 8px;">
+                                    <i class="ph ph-play-circle" style="font-size: 16px;"></i> 
+                                    <span data-t="play_episode">${t.play_episode || 'Play Episode'}</span>
+                                </button>
                             </div>
                         </div>
                     </div>

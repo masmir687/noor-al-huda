@@ -1278,15 +1278,19 @@ body.player-hidden .quran-sidebar {
 
 /* Inner Page Headers */
 .page-header {
-    background-color: var(--emd); color: var(--white); padding: clamp(40px, 6vw, 60px) 0; text-align: center;
+    background-color: var(--emd); color: var(--white); padding: clamp(10px, 2vw, 15px) 0; text-align: center;
+}
+
+.learn-header {
+    /* Same as page-header for consistency */
 }
 
 .page-title {
-    font-size: clamp(24px, 5vw, 32px); margin-bottom: 10px; color: var(--goldl); font-weight: 700;
+    font-size: clamp(18px, 3.5vw, 24px); margin-bottom: 6px; color: var(--goldl); font-weight: 700;
 }
 
 .page-subtitle {
-    font-size: clamp(12px, 2.5vw, 14px); color: rgba(255,255,255,0.7); max-width: 600px; margin: 0 auto;
+    font-size: clamp(10px, 1.8vw, 12px); color: rgba(255,255,255,0.7); max-width: 600px; margin: 0 auto;
 }
 
 /* Collections Grid (Hadith/Learn) */
@@ -1503,6 +1507,29 @@ body.player-hidden .quran-sidebar {
     opacity: 1;
 }
 
+/* Video Modal */
+.video-modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.9); backdrop-filter: blur(8px);
+    display: none; justify-content: center; align-items: center; z-index: 11000;
+}
+.video-modal-overlay.active { display: flex; }
+.video-modal-container {
+    width: 95%; max-width: 900px; aspect-ratio: 16/9; background: #000;
+    position: relative; border-radius: 12px; overflow: hidden;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1);
+}
+.video-modal-close {
+    position: absolute; top: -45px; right: 0; background: none; border: none;
+    color: white; font-size: 32px; cursor: pointer; padding: 5px;
+}
+.video-modal-container iframe { width: 100%; height: 100%; border: none; }
+
+@media (max-width: 768px) {
+    .video-modal-container { width: 100%; border-radius: 0; }
+    .video-modal-close { top: 10px; right: 10px; background: rgba(0,0,0,0.5); border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-size: 20px; z-index: 10; }
+}
+
 /* Splash Screen */
 .splash-screen {
     position: fixed;
@@ -1678,7 +1705,7 @@ body.player-hidden .quran-sidebar {
 
 .privacy-notice-text {
     font-size: 13px;
-    color: var(--stone);
+    color: var(--goldl);
     line-height: 1.5;
     margin: 0;
 }
@@ -1849,11 +1876,11 @@ button *, .btn *, .nav-links a *, .surah-item *, .pill *, .pc-btn *, .ayah-btn *
 
 @media (min-width: 992px) {
     .learn-sidebar {
-        width: 280px;
+        width: 240px;
         height: 100%;
         overflow-y: auto;
         border-right: 1px solid rgba(255, 255, 255, 0.1);
-        padding: 30px 20px;
+        padding: 20px 15px;
     }
 }
 

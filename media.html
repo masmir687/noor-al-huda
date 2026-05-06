@@ -16,33 +16,6 @@
     <meta name="theme-color" content="#0F4A31">
     <link rel="stylesheet" href="css/style.css">
     <style>
-        .media-tabs {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 40px;
-            border-bottom: 1px solid var(--sand);
-        }
-        .media-tab {
-            padding: 15px 20px;
-            font-weight: 700;
-            color: var(--stone);
-            cursor: pointer;
-            position: relative;
-        }
-        .media-tab.active {
-            color: var(--em);
-        }
-        .media-tab.active::after {
-            content: '';
-            position: absolute;
-            bottom: -1px;
-            left: 0;
-            width: 100%;
-            height: 3px;
-            background-color: var(--em);
-            border-radius: 3px 3px 0 0;
-        }
-        
         .podcast-card {
             background-color: var(--cream);
             border: 1px solid var(--sand);
@@ -51,6 +24,12 @@
             overflow: hidden;
             margin-bottom: 20px;
         }
+        
+        [data-theme='dark'] .podcast-card {
+            background-color: var(--parch);
+            border-color: rgba(255,255,255,0.05);
+        }
+
         .podcast-cover {
             width: 160px;
             background-color: var(--emd);
@@ -60,20 +39,173 @@
             color: var(--white);
             font-size: 40px;
             flex-shrink: 0;
+            box-shadow: inset 0 0 40px rgba(0,0,0,0.2);
         }
+
         .podcast-info {
             padding: 20px;
             flex: 1;
             display: flex;
             flex-direction: column;
         }
+
+        .podcast-info .speaker-name {
+            font-size: 11px; 
+            font-weight: 700; 
+            color: var(--emd);
+        }
+
+        [data-theme='dark'] .podcast-info .speaker-name {
+            color: var(--goldl);
+        }
+
         @media (max-width: 600px) {
             .podcast-card { flex-direction: column; }
             .podcast-cover { width: 100%; height: 160px; }
         }
+
+        .media-tabs {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 40px;
+            border-bottom: 1px solid var(--sand);
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+        
+        .media-tabs::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .media-tab {
+            padding: 10px 15px;
+            font-weight: 700;
+            color: var(--stone);
+            cursor: pointer;
+            position: relative;
+            white-space: nowrap;
+        }
+        
+        .media-tab.active {
+            color: var(--em);
+        }
+        
+        .media-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: var(--em);
+            border-radius: 3px 3px 0 0;
+        }
+
+        /* Card Player Controls */
+        .card-player {
+            display: none;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid var(--sand);
+        }
+        
+        [data-theme='dark'] .card-player {
+            border-color: rgba(255,255,255,0.05);
+        }
+
+        .podcast-card.playing .card-player {
+            display: block;
+        }
+
+        .podcast-card.playing .play-media-btn {
+            display: none;
+        }
+
+        .cp-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 12px;
+        }
+
+        .cp-btn {
+            background: none;
+            border: none;
+            color: var(--gold);
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+
+        [data-theme='dark'] .cp-btn {
+            color: var(--goldl);
+        }
+
+        .cp-extra {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .cp-speed {
+            background: var(--parch);
+            border: 1px solid var(--sand);
+            color: var(--stone);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .cp-volume {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .cp-volume input {
+            width: 60px;
+            height: 3px;
+            accent-color: var(--gold);
+        }
+
+        .cp-progress {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .cp-time {
+            font-size: 10px;
+            color: var(--stone);
+            min-width: 30px;
+        }
+
+        .cp-bar {
+            flex: 1;
+            height: 4px;
+            background: var(--sand);
+            border-radius: 2px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .cp-fill {
+            position: absolute;
+            left: 0; top: 0; height: 100%;
+            background: var(--gold);
+            border-radius: 2px;
+            width: 0%;
+        }
     </style>
 </head>
-<body>
+<body data-page-title="media">
     <!-- Navbar -->
     <nav class="nav">
         <div class="container">
@@ -92,7 +224,6 @@
                     <a href="media.html" style="color: var(--goldl)" data-t="media">Media</a>
                 </div>
                 <div class="nav-right">
-                    
                     <button class="nav-icon-btn" id="themeToggle" aria-label="Toggle Theme"><i class="ph ph-moon"></i></button>
                     <button class="lang-btn" data-t="lang-btn">EN</button>
                     <button class="mobile-menu-btn" id="menuBtn"><i class="ph ph-list"></i></button>
@@ -103,69 +234,409 @@
 
     <header class="page-header">
         <div class="container">
-            <h1 class="page-title">Media Center</h1>
-            <p class="page-subtitle">Listen to Quranic recitations from world-renowned Qaris and tune into engaging Islamic podcasts.</p>
+            <h1 class="page-title" data-t="media_center_title" style="font-size: 1.2rem; margin-bottom: 2px;">Media Center</h1>
+            <p class="page-subtitle" data-t="media_center_subtitle" style="font-size: 0.8rem;">Listen to Quranic recitations and engage with Islamic podcasts.</p>
         </div>
     </header>
 
-    <main style="background-color: var(--parch); min-height: 60vh; padding: 40px 0 100px;">
-        <div class="container" style="max-width: 900px;">
-            
-            <div class="media-tabs">
-                <div class="media-tab active">Islamic Podcasts</div>
-                <div class="media-tab">Full Quran Audio</div>
-                <div class="media-tab">Nasheeds (Vocals Only)</div>
-            </div>
+    <main style="background-color: var(--parch); min-height: 60vh; padding-bottom: 100px;">
+        
+        <div class="media-sticky-header" style="position: sticky; top: 60px; background: var(--parch); z-index: 1000; padding: 15px 0; border-bottom: 1px solid var(--sand); margin-bottom: 30px;">
+            <div class="container" style="max-width: 900px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                <div class="media-tabs" style="display: flex; gap: 20px; border: none; margin-bottom: 0; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none;">
+                    <div class="media-tab active" data-cat="all" style="padding: 10px 15px; font-weight: 700; color: var(--stone); cursor: pointer; white-space: nowrap;">All</div>
+                    <div class="media-tab" data-cat="podcasts" style="padding: 10px 15px; font-weight: 700; color: var(--stone); cursor: pointer; white-space: nowrap;">Islamic Podcasts</div>
+                    <div class="media-tab" data-cat="quran" style="padding: 10px 15px; font-weight: 700; color: var(--stone); cursor: pointer; white-space: nowrap;">Full Quran Audio</div>
+                    <div class="media-tab" data-cat="nasheeds" style="padding: 10px 15px; font-weight: 700; color: var(--stone); cursor: pointer; white-space: nowrap;">Nasheeds</div>
+                </div>
 
-            <!-- Podcasts List -->
+                <div class="play-all-container" style="display: flex; align-items: center; gap: 10px; padding: 0 0 5px;">
+                    <span style="font-size: 11px; font-weight: 700; color: var(--stone); text-transform: uppercase; letter-spacing: 1px;">Auto Play</span>
+                    <label class="switch" style="position: relative; display: inline-block; width: 34px; height: 18px;">
+                        <input type="checkbox" id="auto-play-toggle" style="opacity: 0; width: 0; height: 0;">
+                        <span class="slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--sand); transition: .4s; border-radius: 18px;"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="container" style="max-width: 900px;">
+            <!-- Media List -->
             <div class="podcasts-list" id="media-grid">
-                <div style="text-align: center; width: 100%; color: var(--stone); font-size: 12px;">Loading Podcasts...</div>
+                <div style="text-align: center; width: 100%; color: var(--stone); font-size: 12px;"><i class="ph ph-spinner-gap ph-spin" style="font-size: 32px;"></i></div>
             </div>
 
         </div>
     </main>
 
-    <!-- Footer -->
-    <footer class="footer">
+    <!-- Player Bar -->
+    <div class="player-bar hidden" id="playerBar">
         <div class="container">
-            <div class="footer-grid">
-                <div class="footer-brand">
-                    <div class="nav-logo">
-                        <span class="ar">نور الهدى</span>
-                        <span class="en">NOOR AL-HUDA</span>
+            <div class="player-content">
+                <div class="player-info">
+                    <span class="player-title" id="pb-title">Media Audio</span>
+                    <span class="player-sub" id="pb-sub">Noor Al-Huda</span>
+                </div>
+                <div class="player-controls">
+                    <button class="pc-btn" id="player-playlist-btn" title="Toggle List" style="visibility: hidden;"><i class="ph ph-list-bullets"></i></button>
+                    <button class="pc-btn"><i class="ph ph-skip-back"></i></button>
+                    <button class="pc-btn play-main"><i class="ph ph-play"></i></button>
+                    <button class="pc-btn"><i class="ph ph-skip-forward"></i></button>
+                </div>
+                <div class="player-progress">
+                    <span class="time" id="player-progress-current">0:00</span>
+                    <div class="bar">
+                        <div class="fill" id="player-progress-fill" style="width: 0%"></div>
+                        <div class="dot" id="player-progress-dot" style="left: 0%"></div>
                     </div>
-                    <p>Invite to the way of your Lord with wisdom and good instruction.</p>
+                    <span class="time" id="player-progress-total">0:00</span>
                 </div>
-                <div class="footer-links">
-                    <h4 data-t="platform">Platform</h4>
-                    <a href="quran/1/" data-t="quran">Quran</a>
-                    <a href="hadith.html" data-t="hadith">Hadith</a>
-                    <a href="bookmarks.html" data-t="bookmarks">Bookmarks</a>
-                    <a href="learn.html" data-t="learn">Learn</a>
+                <div class="player-extra">
+                    <select id="speed-select">
+                        <option value="0.5" style="color: black;">0.5x</option>
+                        <option value="0.75" style="color: black;">0.75x</option>
+                        <option value="1" selected style="color: black;">1x</option>
+                        <option value="1.25" style="color: black;">1.25x</option>
+                        <option value="1.5" style="color: black;">1.5x</option>
+                        <option value="2" style="color: black;">2x</option>
+                    </select>
+                    <div class="volume-control" style="display: flex; align-items: center; gap: 8px;">
+                        <i class="ph ph-speaker-high" id="volume-icon"></i>
+                        <input type="range" id="volume-slider" min="0" max="1" step="0.1" value="1" style="width: 80px; height: 4px; accent-color: var(--gold); cursor: pointer;">
+                    </div>
+                    <button id="player-close" class="player-close" aria-label="Close Player"><i class="ph ph-x"></i></button>
                 </div>
-                <div class="footer-links">
-                    <h4 data-t="resources">Resources</h4>
-                    <a href="videos.html" data-t="videos">Videos</a>
-                    <a href="media.html" data-t="media">Media</a>
-                    <a href="qa.html" data-t="qa">Q&A</a>
-                </div>
-                <div class="footer-links">
-                    <h4 data-t="legal">Legal</h4>
-                    <a href="privacy.html" data-t="privacy">Privacy</a>
-                    <a href="terms.html" data-t="terms">Terms</a>
-                    <a href="contact.html" data-t="contact">Contact</a>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2026 Noor Al-Huda Islamic Platform. <span data-t="all_rights_reserved">All rights reserved.</span></p>
-                <span class="blessing">بَارَكَ اللَّهُ فِيكُمْ — <span data-t="may_allah_bless_your_work">May Allah bless your work</span></span>
             </div>
         </div>
-    </footer>
+    </div>
 
     <script src="js/i18n.js"></script>
     <script src="js/bookmarks.js"></script>
     <script src="js/main.js"></script>
-    <script src="js/data-loader.js"></script>
+    
+    <script>
+        /**
+         * Media Center Logic - Connects to Global Audio Player
+         */
+        let allMedia = [];
+        let currentFilteredMedia = [];
+        let currentCategory = localStorage.getItem('media-last-cat') || 'all';
+
+        async function init() {
+            try {
+                const res = await fetch('data/media.json');
+                allMedia = await res.json();
+                
+                setupTabs();
+                renderPlaylist(currentCategory);
+
+                // Load last session
+                const lastUrl = localStorage.getItem('media-last-url');
+                const lastTime = parseFloat(localStorage.getItem('media-last-time') || "0");
+                const lastTitle = localStorage.getItem('media-last-title');
+                const lastSpeaker = localStorage.getItem('media-last-speaker');
+                const lastId = parseInt(localStorage.getItem('media-last-id'));
+
+                if (lastUrl && lastUrl !== "") {
+                    window.globalAudio.src = lastUrl;
+                    window.globalAudio.currentTime = lastTime;
+                    currentMediaId = lastId || null;
+                    
+                    const pbTitle = document.getElementById('pb-title');
+                    const pbSub = document.getElementById('pb-sub');
+                    if (pbTitle) pbTitle.textContent = lastTitle;
+                    if (pbSub) pbSub.textContent = lastSpeaker;
+                    
+                    window.updatePlayerUI(false); // Show player
+                    syncCardState();
+                }
+                
+            } catch (e) {
+                console.error("Failed to load media library", e);
+            }
+        }
+
+        function setupTabs() {
+            const tabContainer = document.querySelector('.media-tabs');
+            tabContainer.querySelectorAll('.media-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.cat === currentCategory);
+                tab.onclick = () => {
+                    currentCategory = tab.dataset.cat;
+                    localStorage.setItem('media-last-cat', currentCategory);
+                    tabContainer.querySelectorAll('.media-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    renderPlaylist(currentCategory);
+                };
+            });
+        }
+
+        function renderPlaylist(cat) {
+            const gridContainer = document.getElementById('media-grid');
+            currentFilteredMedia = cat === 'all' 
+                ? allMedia 
+                : allMedia.filter(m => m.category === cat);
+
+            const lang = localStorage.getItem('lang') || 'en';
+
+            gridContainer.innerHTML = currentFilteredMedia.map(item => `
+                <div class="podcast-card" id="card-${item.id}" data-id="${item.id}" data-url="${item.url}">
+                    <div class="podcast-cover" style="background: ${item.gradient}">
+                        <i class="ph ${item.icon || 'ph-headphones'}"></i>
+                    </div>
+                    <div class="podcast-info">
+                        <span style="font-size: 10px; color: var(--em); font-weight: 700; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;">${item.episode}</span>
+                        <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 10px; color: var(--ink);">${lang === 'bn' && item.titleBn ? item.titleBn : item.title}</h3>
+                        <p style="font-size: 13px; color: var(--stone); margin-bottom: 20px;">${lang === 'bn' && item.descriptionBn ? item.descriptionBn : item.description}</p>
+                        
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: auto;">
+                            <span class="speaker-name">${lang === 'bn' && item.speakerBn ? item.speakerBn : item.speaker}</span>
+                            <button class="btn btn-gold play-media-btn" data-url="${item.url}" data-title="${item.title}" data-speaker="${item.speaker}">
+                                <i class="ph ph-play-circle" style="font-size: 16px;"></i> 
+                                <span data-t="play_episode">Play</span>
+                            </button>
+                        </div>
+
+                        <!-- In-Card Player Controls (Visible only when playing) -->
+                        <div class="card-player">
+                            <div class="cp-controls">
+                                <button class="cp-btn card-play-pause"><i class="ph ph-pause-circle"></i></button>
+                                <div class="cp-extra">
+                                    <select class="cp-speed">
+                                        <option value="0.5">0.5x</option>
+                                        <option value="0.75">0.75x</option>
+                                        <option value="1" selected>1x</option>
+                                        <option value="1.25">1.25x</option>
+                                        <option value="1.5">1.5x</option>
+                                        <option value="2">2x</option>
+                                    </select>
+                                    <div class="cp-volume">
+                                        <i class="ph ph-speaker-high" style="font-size: 14px; color: var(--gold);"></i>
+                                        <input type="range" class="card-vol" min="0" max="1" step="0.1" value="1">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="cp-progress">
+                                <span class="cp-time card-time-cur">0:00</span>
+                                <div class="cp-bar card-progress-bar">
+                                    <div class="cp-fill card-progress-fill"></div>
+                                </div>
+                                <span class="cp-time card-time-total">0:00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            // Attach play functionality
+            gridContainer.querySelectorAll('.play-media-btn').forEach(btn => {
+                btn.onclick = (e) => {
+                    e.preventDefault();
+                    const card = btn.closest('.podcast-card');
+                    const id = parseInt(card.dataset.id);
+                    const item = allMedia.find(m => m.id === id);
+                    if (item) {
+                        playMedia(item, btn.querySelector('i'), card);
+                    }
+                };
+            });
+
+            // Attach card control events
+            gridContainer.querySelectorAll('.podcast-card').forEach(card => {
+                const playPause = card.querySelector('.card-play-pause');
+                const speed = card.querySelector('.cp-speed');
+                const vol = card.querySelector('.card-vol');
+                const bar = card.querySelector('.card-progress-bar');
+
+                if (playPause) playPause.onclick = () => {
+                    if (window.globalAudio.paused) window.globalAudio.play();
+                    else window.globalAudio.pause();
+                    syncCardIcons();
+                };
+
+                if (speed) speed.onchange = (e) => {
+                    window.globalAudio.playbackRate = parseFloat(e.target.value);
+                    localStorage.setItem('playbackSpeed', e.target.value);
+                    const globalSpeed = document.getElementById('speed-select');
+                    if (globalSpeed) globalSpeed.value = e.target.value;
+                };
+
+                if (vol) vol.oninput = (e) => {
+                    const v = parseFloat(e.target.value);
+                    window.globalAudio.volume = v;
+                    const globalVol = document.getElementById('volume-slider');
+                    if (globalVol) globalVol.value = v;
+                    localStorage.setItem('playbackVolume', v);
+                };
+
+                if (bar) bar.onclick = (e) => {
+                    const rect = bar.getBoundingClientRect();
+                    const pos = (e.clientX - rect.left) / rect.width;
+                    window.globalAudio.currentTime = pos * window.globalAudio.duration;
+                };
+            });
+            
+            if (window.i18n) window.i18n.translatePage(lang);
+            syncCardState(); // Ensure active card is highlighted if audio already playing
+        }
+
+        function playMedia(item) {
+            // Robust check: Is this already playing?
+            const currentSrc = window.globalAudio.src;
+            if ((item.id === currentMediaId || currentSrc.includes(item.url)) && !window.globalAudio.paused) {
+                window.globalAudio.pause();
+                syncCardIcons();
+                return;
+            }
+
+            currentMediaId = item.id;
+            localStorage.setItem('media-last-id', currentMediaId);
+            window.speechSynthesis.cancel();
+            
+            // Sync UI cards
+            document.querySelectorAll('.podcast-card').forEach(c => c.classList.remove('playing'));
+            const cardEl = document.getElementById(`card-${item.id}`);
+            if (cardEl) cardEl.classList.add('playing');
+
+            // Sync Player Bar
+            const pbTitle = document.getElementById('pb-title');
+            const pbSub = document.getElementById('pb-sub');
+            if (pbTitle) pbTitle.textContent = item.title;
+            if (pbSub) pbSub.textContent = item.speaker;
+            window.updatePlayerUI(false);
+
+            // Start Audio
+            window.globalAudio.src = item.url;
+            const savedSpeed = localStorage.getItem('playbackSpeed') || "1";
+            window.globalAudio.playbackRate = parseFloat(savedSpeed);
+            
+            window.globalAudio.play().then(() => {
+                syncCardIcons();
+                const gs = document.getElementById('speed-select');
+                if (gs) gs.value = savedSpeed;
+                if (cardEl) {
+                    const cs = cardEl.querySelector('.cp-speed');
+                    if (cs) cs.value = savedSpeed;
+                }
+            }).catch(e => {
+                console.error("Playback failed:", e);
+                alert("Failed to play audio. The source might be unavailable.");
+            });
+        }
+
+        function syncCardIcons() {
+            const isPaused = window.globalAudio.paused;
+            document.querySelectorAll('.podcast-card').forEach(card => {
+                const btn = card.querySelector('.card-play-pause i');
+                if (btn) {
+                    btn.className = isPaused ? 'ph ph-play-circle' : 'ph ph-pause-circle';
+                }
+            });
+            const mainPlay = document.querySelector('.play-main i');
+            if (mainPlay) window.updateIcon(mainPlay, isPaused ? 'pause' : 'play');
+        }
+
+        function syncCardState() {
+            const currentSrc = window.globalAudio.src;
+            document.querySelectorAll('.podcast-card').forEach(card => {
+                if (currentSrc.includes(card.dataset.url)) {
+                    card.classList.add('playing');
+                    currentMediaId = parseInt(card.dataset.id);
+                    syncCardIcons();
+                } else {
+                    card.classList.remove('playing');
+                }
+            });
+        }
+
+        // Global sync for progress bars in cards
+        window.globalAudio.addEventListener('timeupdate', () => {
+            const cur = window.globalAudio.currentTime;
+            const dur = window.globalAudio.duration;
+            if (!dur) return;
+            
+            // Save state every 5 seconds
+            if (Math.floor(cur) % 5 === 0) {
+                localStorage.setItem('media-last-url', window.globalAudio.src);
+                localStorage.setItem('media-last-time', cur);
+                localStorage.setItem('media-last-title', document.getElementById('pb-title')?.textContent || "");
+                localStorage.setItem('media-last-speaker', document.getElementById('pb-sub')?.textContent || "");
+            }
+
+            const p = (cur / dur) * 100;
+
+            const activeCard = document.querySelector('.podcast-card.playing');
+            if (activeCard) {
+                const fill = activeCard.querySelector('.card-progress-fill');
+                const timeC = activeCard.querySelector('.card-time-cur');
+                const timeT = activeCard.querySelector('.card-time-total');
+                
+                if (fill) fill.style.width = `${p}%`;
+                if (timeC) {
+                    const m = Math.floor(cur / 60), s = Math.floor(cur % 60);
+                    timeC.textContent = `${m}:${s < 10 ? '0' : ''}${s}`;
+                }
+                if (timeT) {
+                    const m = Math.floor(dur / 60), s = Math.floor(dur % 60);
+                    timeT.textContent = `${m}:${s < 10 ? '0' : ''}${s}`;
+                }
+            }
+        });
+
+        window.globalAudio.addEventListener('play', syncCardIcons);
+        window.globalAudio.addEventListener('pause', syncCardIcons);
+
+        function playNext() {
+            const index = currentFilteredMedia.findIndex(m => m.id === currentMediaId);
+            if (index !== -1 && index < currentFilteredMedia.length - 1) {
+                const nextMedia = currentFilteredMedia[index + 1];
+                playMedia(nextMedia);
+                
+                setTimeout(() => {
+                    const card = document.getElementById(`card-${nextMedia.id}`);
+                    if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 100);
+            }
+        }
+
+        function playPrev() {
+            const index = currentFilteredMedia.findIndex(m => m.id === currentMediaId);
+            if (index > 0) {
+                const prevMedia = currentFilteredMedia[index - 1];
+                playMedia(prevMedia);
+
+                setTimeout(() => {
+                    const card = document.getElementById(`card-${prevMedia.id}`);
+                    if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 100);
+            }
+        }
+
+        // Attach global player skip logic
+        window.onPlayerSkipForward = playNext;
+        window.onPlayerSkipBack = playPrev;
+
+        window.globalAudio.addEventListener('ended', () => {
+            const isAutoPlay = document.getElementById('auto-play-toggle')?.checked;
+            if (isAutoPlay) {
+                playNext();
+            }
+        });
+
+        // Initialize Toggle State
+        const autoPlayToggle = document.getElementById('auto-play-toggle');
+        if (autoPlayToggle) {
+            autoPlayToggle.checked = localStorage.getItem('media-auto-play') === 'true';
+            autoPlayToggle.onchange = (e) => {
+                localStorage.setItem('media-auto-play', e.target.checked);
+            };
+        }
+
+        document.addEventListener('languageChanged', () => {
+            renderPlaylist(currentCategory);
+        });
+
+        // Initialize
+        init();
+    </script>
 </body>
 </html>

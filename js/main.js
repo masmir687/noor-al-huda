@@ -194,13 +194,33 @@ window.toggleSpeech = function(textToRead, playIconElement, lang = 'ar', onEnd =
         currentOriginalHTML = textElement.innerHTML;
     }
 
+    // Expand salutations for TTS
+    let expandedText = textToRead;
+    if (lang === 'ar') {
+        expandedText = expandedText.replace(/ﷺ/g, " صلى الله عليه وسلم ");
+    } else if (lang === 'bn') {
+        expandedText = expandedText.replace(/ﷺ/g, " সাল্লাল্লাহু আলাইহি ওয়াসাল্লাম ");
+        expandedText = expandedText.replace(/\bProphet Muhammad\b/gi, "Prophet Muhammad সাল্লাল্লাহু আলাইহি ওয়াসাল্লাম");
+        expandedText = expandedText.replace(/\bমহানবী\b/g, "মহানবী সাল্লাল্লাহু আলাইহি ওয়াসাল্লাম");
+        expandedText = expandedText.replace(/\bরাসূল\b/g, "রাসূল সাল্লাল্লাহু আলাইহি ওয়াসাল্লাম");
+    } else {
+        expandedText = expandedText.replace(/ﷺ/g, " peace be upon him ");
+        expandedText = expandedText.replace(/\bProphet Muhammad\b/gi, "Prophet Muhammad, peace be upon him");
+    }
+    
+    // Use expanded text for both speech and highlighting to keep them in sync
+    textToRead = expandedText;
+
     const speed = parseFloat(document.getElementById('speed-select')?.value || "1.0");
     const vol = parseFloat(document.getElementById('volume-slider')?.value || "1.0");
     globalAudio.volume = vol;
 
-    if ((lang === 'en' || lang === 'bn') && 'speechSynthesis' in window) {
+    if ((lang === 'en' || lang === 'bn' || lang === 'ar') && 'speechSynthesis' in window) {
         const utterance = new SpeechSynthesisUtterance(textToRead);
-        utterance.lang = lang === 'bn' ? 'bn-BD' : 'en-US';
+        if (lang === 'bn') utterance.lang = 'bn-BD';
+        else if (lang === 'ar') utterance.lang = 'ar-SA';
+        else utterance.lang = 'en-US';
+        
         utterance.rate = speed;
         utterance.volume = vol;
         
@@ -565,7 +585,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let playerToggleBtn = null;
     const isQuran = path.includes('/quran/') || path.includes('quran.html') || window.SURAH_ID;
     const isHadith = path.includes('/collection/') || path.includes('hadith.html');
-    const shouldShowPlayer = isQuran || isHadith;
+    const isMedia = path.includes('media.html');
+    const shouldShowPlayer = isQuran || isHadith || isMedia;
     const isExcludedPage = !shouldShowPlayer;
     
     if (!isExcludedPage) {
@@ -830,4 +851,46 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => { splash.style.display = 'none'; }, 600);
         }, 1500);
     }
+
+    // --- VIDEO MODAL LOGIC ---
+    const videoModal = document.createElement('div');
+    videoModal.className = 'video-modal-overlay';
+    videoModal.id = 'videoModal';
+    videoModal.innerHTML = `
+        <div class="video-modal-container">
+            <button class="video-modal-close" id="closeVideo"><i class="ph ph-x"></i></button>
+            <div id="videoIframeContainer" style="width:100%; height:100%;"></div>
+        </div>
+    `;
+    document.body.appendChild(videoModal);
+
+    window.openVideo = function(url) {
+        if (!url || url === '#') return;
+        
+        let embedUrl = url;
+        if (url.includes('youtube.com/watch?v=')) {
+            const videoId = url.split('v=')[1].split('&')[0];
+            embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+        } else if (url.includes('youtu.be/')) {
+            const videoId = url.split('youtu.be/')[1].split('?')[0];
+            embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+        } else if (url.includes('youtube.com/playlist?list=')) {
+            const listId = url.split('list=')[1].split('&')[0];
+            embedUrl = `https://www.youtube.com/embed/videoseries?list=${listId}&autoplay=1`;
+        }
+
+        const container = document.getElementById('videoIframeContainer');
+        container.innerHTML = `<iframe src="${embedUrl}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+        videoModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    };
+
+    window.closeVideo = function() {
+        videoModal.classList.remove('active');
+        document.getElementById('videoIframeContainer').innerHTML = '';
+        document.body.style.overflow = '';
+    };
+
+    document.getElementById('closeVideo').onclick = window.closeVideo;
+    videoModal.onclick = (e) => { if (e.target === videoModal) window.closeVideo(); };
 });
