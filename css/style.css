@@ -143,6 +143,27 @@ body {
     .sidebar-toggle-btn {
         display: inline-flex !important;
     }
+
+    /* Sticky Mobile Toolbar for Quran/Hadith toggle button */
+    .quran-content > .container > div:first-child,
+    .quran-content > div:first-child {
+        position: sticky;
+        top: 54px; /* Mobile navbar height */
+        z-index: 100;
+        background-color: var(--cream);
+        margin-left: -15px !important;
+        margin-right: -15px !important;
+        padding: 10px 15px !important;
+        margin-top: -15px !important; /* Offset parent padding */
+        border-bottom: 1px solid var(--sand);
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    [data-theme='dark'] .quran-content > .container > div:first-child,
+    [data-theme='dark'] .quran-content > div:first-child {
+        background-color: #141721;
+        border-bottom-color: #1E2235;
+    }
 }
 
 .ar {
@@ -1235,17 +1256,17 @@ body.player-hidden .quran-sidebar {
         background-color: var(--emd); /* Ensure solid background */
         color: var(--white);
         padding: 20px;
-        position: fixed; top: 60px; left: -300px; width: 280px; height: calc(100vh - 60px); transition: left 0.3s ease-in-out; box-shadow: 2px 0 15px rgba(0,0,0,0.3); overflow-y: auto; -webkit-overflow-scrolling: touch;
+        position: fixed; top: 54px; left: -300px; width: 280px; height: calc(100vh - 54px); transition: left 0.3s ease-in-out; box-shadow: 2px 0 15px rgba(0,0,0,0.3); overflow-y: auto; -webkit-overflow-scrolling: touch;
     }
     body:not(.player-hidden) .quran-sidebar {
-        height: calc(100vh - 60px - 90px);
+        height: calc(100vh - 54px - 90px);
     }
     .quran-sidebar.open {
         left: 0;
     }
     .quran-overlay {
         z-index: 999;
-        display: none; position: fixed; top: 60px; left: 0; right: 0; bottom: 70px; background: rgba(0,0,0,0.5);
+        display: none; position: fixed; top: 54px; left: 0; right: 0; bottom: 70px; background: rgba(0,0,0,0.5);
     }
     .quran-sidebar.open ~ .quran-overlay, /* use ~ to catch it anywhere as sibling */
     .quran-sidebar.open + .quran-overlay {
@@ -1594,10 +1615,66 @@ body.player-hidden .quran-sidebar {
     body.player-hidden .quran-sidebar {
         height: calc(100vh - 60px) !important;
     }
-}
-
 /* --- Update Notification --- */
 .update-notification {
+...
+}
+
+/* --- Custom Toggle Switch --- */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 34px;
+    height: 18px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--sand);
+    transition: .4s;
+    border-radius: 18px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 12px;
+    width: 12px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+input:checked + .slider {
+    background-color: var(--em);
+}
+
+input:checked + .slider:before {
+    transform: translateX(16px);
+}
+
+[data-theme='dark'] .slider {
+    background-color: #2D3348;
+}
+
+[data-theme='dark'] .slider:before {
+    background-color: #F1F5F9;
+}
+
     position: fixed;
     bottom: 30px;
     left: 50%;
@@ -1874,6 +1951,22 @@ button *, .btn *, .nav-links a *, .surah-item *, .pill *, .pc-btn *, .ayah-btn *
     padding: 20px;
 }
 
+@media (max-width: 991px) {
+    .learn-sidebar {
+        position: sticky;
+        top: 54px; /* Mobile navbar height */
+        z-index: 100;
+        padding: 10px 15px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .learn-sidebar .sidebar-heading {
+        display: none; /* Hide heading on mobile sticky view to save space */
+    }
+    .learn-tabs {
+        padding-bottom: 0;
+    }
+}
+
 @media (min-width: 992px) {
     .learn-sidebar {
         width: 240px;
@@ -2096,4 +2189,59 @@ button *, .btn *, .nav-links a *, .surah-item *, .pill *, .pc-btn *, .ayah-btn *
 [data-theme='dark'] .learn-tabs .btn-outline:hover {
     border-color: var(--gold);
     color: var(--goldl);
+}
+
+/* --- Custom Toggle Switch --- */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 34px;
+    height: 18px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--sand);
+    transition: .4s;
+    border-radius: 18px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 12px;
+    width: 12px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+input:checked + .slider {
+    background-color: var(--em);
+}
+
+input:checked + .slider:before {
+    transform: translateX(16px);
+}
+
+[data-theme='dark'] .slider {
+    background-color: #2D3348;
+}
+
+[data-theme='dark'] .slider:before {
+    background-color: #F1F5F9;
 }

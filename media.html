@@ -241,21 +241,24 @@
 
     <main style="background-color: var(--parch); min-height: 60vh; padding-bottom: 100px;">
         
-        <div class="media-sticky-header" style="position: sticky; top: 60px; background: var(--parch); z-index: 1000; padding: 15px 0; border-bottom: 1px solid var(--sand); margin-bottom: 30px;">
-            <div class="container" style="max-width: 900px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
-                <div class="media-tabs" style="display: flex; gap: 20px; border: none; margin-bottom: 0; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none;">
-                    <div class="media-tab active" data-cat="all" style="padding: 10px 15px; font-weight: 700; color: var(--stone); cursor: pointer; white-space: nowrap;">All</div>
-                    <div class="media-tab" data-cat="podcasts" style="padding: 10px 15px; font-weight: 700; color: var(--stone); cursor: pointer; white-space: nowrap;">Islamic Podcasts</div>
-                    <div class="media-tab" data-cat="quran" style="padding: 10px 15px; font-weight: 700; color: var(--stone); cursor: pointer; white-space: nowrap;">Full Quran Audio</div>
-                    <div class="media-tab" data-cat="nasheeds" style="padding: 10px 15px; font-weight: 700; color: var(--stone); cursor: pointer; white-space: nowrap;">Nasheeds</div>
+        <div class="media-sticky-header" style="position: sticky; top: 54px; background: var(--parch); z-index: 100; padding: 10px 0; border-bottom: 1px solid var(--sand); margin-bottom: 20px;">
+            <div class="container" style="max-width: 900px; display: flex; flex-direction: column; gap: 10px;">
+                <div class="media-tabs" style="display: flex; gap: 15px; border: none; margin-bottom: 0; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; -ms-overflow-style: none;">
+                    <div class="media-tab active" data-cat="all" style="padding: 8px 12px; font-weight: 700; color: var(--stone); cursor: pointer; white-space: nowrap; font-size: 13px;">All</div>
+                    <div class="media-tab" data-cat="podcasts" style="padding: 8px 12px; font-weight: 700; color: var(--stone); cursor: pointer; white-space: nowrap; font-size: 13px;">Islamic Podcasts</div>
+                    <div class="media-tab" data-cat="quran" style="padding: 8px 12px; font-weight: 700; color: var(--stone); cursor: pointer; white-space: nowrap; font-size: 13px;">Full Quran Audio</div>
+                    <div class="media-tab" data-cat="nasheeds" style="padding: 8px 12px; font-weight: 700; color: var(--stone); cursor: pointer; white-space: nowrap; font-size: 13px;">Nasheeds</div>
                 </div>
 
-                <div class="play-all-container" style="display: flex; align-items: center; gap: 10px; padding: 0 0 5px;">
-                    <span style="font-size: 11px; font-weight: 700; color: var(--stone); text-transform: uppercase; letter-spacing: 1px;">Auto Play</span>
-                    <label class="switch" style="position: relative; display: inline-block; width: 34px; height: 18px;">
-                        <input type="checkbox" id="auto-play-toggle" style="opacity: 0; width: 0; height: 0;">
-                        <span class="slider" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--sand); transition: .4s; border-radius: 18px;"></span>
-                    </label>
+                <div class="media-controls-row" style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(0,0,0,0.03); padding-top: 8px;">
+                    <div class="play-all-container" style="display: flex; align-items: center; gap: 8px;">
+                        <span style="font-size: 10px; font-weight: 700; color: var(--stone); text-transform: uppercase; letter-spacing: 1px;">Auto Play</span>
+                        <label class="switch">
+                            <input type="checkbox" id="auto-play-toggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <span id="media-count-badge" style="font-size: 10px; font-weight: 700; color: var(--em); background: rgba(26, 107, 71, 0.1); padding: 2px 8px; border-radius: 4px;">0 Items</span>
                 </div>
             </div>
         </div>
@@ -375,6 +378,9 @@
             currentFilteredMedia = cat === 'all' 
                 ? allMedia 
                 : allMedia.filter(m => m.category === cat);
+
+            const countBadge = document.getElementById('media-count-badge');
+            if (countBadge) countBadge.textContent = `${currentFilteredMedia.length} Items`;
 
             const lang = localStorage.getItem('lang') || 'en';
 

@@ -12,6 +12,13 @@
 - Support dark mode using the `[data-theme='dark']` attribute selector on the `body` tag.
 - Ensure RTL (Right-to-Left) support for Arabic text using the `dir="rtl"` attribute and appropriate CSS logical properties where necessary.
 
+## Mobile Layout Standards
+- **Navbar Height:** Mobile navbar is exactly **54px** high.
+- **Sticky Navigation:** Secondary navigation elements (like category tabs, sidebar toggles, or filter bars) should use `position: sticky`.
+  - Set `top: 54px` to sit directly below the mobile navbar.
+  - Use a `z-index` between **100 and 900** to stay below the main navigation menus.
+- **Header Structure:** For complex headers with both tabs and toggles (e.g., Media page), use a vertical stack (flex-direction: column) on mobile to prevent squashing elements.
+
 ## JavaScript Conventions
 - All JavaScript must be Vanilla JS (`js/main.js`).
 - Do not introduce npm packages or module bundlers (like Webpack or Vite) unless explicitly requested.
