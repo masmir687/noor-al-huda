@@ -852,6 +852,56 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 1500);
     }
 
+    // 10. Featured Videos (Homepage)
+    async function initFeaturedVideos() {
+        const grid = document.getElementById('featured-video-grid');
+        if (!grid) return;
+
+        try {
+            // Added cache-busting timestamp to ensure fresh data
+            const res = await fetch(`data/videos.json?v=${new Date().getTime()}`);
+            const allVideos = await res.json();
+            if (!allVideos || allVideos.length === 0) return;
+
+            const total = allVideos.length;
+            const now = new Date();
+            // Create a consistent daily seed
+            const seed = now.getFullYear() * 1000 + (now.getMonth() + 1) * 100 + now.getDate();
+            
+            const featuredVideos = [];
+            const selectedIndices = new Set();
+            
+            // Deterministically pick 3 unique indices
+            for (let i = 0; selectedIndices.size < 3 && selectedIndices.size < total; i++) {
+                // Simplified deterministic formula: (seed + offset) % total
+                const index = (seed + (i * 17)) % total;
+                if (!selectedIndices.has(index)) {
+                    selectedIndices.add(index);
+                    featuredVideos.push(allVideos[index]);
+                }
+            }
+            
+            const lang = localStorage.getItem('lang') || 'en';
+            grid.innerHTML = featuredVideos.map(vid => `
+                <a href="videos.html?id=${vid.id}#vid${vid.id}" class="vid-card" style="text-decoration: none; color: inherit;">
+                    <div class="vid-thumb" style="background: ${vid.gradient || 'linear-gradient(135deg, #0F4A31, #1A7B8A)'}">
+                        <div class="play-btn"><i class="ph ph-play"></i></div>
+                        <span class="vid-dur">${vid.duration}</span>
+                    </div>
+                    <div class="vid-info">
+                        <h4 class="vid-title">${lang === 'bn' && vid.titleBn ? vid.titleBn : vid.title}</h4>
+                        <span class="vid-speaker">${lang === 'bn' && vid.speakerBn ? vid.speakerBn : vid.speaker}</span>
+                    </div>
+                </a>
+            `).join('');
+        } catch (err) {
+            console.error("Failed to load featured videos", err);
+        }
+    }
+
+    initFeaturedVideos();
+    document.addEventListener('languageChanged', initFeaturedVideos);
+
     // --- VIDEO MODAL LOGIC ---
     const videoModal = document.createElement('div');
     videoModal.className = 'video-modal-overlay';

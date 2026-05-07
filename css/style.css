@@ -299,6 +299,13 @@ body {
     background-color: rgba(255, 255, 255, 0.1); border-color: var(--white);
 }
 
+.hero-btns {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
 @media (max-width: 768px) {
     .nav {
     box-sizing: border-box; max-width: 100vw;
@@ -415,6 +422,36 @@ body {
     font-size: 10px; color: var(--stone); margin-top: 4px;
 }
 
+/* Explore Dark Mode Refinements */
+[data-theme='dark'] .mod-card {
+    background-color: var(--sand);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme='dark'] .mod-card:hover {
+    border-color: var(--gold);
+    background-color: var(--cream);
+}
+
+[data-theme='dark'] .mod-name {
+    color: var(--white);
+}
+
+[data-theme='dark'] .mod-count {
+    color: var(--stone);
+}
+
+[data-theme='dark'] .mod-icon {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+[data-theme='dark'] .mod-icon.mod-q { color: var(--eml); }
+[data-theme='dark'] .mod-icon.mod-h { color: #60A5FA; }
+[data-theme='dark'] .mod-icon.mod-l { color: #FCD34D; }
+[data-theme='dark'] .mod-icon.mod-qa { color: #C084FC; }
+[data-theme='dark'] .mod-icon.mod-v { color: #38BDF8; }
+[data-theme='dark'] .mod-icon.mod-m { color: #FB923C; }
+
 /* Content Split */
 .content-split {
     padding: 40px 0; border-top: 1px solid var(--sand);
@@ -454,7 +491,11 @@ body {
 
 /* Hadith Section */
 .hadith-section {
-    background-color: #FDFBF8; padding: 0;
+    padding: 0;
+}
+
+[data-theme='dark'] .hadith-section {
+    background-color: transparent;
 }
 
 .hadith-card {
@@ -507,7 +548,7 @@ body {
 [data-theme='dark'] .badge-daif { background: #7F1D1D; color: #FCA5A5; }
 
 .hadith-btns {
-    display: flex; gap: 10px; position: relative; z-index: 10; pointer-events: auto;
+    display: flex; gap: 10px; position: relative; z-index: 10; pointer-events: auto; margin-top: 15px;
 }
 
 .btn-sm {
@@ -602,6 +643,17 @@ body {
 
 .pt-next {
     display: block; font-size: 9px; color: var(--goldl); font-weight: 700;
+}
+
+.prayer-note {
+    font-size: 11px;
+    color: var(--goldl);
+    text-align: center;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    font-style: italic;
+    width: 100%;
 }
 
 /* Footer */

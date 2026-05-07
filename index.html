@@ -178,10 +178,10 @@
                             </div>
                             <span class="grade-badge" data-t="sahih">Sahih</span>
                         </div>
-                    </div>
-                    <div class="hadith-btns">
-                        <button class="btn-sm listen-btn"><i class="ph ph-play-circle"></i> <span data-t="listen">Listen</span></button>
-                        <button class="btn-sm outline share-btn" data-collection="muslim" data-number="2699a"><i class="ph ph-share-network"></i> <span data-t="share">Share</span></button>
+                        <div class="hadith-btns" style="margin-top: 15px;">
+                            <button class="btn-sm listen-btn"><i class="ph ph-play-circle"></i> <span data-t="listen">Listen</span></button>
+                            <button class="btn-sm outline share-btn" data-collection="muslim" data-number="2699a"><i class="ph ph-share-network"></i> <span data-t="share">Share</span></button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -192,37 +192,8 @@
     <section class="video-row">
         <div class="container">
             <div class="section-label"><span data-t="featured_videos">Featured Videos</span></div>
-            <div class="vid-grid">
-                <div class="vid-card">
-                    <div class="vid-thumb" style="background: linear-gradient(to bottom, #1A6B47, #0F4A31);">
-                        <div class="play-btn"><i class="ph ph-play"></i></div>
-                        <span class="vid-dur">12:45</span>
-                    </div>
-                    <div class="vid-info">
-                        <h4 class="vid-title">The Beauty of patience in Islam</h4>
-                        <span class="vid-speaker">Sheikh Ahmad Ibrahim</span>
-                    </div>
-                </div>
-                <div class="vid-card">
-                    <div class="vid-thumb" style="background: linear-gradient(to bottom, #1A7B8A, #0B4A54);">
-                        <div class="play-btn"><i class="ph ph-play"></i></div>
-                        <span class="vid-dur">08:20</span>
-                    </div>
-                    <div class="vid-info">
-                        <h4 class="vid-title">Understanding the Message of Quran</h4>
-                        <span class="vid-speaker">Dr. Maryam Al-Sayed</span>
-                    </div>
-                </div>
-                <div class="vid-card">
-                    <div class="vid-thumb" style="background: linear-gradient(to bottom, #C8922A, #8A641A);">
-                        <div class="play-btn"><i class="ph ph-play"></i></div>
-                        <span class="vid-dur">15:10</span>
-                    </div>
-                    <div class="vid-info">
-                        <h4 class="vid-title">Prophetic Manners in Daily Life</h4>
-                        <span class="vid-speaker">Ustadha Fatima Aziz</span>
-                    </div>
-                </div>
+            <div class="vid-grid" id="featured-video-grid">
+                <!-- Dynamically populated by main.js -->
             </div>
         </div>
     </section>
@@ -253,8 +224,13 @@
                         <span class="pt-name" data-t="isha">Isha</span>
                         <span class="pt-time">9:18</span>
                     </div>
+                    <a href="https://mirjan-ali-sha.github.io/islamic-calendar/" target="_blank" class="prayer-item" style="text-decoration: none; color: inherit;">
+                        <span class="pt-name" data-t="calendar">Calendar</span>
+                        <span class="pt-time"><i class="ph ph-calendar-blank"></i></span>
+                    </a>
                 </div>
             </div>
+            <div class="prayer-note" data-t="calendar_note">Click on Calendar and Install the App for Accurate and more options for Prayer Times.</div>
         </div>
     </section>
 

@@ -238,16 +238,42 @@
     
     <script>
         /**
-         * Enhanced Video Library Logic - Integrated Player, State, and Scrolling
+         * Enhanced Video Library Logic - Robust Routing and Dynamic Loading
          */
         let player;
         let allVideos = [];
         let currentFilteredVideos = [];
         let currentCategory = localStorage.getItem('video-last-cat') || 'all';
-        // Ensure ID is treated as a number for consistency
-        let currentVideoId = parseInt(localStorage.getItem('video-last-id')) || null;
+        let currentVideoId = null;
 
-        // Load YouTube IFrame API
+        // --- ROUTING ENGINE ---
+        function getTargetId() {
+            const params = new URLSearchParams(window.location.search);
+            // Check hash first as a fallback for some environments
+            const hash = window.location.hash.replace('#', '');
+            
+            // 1. URL Query Param (?id=6)
+            if (params.has('id')) return params.get('id');
+            
+            // 2. YouTube-style Query Param (?v=6)
+            if (params.has('v')) return params.get('v');
+
+            // 3. Hash fragment (#6)
+            if (hash && !isNaN(hash) && hash.length > 0) return hash;
+
+            // 4. Fallback to LocalStorage (last watched)
+            return localStorage.getItem('video-last-id');
+        }
+
+        function updateUrl(id) {
+            if (!id) return;
+            // Update URL to look like /videos/ID without reloading
+            // Fallback to query param if it's safer for the environment
+            const newUrl = window.location.pathname + '?id=' + id;
+            window.history.replaceState({ id }, '', newUrl);
+        }
+
+        // --- INITIALIZATION ---
         const tag = document.createElement('script');
         tag.src = "https://www.youtube.com/iframe_api";
         const firstScriptTag = document.getElementsByTagName('script')[0];
@@ -262,12 +288,35 @@
                 const res = await fetch('data/videos.json');
                 allVideos = await res.json();
                 
+                const targetId = getTargetId();
+                
+                // Prioritize finding the video by ID
+                let startVideo = null;
+                if (targetId !== null && !isNaN(targetId)) {
+                    startVideo = allVideos.find(v => String(v.id) === String(targetId));
+                }
+                
+                // Fallback to first video if not found or no targetId
+                if (!startVideo) {
+                    startVideo = allVideos[0];
+                }
+
+                currentVideoId = startVideo.id;
+                
+                // If we forced a specific video from URL, ensure we are in 'all' category so it's visible
+                if (targetId && String(targetId) !== String(localStorage.getItem('video-last-id'))) {
+                    currentCategory = 'all';
+                }
+
                 setupTabs();
                 renderPlaylist(currentCategory);
                 
-                const startVideo = allVideos.find(v => v.id == currentVideoId) || allVideos[0];
-                if (startVideo) loadPlayer(startVideo, false);
+                // Load player (autoplay if targetId was explicitly provided via URL/Hash)
+                const isExplicitLink = !!(new URLSearchParams(window.location.search).get('id') || window.location.hash);
+                loadPlayer(startVideo, isExplicitLink);
                 
+                if (currentVideoId) updateUrl(currentVideoId);
+
             } catch (e) {
                 console.error("Failed to load video library", e);
             }
@@ -296,7 +345,7 @@
             const lang = localStorage.getItem('lang') || 'en';
 
             playlistContainer.innerHTML = currentFilteredVideos.map(vid => `
-                <div class="playlist-item ${vid.id == currentVideoId ? 'active' : ''}" data-id="${vid.id}">
+                <div class="playlist-item ${String(vid.id) === String(currentVideoId) ? 'active' : ''}" data-id="${vid.id}">
                     <div class="pi-thumb" style="background: ${vid.gradient}">
                         <i class="ph ph-play-circle"></i>
                     </div>
@@ -312,8 +361,11 @@
 
             playlistContainer.querySelectorAll('.playlist-item').forEach(item => {
                 item.onclick = () => {
-                    const vid = allVideos.find(v => v.id == item.dataset.id);
-                    if (vid) loadPlayer(vid, true);
+                    const vid = allVideos.find(v => String(v.id) === String(item.dataset.id));
+                    if (vid) {
+                        loadPlayer(vid, true);
+                        updateUrl(vid.id);
+                    }
                 };
             });
         }
@@ -324,7 +376,7 @@
             
             // Sync UI items
             document.querySelectorAll('.playlist-item').forEach(item => {
-                item.classList.toggle('active', item.dataset.id == currentVideoId);
+                item.classList.toggle('active', String(item.dataset.id) === String(currentVideoId));
             });
 
             const lang = localStorage.getItem('lang') || 'en';
@@ -343,13 +395,11 @@
             if (video.url.includes('v=')) yId = video.url.split('v=')[1].split('&')[0];
             else if (video.url.includes('youtu.be/')) yId = video.url.split('youtu.be/')[1].split('?')[0];
 
-            // Always destroy the player to force a clean reload, especially when switching between single video and playlist
             if (player && typeof player.destroy === 'function') {
                 player.destroy();
                 player = null;
             }
 
-            // Restore the container div if it was replaced by an iframe
             const playerArea = document.querySelector('.main-player-area');
             let container = document.getElementById('player-container');
             if (!container || container.tagName === 'IFRAME') {
@@ -383,7 +433,6 @@
                 }
             });
 
-            // Scroll playlist to active item
             const activeItem = document.querySelector('.playlist-item.active');
             if (activeItem) activeItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
@@ -395,15 +444,17 @@
         }
 
         function playNext() {
-            const index = currentFilteredVideos.findIndex(v => v.id == currentVideoId);
+            const index = currentFilteredVideos.findIndex(v => String(v.id) === String(currentVideoId));
             if (index !== -1 && index < currentFilteredVideos.length - 1) {
-                loadPlayer(currentFilteredVideos[index + 1], true);
+                const nextVid = currentFilteredVideos[index + 1];
+                loadPlayer(nextVid, true);
+                updateUrl(nextVid.id);
             }
         }
 
         document.addEventListener('languageChanged', () => {
             renderPlaylist(currentCategory);
-            const current = allVideos.find(v => v.id == currentVideoId);
+            const current = allVideos.find(v => String(v.id) === String(currentVideoId));
             if (current) {
                 const lang = localStorage.getItem('lang') || 'en';
                 document.getElementById('current-title').textContent = lang === 'bn' && current.titleBn ? current.titleBn : current.title;
