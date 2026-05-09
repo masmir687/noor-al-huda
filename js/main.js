@@ -578,13 +578,46 @@ document.addEventListener('DOMContentLoaded', () => {
     // 4. Mobile Menu
     const menuBtn = document.getElementById('menuBtn');
     const navLinks = document.getElementById('navLinks');
+
+    function closeMenu() {
+        if (navLinks && navLinks.classList.contains('active')) {
+            navLinks.classList.remove('active');
+            const i = menuBtn.querySelector('i');
+            if (i) i.classList.replace('ph-x', 'ph-list');
+        }
+    }
+
     if (menuBtn) {
-        menuBtn.onclick = () => {
+        menuBtn.onclick = (e) => {
+            e.stopPropagation();
             navLinks.classList.toggle('active');
             const i = menuBtn.querySelector('i');
             if (navLinks.classList.contains('active')) i.classList.replace('ph-list', 'ph-x');
             else i.classList.replace('ph-x', 'ph-list');
         };
+    }
+
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+        if (navLinks && navLinks.classList.contains('active')) {
+            if (!navLinks.contains(e.target) && !menuBtn.contains(e.target)) {
+                closeMenu();
+            }
+        }
+    });
+
+    // Close menu when scrolling
+    window.addEventListener('scroll', () => {
+        closeMenu();
+    }, { passive: true });
+
+    // Close menu when clicking a link inside it
+    if (navLinks) {
+        navLinks.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                closeMenu();
+            });
+        });
     }
 
     // 5. Floating Player Button (Created early so UI sync works)
