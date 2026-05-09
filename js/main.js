@@ -433,7 +433,13 @@ window.addEventListener('appinstalled', () => {
 
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js').then(reg => {
+        // Determine the correct path to sw.js based on current directory depth
+        const depth = window.location.pathname.split('/').filter(p => p && !p.endsWith('.html')).length;
+        // Adjust depth if we are in a subdirectory like /quran/1/
+        const isSubDir = window.location.pathname.includes('/quran/') || window.location.pathname.includes('/collection/');
+        const swPath = isSubDir ? '../../sw.js' : './sw.js';
+
+        navigator.serviceWorker.register(swPath).then(reg => {
             console.log('SW Registered with scope:', reg.scope);
 
             // Check for updates periodically (Lazy background check)

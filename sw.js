@@ -1,10 +1,11 @@
-const CACHE_VERSION = 'v1.6.2';
+const CACHE_VERSION = 'v1.6.3';
 const CACHE_NAME = `noor-al-huda-${CACHE_VERSION}`;
 
 // Assets to pre-cache immediately
 const CORE_ASSETS = [
     './',
     './index.html',
+    './quran.html',
     './quran/1/index.html',
     './hadith.html',
     './bookmarks.html',

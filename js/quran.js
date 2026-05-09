@@ -160,7 +160,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         const state = JSON.parse(savedState);
                         if (state && state.surah && parseInt(state.surah) !== 1) {
                             // Redirect to the saved surah instead of staying on Surah 1
-                            window.location.replace(`../../quran/${state.surah}/`);
+                            const prefix = window.SURAH_ID ? '../../' : '';
+                            window.location.replace(`${prefix}quran/${state.surah}/`);
                             return; // Stop execution
                         }
                     } catch(e) {}
@@ -189,6 +190,14 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (err) {
             console.error("Quran Init Failed:", err);
+            quranContainer.innerHTML = `
+                <div style="text-align: center; padding: 40px; color: var(--error);">
+                    <i class="ph ph-warning-circle" style="font-size: 48px; margin-bottom: 20px;"></i>
+                    <h3>Something went wrong</h3>
+                    <p>${err.message || "Failed to initialize Quran reader."}</p>
+                    <button onclick="window.location.reload()" class="btn btn-gold" style="margin-top: 20px;">Retry</button>
+                </div>
+            `;
         }
     }
 
@@ -196,6 +205,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const lang = localStorage.getItem('lang') || 'en';
         try {
             const res = await fetch('https://api.alquran.cloud/v1/surah');
+            if (!res.ok) throw new Error("Failed to fetch Surah list");
             const data = await res.json();
             surahListContainer.innerHTML = '';
             
@@ -223,7 +233,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 surahListContainer.appendChild(a);
             });
         } catch (error) {
+            console.error("loadSurahList error:", error);
             surahListContainer.innerHTML = '<div style="color: var(--error); padding: 20px;">Failed to load Surahs.</div>';
+            throw error; // Propagate to init catch
         }
     }
 
@@ -237,6 +249,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 fetch(`https://api.alquran.cloud/v1/surah/${surahNumber}`),
                 fetch(`https://api.alquran.cloud/v1/surah/${surahNumber}/${translationCode}`)
             ]);
+
+            if (!arRes.ok || !trRes.ok) throw new Error("Failed to fetch Ayah data");
+
             const arData = await arRes.json();
             const trData = await trRes.json();
             const surahAr = arData.data;
