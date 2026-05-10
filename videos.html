@@ -249,28 +249,41 @@
         // --- ROUTING ENGINE ---
         function getTargetId() {
             const params = new URLSearchParams(window.location.search);
-            // Check hash first as a fallback for some environments
             const hash = window.location.hash.replace('#', '');
             
-            // 1. URL Query Param (?id=6)
+            // Priority: URL Param > Hash > LocalStorage
             if (params.has('id')) return params.get('id');
-            
-            // 2. YouTube-style Query Param (?v=6)
-            if (params.has('v')) return params.get('v');
-
-            // 3. Hash fragment (#6)
+            // Remove 'v' from here to avoid conflict with YouTube 'v' parameter
             if (hash && !isNaN(hash) && hash.length > 0) return hash;
-
-            // 4. Fallback to LocalStorage (last watched)
             return localStorage.getItem('video-last-id');
         }
 
-        function updateUrl(id) {
-            if (!id) return;
-            // Update URL to look like /videos/ID without reloading
-            // Fallback to query param if it's safer for the environment
-            const newUrl = window.location.pathname + '?id=' + id;
-            window.history.replaceState({ id }, '', newUrl);
+        function getTargetUrl() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.has('url')) return params.get('url');
+            if (params.has('v')) return 'https://www.youtube.com/watch?v=' + params.get('v');
+            return null;
+        }
+
+        function updateUrl(id, externalUrl) {
+            let newUrl = window.location.pathname;
+            if (externalUrl) {
+                try {
+                    const urlObj = new URL(externalUrl);
+                    if (urlObj.hostname.includes('youtube.com') && urlObj.searchParams.has('v')) {
+                        newUrl += '?v=' + urlObj.searchParams.get('v');
+                    } else if (urlObj.hostname.includes('youtu.be')) {
+                        newUrl += '?v=' + urlObj.pathname.substring(1);
+                    } else {
+                        newUrl += '?url=' + encodeURIComponent(externalUrl);
+                    }
+                } catch(e) {
+                    newUrl += '?url=' + encodeURIComponent(externalUrl);
+                }
+            } else if (id && id !== 'ext') {
+                newUrl += '?id=' + id;
+            }
+            window.history.replaceState({ id, url: externalUrl }, '', newUrl);
         }
 
         // --- INITIALIZATION ---
@@ -288,34 +301,36 @@
                 const res = await fetch('data/videos.json');
                 allVideos = await res.json();
                 
-                const targetId = getTargetId();
+                const externalUrl = getTargetUrl();
                 
-                // Prioritize finding the video by ID
+                setupTabs();
+                renderPlaylist(currentCategory);
+
+                if (externalUrl) {
+                    const mockVideo = {
+                        id: 'ext',
+                        title: 'External Video Reference',
+                        titleBn: 'বাহ্যিক ভিডিও রেফারেন্স',
+                        speaker: 'Islamic Scholar',
+                        speakerBn: 'ইসলামিক স্কলার',
+                        url: externalUrl,
+                        duration: 'External'
+                    };
+                    loadPlayer(mockVideo, true);
+                    return; // Crucial: Stop execution here so it NEVER touches internal IDs
+                }
+
+                // Internal ID logic only runs if NO external url/v is provided
+                const targetId = getTargetId();
                 let startVideo = null;
-                if (targetId !== null && !isNaN(targetId)) {
+                if (targetId !== null && targetId !== 'ext' && !isNaN(targetId)) {
                     startVideo = allVideos.find(v => String(v.id) === String(targetId));
                 }
                 
-                // Fallback to first video if not found or no targetId
-                if (!startVideo) {
-                    startVideo = allVideos[0];
-                }
-
-                currentVideoId = startVideo.id;
+                if (!startVideo) startVideo = allVideos[0];
                 
-                // If we forced a specific video from URL, ensure we are in 'all' category so it's visible
-                if (targetId && String(targetId) !== String(localStorage.getItem('video-last-id'))) {
-                    currentCategory = 'all';
-                }
-
-                setupTabs();
-                renderPlaylist(currentCategory);
-                
-                // Load player (autoplay if targetId was explicitly provided via URL/Hash)
                 const isExplicitLink = !!(new URLSearchParams(window.location.search).get('id') || window.location.hash);
                 loadPlayer(startVideo, isExplicitLink);
-                
-                if (currentVideoId) updateUrl(currentVideoId);
 
             } catch (e) {
                 console.error("Failed to load video library", e);
@@ -364,7 +379,6 @@
                     const vid = allVideos.find(v => String(v.id) === String(item.dataset.id));
                     if (vid) {
                         loadPlayer(vid, true);
-                        updateUrl(vid.id);
                     }
                 };
             });
@@ -372,7 +386,14 @@
 
         function loadPlayer(video, shouldAutoplay) {
             currentVideoId = video.id;
-            localStorage.setItem('video-last-id', currentVideoId);
+            const isExternal = video.id === 'ext';
+            
+            if (!isExternal) {
+                localStorage.setItem('video-last-id', currentVideoId);
+            }
+            
+            // Sync URL
+            updateUrl(currentVideoId, isExternal ? video.url : null);
             
             // Sync UI items
             document.querySelectorAll('.playlist-item').forEach(item => {
@@ -383,17 +404,22 @@
             document.getElementById('current-title').textContent = lang === 'bn' && video.titleBn ? video.titleBn : video.title;
             document.getElementById('current-speaker').textContent = lang === 'bn' && video.speakerBn ? video.speakerBn : video.speaker;
 
-            const isPlaylist = video.duration && video.duration.toLowerCase() === 'playlist' && video.url.includes('list=');
-
             let yId = "";
             let listId = "";
 
-            if (isPlaylist) {
+            // Robust YouTube ID Extraction
+            if (video.url.includes('youtube.com/watch?v=')) {
+                yId = video.url.split('v=')[1].split('&')[0];
+                if (video.url.includes('list=')) listId = video.url.split('list=')[1].split('&')[0];
+            } else if (video.url.includes('youtu.be/')) {
+                yId = video.url.split('youtu.be/')[1].split('?')[0];
+                if (video.url.includes('list=')) listId = video.url.split('list=')[1].split('&')[0];
+            } else if (video.url.includes('youtube.com/playlist?list=')) {
                 listId = video.url.split('list=')[1].split('&')[0];
+            } else {
+                // If it's just an ID
+                yId = video.url;
             }
-            
-            if (video.url.includes('v=')) yId = video.url.split('v=')[1].split('&')[0];
-            else if (video.url.includes('youtu.be/')) yId = video.url.split('youtu.be/')[1].split('?')[0];
 
             if (player && typeof player.destroy === 'function') {
                 player.destroy();
@@ -418,7 +444,7 @@
                 'modestbranding': 1
             };
 
-            if (isPlaylist) {
+            if (listId) {
                 playerVars.listType = 'playlist';
                 playerVars.list = listId;
             }
@@ -426,7 +452,7 @@
             player = new YT.Player('player-container', {
                 height: '100%',
                 width: '100%',
-                videoId: yId,
+                videoId: yId || '',
                 playerVars: playerVars,
                 events: {
                     'onStateChange': onPlayerStateChange

@@ -78,13 +78,14 @@
         <div class="container" style="padding-top: 40px; padding-bottom: 60px;">
             
             <!-- Filters -->
-            <div class="qa-filters">
-                <button class="filter-btn active">All Topics</button>
-                <button class="filter-btn">Prayer (Salah)</button>
-                <button class="filter-btn">Purification (Taharah)</button>
-                <button class="filter-btn">Belief (Aqeedah)</button>
-                <button class="filter-btn">Fasting (Sawm)</button>
-                <button class="filter-btn">Finance</button>
+            <div class="qa-filters" id="qa-filters">
+                <button class="filter-btn active" data-category="all" data-t="all_topics">All Topics</button>
+                <button class="filter-btn" data-category="Atheism" data-t="cat_atheism">Atheism</button>
+                <button class="filter-btn" data-category="Idol Worship" data-t="cat_idols">Idol Worship</button>
+                <button class="filter-btn" data-category="Christianity" data-t="cat_christianity">Christianity</button>
+                <button class="filter-btn" data-category="Judaism" data-t="cat_judaism">Judaism</button>
+                <button class="filter-btn" data-category="Fiqh" data-t="cat_fiqh">Fiqh & Life</button>
+                <button class="filter-btn" data-category="Logic" data-t="cat_logic">Logic & Philosophy</button>
             </div>
 
             <!-- Q&A List -->
@@ -93,6 +94,23 @@
             </div>
         </div>
     </main>
+
+    <!-- Q&A Modal -->
+    <div class="lang-modal-overlay" id="qaModal">
+        <div class="lang-modal" style="max-width: 600px; width: 95%; max-height: 90vh; display: flex; flex-direction: column; padding: 0; overflow: hidden;">
+            <div class="lang-modal-header" style="padding: 20px; margin-bottom: 0; border-bottom: 1px solid var(--sand); flex-shrink: 0;">
+                <span class="lang-modal-title" id="qa-modal-title" style="font-size: 1.1rem; line-height: 1.3;">Answer</span>
+                <button class="lang-close" id="qa-modal-close"><i class="ph ph-x"></i></button>
+            </div>
+            <div id="qa-modal-body" style="padding: 20px; overflow-y: auto; font-family: 'DM Sans', sans-serif; line-height: 1.7; color: var(--ink); flex: 1; scrollbar-width: thin;">
+                <!-- Answer content will be injected here -->
+            </div>
+            <div class="qa-meta" style="padding: 15px 20px; border-top: 1px solid var(--sand); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; background: var(--cream);">
+                <span style="color: var(--stone); font-size: 11px;"><i class="ph ph-check-circle" style="color: var(--em)"></i> <span data-t="verified_by_scholars">Verified by Scholars</span></span>
+                <button class="btn btn-sm" id="qa-modal-share" style="padding: 6px 12px; font-size: 11px;"><i class="ph ph-share"></i> <span data-t="share">Share</span></button>
+            </div>
+        </div>
+    </div>
 
     <!-- Footer -->
     <footer class="footer">

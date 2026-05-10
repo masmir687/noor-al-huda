@@ -957,15 +957,17 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!url || url === '#') return;
         
         let embedUrl = url;
+        const params = "?autoplay=1&rel=0&modestbranding=1&playsinline=1";
+        
         if (url.includes('youtube.com/watch?v=')) {
             const videoId = url.split('v=')[1].split('&')[0];
-            embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+            embedUrl = `https://www.youtube.com/embed/${videoId}${params}`;
         } else if (url.includes('youtu.be/')) {
             const videoId = url.split('youtu.be/')[1].split('?')[0];
-            embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+            embedUrl = `https://www.youtube.com/embed/${videoId}${params}`;
         } else if (url.includes('youtube.com/playlist?list=')) {
             const listId = url.split('list=')[1].split('&')[0];
-            embedUrl = `https://www.youtube.com/embed/videoseries?list=${listId}&autoplay=1`;
+            embedUrl = `https://www.youtube.com/embed/videoseries?list=${listId}&autoplay=1&rel=0&modestbranding=1&playsinline=1`;
         }
 
         const container = document.getElementById('videoIframeContainer');
