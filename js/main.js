@@ -6,6 +6,12 @@
 // --- GLOBAL UTILITIES (Top Level) ---
 
 (function() {
+    const isSubDir = window.location.pathname.includes('/quran/') || window.location.pathname.includes('/collection/');
+    const msPath = isSubDir ? '../../js/media-session.js' : 'js/media-session.js';
+    const script = document.createElement('script');
+    script.src = msPath;
+    document.head.appendChild(script);
+
     const url = window.location.href;
     if (url.endsWith('index.html')) {
         const newUrl = url.replace('index.html', '');
@@ -124,39 +130,95 @@ window.updateProgressTime = function(current, total) {
     }
 };
 
-globalAudio.addEventListener('timeupdate', () => {
-    if (window.hadithPlaybackActive) return; // Handled by hadith script
-    const cur = globalAudio.currentTime;
-    const dur = globalAudio.duration;
-    if (!dur) return;
-    const p = (cur / dur) * 100;
-    window.updateProgressBar(p);
-    window.updateProgressTime(cur);
-});
+    // 8. Global Player Persistence
+    const saveAudioState = () => {
+        if (!globalAudio.src) return;
+        const state = {
+            src: globalAudio.src,
+            currentTime: globalAudio.currentTime,
+            paused: globalAudio.paused,
+            title: document.querySelector('.player-title')?.textContent || "",
+            sub: document.querySelector('.player-sub')?.textContent || "",
+            type: window.hadithPlaybackActive ? 'hadith' : (window.quranAudio && !window.quranAudio.paused ? 'quran' : 'tts'),
+            lastUpdate: Date.now()
+        };
+        localStorage.setItem('persistent_audio_state', JSON.stringify(state));
+    };
 
-globalAudio.addEventListener('loadedmetadata', () => {
-    if (window.hadithPlaybackActive) return;
-    const dur = globalAudio.duration;
-    window.updateProgressTime(0, dur);
+    globalAudio.addEventListener('timeupdate', () => {
+        if (window.MediaSessionManager) window.MediaSessionManager.updatePositionState();
+        if (window.hadithPlaybackActive) return; // Handled by hadith script
+        const cur = globalAudio.currentTime;
+        const dur = globalAudio.duration;
+        if (!dur) return;
+        const p = (cur / dur) * 100;
+        window.updateProgressBar(p);
+        window.updateProgressTime(cur);
 
-    // Ensure playback rate is maintained
-    const speedS = document.getElementById('speed-select');
-    if (speedS) globalAudio.playbackRate = parseFloat(speedS.value);
-});
+        // Save state every 2 seconds
+        if (Math.floor(cur) % 2 === 0) saveAudioState();
+    });
 
-globalAudio.addEventListener('play', () => {
-    const playMainBtn = document.querySelector('.play-main i');
-    if (playMainBtn && currentAudioIcon && playMainBtn !== currentAudioIcon) {
-        window.updateIcon(playMainBtn, 'play');
-    }
-});
+    globalAudio.addEventListener('loadedmetadata', () => {
+        if (window.hadithPlaybackActive) return;
+        const dur = globalAudio.duration;
+        window.updateProgressTime(0, dur);
 
-globalAudio.addEventListener('pause', () => {
-    const playMainBtn = document.querySelector('.play-main i');
-    if (playMainBtn) {
-        window.updateIcon(playMainBtn, 'pause');
-    }
-});
+        // Ensure playback rate is maintained
+        const speedS = document.getElementById('speed-select');
+        if (speedS) globalAudio.playbackRate = parseFloat(speedS.value);
+    });
+
+    globalAudio.addEventListener('play', () => {
+        if (window.MediaSessionManager) window.MediaSessionManager.updatePlaybackState('playing');
+        const playMainBtn = document.querySelector('.play-main i');
+        if (playMainBtn && currentAudioIcon && playMainBtn !== currentAudioIcon) {
+            window.updateIcon(playMainBtn, 'play');
+        }
+        saveAudioState();
+    });
+
+    globalAudio.addEventListener('pause', () => {
+        if (window.MediaSessionManager) window.MediaSessionManager.updatePlaybackState('paused');
+        const playMainBtn = document.querySelector('.play-main i');
+        if (playMainBtn) {
+            window.updateIcon(playMainBtn, 'pause');
+        }
+        saveAudioState();
+    });
+
+    const resumeAudio = async () => {
+        const saved = localStorage.getItem('persistent_audio_state');
+        if (!saved) return;
+        const state = JSON.parse(saved);
+        
+        // If it was playing recently (within last 30 mins)
+        if (state.src && !state.paused && (Date.now() - state.lastUpdate < 1800000)) {
+            globalAudio.src = state.src;
+            globalAudio.currentTime = state.currentTime;
+            
+            const pTitle = document.querySelector('.player-title');
+            const pSub = document.querySelector('.player-sub');
+            if (pTitle) pTitle.textContent = state.title;
+            if (pSub) pSub.textContent = state.sub;
+
+            window.updatePlayerUI(false);
+            
+            try {
+                // Browsers often block auto-play on load without user gesture, but navigation counts as one
+                await globalAudio.play();
+                if (window.MediaSessionManager) {
+                    window.MediaSessionManager.updateMetadata({ title: state.title, artist: state.sub });
+                }
+            } catch (e) {
+                console.warn("Auto-resume blocked by browser, waiting for user gesture.");
+                if (window.MediaSessionManager) window.MediaSessionManager.updatePlaybackState('paused');
+            }
+        }
+    };
+    
+    // Call resume
+    resumeAudio();
 
 window.toggleSpeech = function(textToRead, playIconElement, lang = 'ar', onEnd = null, textElement = null) {
     restoreHighlight();
@@ -188,6 +250,15 @@ window.toggleSpeech = function(textToRead, playIconElement, lang = 'ar', onEnd =
     
     currentAudioText = textToRead;
     currentAudioIcon = playIconElement;
+
+    if (window.MediaSessionManager) {
+        window.MediaSessionManager.updateMetadata({
+            title: textToRead.substring(0, 50),
+            artist: lang === 'ar' ? 'Arabic Recitation' : (lang === 'bn' ? 'বাংলা অনুবাদ' : 'English Translation'),
+            album: 'Noor Al-Huda'
+        });
+        window.MediaSessionManager.updatePlaybackState('playing');
+    }
 
     if (textElement) {
         currentTextElement = textElement;
@@ -875,12 +946,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // 8. Page Cleanups
+    // 8. Page Cleanups (Restrictions removed for global player)
+    /*
     if (isExcludedPage) {
         const pb = document.getElementById('playerBar');
         if (pb) pb.remove();
         document.body.classList.add('player-restricted');
     }
+    */
 
     // 9. Splash
     const splash = document.getElementById('splash-screen');

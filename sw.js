@@ -20,6 +20,7 @@ const CORE_ASSETS = [
     './js/data-loader.js',
     './js/bookmarks.js',
     './js/bookmarks-page.js',
+    './js/media-session.js',
     './js/learn.js',
     './js/i18n.js',
     './data/learn/faith.json',

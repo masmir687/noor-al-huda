@@ -462,11 +462,12 @@
                     if (cs) cs.value = savedSpeed;
                 }
                 
-                if (window.updateMediaSession) {
-                    window.updateMediaSession({
+                if (window.MediaSessionManager) {
+                    window.MediaSessionManager.updateMetadata({
                         title: item.title,
                         artist: item.speaker
                     });
+                    window.MediaSessionManager.updatePlaybackState('playing');
                 }
             }).catch(e => {
                 console.error("Playback failed:", e);

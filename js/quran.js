@@ -30,6 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Progress Bar Sync
     quranAudio.addEventListener('timeupdate', () => {
+        if (window.MediaSessionManager) window.MediaSessionManager.updatePositionState();
         const cur = quranAudio.currentTime;
         const dur = quranAudio.duration;
         if (!dur) return;
@@ -429,6 +430,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const surah = btn.dataset.surah.padStart(3, '0');
         const ayah = btn.dataset.ayah.padStart(3, '0');
         
+        const lang = localStorage.getItem('lang') || 'en';
+        const t = (window.i18n && window.i18n.translations[lang]) || { surah: "Surah" };
+        const surahName = document.getElementById('surah-header-en')?.textContent.split('(')[0].trim() || "Quran";
+
+        if (window.MediaSessionManager) {
+            window.MediaSessionManager.updateMetadata({
+                title: `${surahName} [${btn.dataset.ayah}]`,
+                artist: reciterSelect?.options[reciterSelect.selectedIndex]?.text || "Recitation",
+                album: t.surah || "Quran"
+            });
+            window.MediaSessionManager.updatePlaybackState('playing');
+        }
+
         // Save current Ayah index to state for resuming later
         localStorage.setItem('quran_playback_state', JSON.stringify({ surah: currentSurah, ayahIndex: index }));
 
@@ -460,6 +474,20 @@ document.addEventListener('DOMContentLoaded', () => {
     function playBismillah(isGlobal = true) {
         if (!bismillahBtn) return;
         isGlobalPlay = isGlobal;
+
+        const lang = localStorage.getItem('lang') || 'en';
+        const t = (window.i18n && window.i18n.translations[lang]) || { surah: "Surah" };
+        const surahName = document.getElementById('surah-header-en')?.textContent.split('(')[0].trim() || "Quran";
+
+        if (window.MediaSessionManager) {
+            window.MediaSessionManager.updateMetadata({
+                title: `${surahName} [Bismillah]`,
+                artist: reciterSelect?.options[reciterSelect.selectedIndex]?.text || "Recitation",
+                album: t.surah || "Quran"
+            });
+            window.MediaSessionManager.updatePlaybackState('playing');
+        }
+
         if (isBismillahPlaying && !quranAudio.paused) {
             quranAudio.pause();
         } else {
