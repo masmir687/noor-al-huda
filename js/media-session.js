@@ -12,62 +12,60 @@
         },
 
         setupHandlers() {
-            navigator.mediaSession.setActionHandler('play', () => {
-                if (window.quranAudio && window.quranAudio.src) {
-                    window.quranAudio.play();
-                } else if (window.globalAudio && window.globalAudio.src) {
-                    window.globalAudio.play();
-                } else if (window.speechSynthesis && window.speechSynthesis.paused) {
-                    window.speechSynthesis.resume();
-                }
-            });
-
-            navigator.mediaSession.setActionHandler('pause', () => {
-                if (window.quranAudio && !window.quranAudio.paused) {
-                    window.quranAudio.pause();
-                } else if (window.globalAudio && !window.globalAudio.paused) {
-                    window.globalAudio.pause();
-                } else if (window.speechSynthesis && window.speechSynthesis.speaking) {
-                    window.speechSynthesis.pause();
-                }
-            });
-
-            navigator.mediaSession.setActionHandler('previoustrack', () => {
-                if (window.onPlayerSkipBack) window.onPlayerSkipBack();
-            });
-
-            navigator.mediaSession.setActionHandler('nexttrack', () => {
-                if (window.onPlayerSkipForward) window.onPlayerSkipForward();
-            });
-
-            // Seek handlers
-            const skipTime = 10; // seconds
-            navigator.mediaSession.setActionHandler('seekbackward', (details) => {
-                const audio = this.getActiveAudio();
-                if (audio) {
-                    audio.currentTime = Math.max(audio.currentTime - (details.seekOffset || skipTime), 0);
-                }
-            });
-
-            navigator.mediaSession.setActionHandler('seekforward', (details) => {
-                const audio = this.getActiveAudio();
-                if (audio) {
-                    audio.currentTime = Math.min(audio.currentTime + (details.seekOffset || skipTime), audio.duration);
-                }
-            });
-
-            try {
-                navigator.mediaSession.setActionHandler('stop', () => {
+            const actions = [
+                ['play', () => {
+                    if (window.quranAudio && window.quranAudio.src) {
+                        window.quranAudio.play();
+                    } else if (window.globalAudio && window.globalAudio.src) {
+                        window.globalAudio.play();
+                    } else if (window.speechSynthesis && window.speechSynthesis.paused) {
+                        window.speechSynthesis.resume();
+                    }
+                }],
+                ['pause', () => {
+                    if (window.quranAudio && !window.quranAudio.paused) {
+                        window.quranAudio.pause();
+                    } else if (window.globalAudio && !window.globalAudio.paused) {
+                        window.globalAudio.pause();
+                    } else if (window.speechSynthesis && window.speechSynthesis.speaking) {
+                        window.speechSynthesis.pause();
+                    }
+                }],
+                ['previoustrack', () => {
+                    if (window.onPlayerSkipBack) window.onPlayerSkipBack();
+                }],
+                ['nexttrack', () => {
+                    if (window.onPlayerSkipForward) window.onPlayerSkipForward();
+                }],
+                ['seekbackward', (details) => {
+                    const audio = this.getActiveAudio();
+                    if (audio) {
+                        audio.currentTime = Math.max(audio.currentTime - (details.seekOffset || 10), 0);
+                    }
+                }],
+                ['seekforward', (details) => {
+                    const audio = this.getActiveAudio();
+                    if (audio) {
+                        audio.currentTime = Math.min(audio.currentTime + (details.seekOffset || 10), audio.duration);
+                    }
+                }],
+                ['stop', () => {
                     const audio = this.getActiveAudio();
                     if (audio) {
                         audio.pause();
                         audio.currentTime = 0;
                     }
                     if (window.speechSynthesis) window.speechSynthesis.cancel();
-                });
-            } catch (error) {
-                console.warn('Stop action handler not supported');
-            }
+                }]
+            ];
+
+            actions.forEach(([action, handler]) => {
+                try {
+                    navigator.mediaSession.setActionHandler(action, handler);
+                } catch (error) {
+                    console.warn(`Media Session Action "${action}" failed:`, error);
+                }
+            });
         },
 
         getActiveAudio() {

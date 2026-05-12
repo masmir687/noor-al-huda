@@ -231,14 +231,30 @@ window.updateProgressTime = function(current, total) {
             window.updatePlayerUI(false);
             
             try {
-                // Browsers often block auto-play on load without user gesture, but navigation counts as one
+                // Browsers often block auto-play on load without user gesture.
+                // However, navigation within a PWA often counts as a "user gesture continuation".
                 await globalAudio.play();
+                
+                // IMPORTANT: Re-apply Media Session Metadata immediately on page load
+                // to ensure the system notification widget stays visible and interactive.
                 if (window.MediaSessionManager) {
-                    window.MediaSessionManager.updateMetadata({ title: state.title, artist: state.sub });
+                    window.MediaSessionManager.updateMetadata({ 
+                        title: state.title, 
+                        artist: state.sub,
+                        album: 'Noor Al-Huda'
+                    });
+                    window.MediaSessionManager.updatePlaybackState('playing');
                 }
             } catch (e) {
                 console.warn("Auto-resume blocked by browser, waiting for user gesture.");
-                if (window.MediaSessionManager) window.MediaSessionManager.updatePlaybackState('paused');
+                if (window.MediaSessionManager) {
+                    window.MediaSessionManager.updateMetadata({ 
+                        title: state.title, 
+                        artist: state.sub,
+                        album: 'Noor Al-Huda'
+                    });
+                    window.MediaSessionManager.updatePlaybackState('paused');
+                }
             }
         }
     };
