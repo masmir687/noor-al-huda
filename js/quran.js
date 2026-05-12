@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let isSystemScrolling = false;
     let bismillahBtn = null;
 
-    const quranAudio = new Audio();
+    const quranAudio = window.globalAudio;
     window.quranAudio = quranAudio;
 
     // Progress Bar Sync
@@ -424,6 +424,15 @@ document.addEventListener('DOMContentLoaded', () => {
     quranAudio.addEventListener('play', updateAllAudioButtons);
     quranAudio.addEventListener('pause', updateAllAudioButtons);
 
+    window.playNextAyah = function() {
+        if (currentAyahIndex < totalAyahs) {
+            const nextBtn = document.querySelector(`.listen-btn[data-index="${currentAyahIndex + 1}"]`);
+            if (nextBtn) playAyah(nextBtn, currentAyahIndex + 1, isGlobalPlay);
+        } else {
+            stopGlobalPlay();
+        }
+    };
+
     function playAyah(btn, index, isGlobal = false) {
         currentAyahIndex = index;
         isGlobalPlay = isGlobal;
@@ -434,6 +443,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const t = (window.i18n && window.i18n.translations[lang]) || { surah: "Surah" };
         const surahName = document.getElementById('surah-header-en')?.textContent.split('(')[0].trim() || "Quran";
 
+        localStorage.setItem('active_media_type', 'quran');
         if (window.MediaSessionManager) {
             window.MediaSessionManager.updateMetadata({
                 title: `${surahName} [${btn.dataset.ayah}]`,
@@ -444,6 +454,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Save current Ayah index to state for resuming later
+        localStorage.setItem('quran_playback_state', JSON.stringify({
+            surah: currentSurah,
+            ayahIndex: index,
+            isGlobal: isGlobal
+        }));
         localStorage.setItem('quran_playback_state', JSON.stringify({ surah: currentSurah, ayahIndex: index }));
 
         if (currentAyahBtn === btn && !quranAudio.paused) {
@@ -506,7 +521,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    quranAudio.onended = () => {
+    quranAudio.addEventListener('ended', () => {
         if (isBismillahPlaying) {
             isBismillahPlaying = false;
             // When Bismillah finishes during global play, resume from saved Ayah if available
@@ -542,7 +557,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         }
-    };
+    });
 
     if (mainPlayBtn) {
         mainPlayBtn.onclick = () => {

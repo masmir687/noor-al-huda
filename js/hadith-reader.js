@@ -104,8 +104,25 @@ document.addEventListener('DOMContentLoaded', () => {
         if (sub) sub.textContent = `Hadith ${currentBatch[currentPlayingIndex].number}`;
     }
 
+    window.playNextHadith = function() {
+        if (isSequentialActive && currentPlayingIndex < currentBatch.length - 1) {
+            window.playHadith(currentPlayingIndex + 1);
+        } else if (isSequentialActive && currentPage < totalPages) {
+            // Next Page
+            renderPage(currentPage + 1).then(() => {
+                window.playHadith(0);
+            });
+        } else {
+            stopSequentialPlay();
+        }
+    };
+
     window.playHadith = async function(index, sequential = true) {
         if (index < 0 || index >= currentBatch.length) {
+            if (sequential && currentPage < totalPages) {
+                renderPage(currentPage + 1).then(() => window.playHadith(0, true));
+                return;
+            }
             stopSequentialPlay();
             return;
         }
@@ -113,6 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
         isSequentialActive = sequential;
 
         const h = currentBatch[index];
+        localStorage.setItem('active_media_type', 'hadith');
 
         // If still patching, wait briefly
         if (!h.english || h.english.includes("No text available") || h.english.includes("Loading from mirror")) {
@@ -133,176 +151,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (window.toggleSpeech) {
             window.toggleSpeech(content, icon || null, currentLang, () => {
-                if (isSequentialActive) window.playHadith(currentPlayingIndex + 1);
+                if (isSequentialActive) window.playNextHadith();
             }, textEl);
             updateSequentialUI();
             savePlaybackState();
         }
     };
-    function stopSequentialPlay() {
-        isSequentialActive = false;
-        window.hadithPlaybackActive = false;
-        if (window.toggleSpeech) window.toggleSpeech("", null);
-        hadithContainer.querySelectorAll('.hadith-card').forEach(c => c.classList.remove('active-playing'));
-        savePlaybackState();
-    }
 
-    // Handle Skip Buttons
-    window.onPlayerSkipBack = () => {
-        if (currentPlayingIndex > 0) {
-            window.playHadith(currentPlayingIndex - 1);
-        } else if (currentPage > 1) {
-            renderPage(currentPage - 1).then(() => {
-                window.playHadith(currentBatch.length - 1);
-            });
-        }
-    };
-    window.onPlayerSkipForward = () => {
-        if (currentPlayingIndex < currentBatch.length - 1) {
-            window.playHadith(currentPlayingIndex + 1);
-        } else if (currentPage < totalPages) {
-            renderPage(currentPage + 1).then(() => {
-                window.playHadith(0);
-            });
-        }
-    };
-
-    // Handle Progress Bar Click (Seeking by Hadith Index)
-    const progressBar = document.querySelector('.player-progress .bar');
-    if (progressBar) {
-        progressBar.addEventListener('click', (e) => {
-            if (!isSequentialActive && !window.hadithPlaybackActive) return;
-            const rect = progressBar.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const width = rect.width;
-            const p = x / width;
-            const targetIndex = Math.floor(p * currentBatch.length);
-            window.playHadith(targetIndex);
-        });
-    }
-
-    window.onPlayerClose = () => {
-        isSequentialActive = false;
-        window.hadithPlaybackActive = false;
-        hadithContainer.querySelectorAll('.hadith-card').forEach(c => c.classList.remove('active-playing'));
-        savePlaybackState();
-        if (window.updateSkipButtons) window.updateSkipButtons(true, true); // Reset
-    };
-
-    // --- Initialization ---
-    if (!specificIdParam && window.location.hash.startsWith('#hadith-')) {
-        specificIdParam = window.location.hash.replace('#hadith-', '');
-    }
-
-    const getBasePath = () => {
-        const path = window.location.pathname;
-        if (path.includes('/collection/') || path.includes('/quran/') || window.COLLECTION_ID || window.SURAH_ID) {
-            return '../../data/';
-        }
-        return 'data/';
-    };
-
-    // Handle URL changes via hash (Smooth navigation)
-    window.addEventListener('hashchange', async () => {
-        if (isSystemScrolling) return;
-        const hash = window.location.hash;
-        if (hash.startsWith('#hadith-')) {
-            const id = hash.replace('#hadith-', '');
-            if (id !== specificIdParam) {
-                specificIdParam = id;
-                // If ID is in current collection/book, just jump
-                const idx = filteredHadiths.findIndex(h => h.id == id);
-                if (idx >= 0) {
-                    const targetPage = Math.floor(idx / itemsPerPage) + 1;
-                    if (targetPage !== currentPage) {
-                        await renderPage(targetPage);
-                    }
-                    scrollToElement(`hadith-${id}`);
-                } else {
-                    // Need to find which book it's in
-                    if (globalData && globalData.hadiths) {
-                        const target = globalData.hadiths.find(h => h.id == id);
-                        if (target) {
-                            await loadBook(target.vol);
-                            scrollToElement(`hadith-${target.id}`);
-                        }
-                    }
-                }
-            }
-        }
-    });
-
-    // --- Initialization ---
-    async function init() {
-        const basePath = getBasePath();
-        try {
-            const res = await fetch(`${basePath}${collectionId}_meta.json`);
-            if (!res.ok) throw new Error(`Metadata not found: ${collectionId}_meta.json at ${basePath}`);
-            collectionMeta = await res.json();
-            
-            // Set Initial UI based on Meta (Immediate Feedback)
-            if (headerMeta) headerMeta.textContent = currentLang === 'bn' ? collectionMeta.titleBn : collectionMeta.titleEn;
-            if (headerEn) headerEn.textContent = currentLang === 'bn' ? collectionMeta.titleBn : collectionMeta.titleEn;
-            if (headerAr) headerAr.textContent = collectionMeta.titleAr;
-
-            // Start loading index early for filters
-            if (collectionMeta.indexFile) loadIndexInBackground();
-
-            if (authorSpan) authorSpan.textContent = collectionMeta.author;
-            updateDocumentTitle();
-            renderSidebar();
-            
-            // Set Initial Player Content
-            const pTitle = document.querySelector('.player-title');
-            const pSub = document.querySelector('.player-sub');
-            if (pTitle) pTitle.textContent = currentLang === 'bn' ? collectionMeta.titleBn : collectionMeta.titleEn;
-            if (pSub) pSub.textContent = currentLang === 'bn' ? "হাদিস সংগ্রহ" : "Hadith Collection";
-
-            if (numberParam || specificIdParam) {
-                // Wait for index if we need to find a specific hadith
-                if (indexPromise) {
-                    try { await indexPromise; } catch(e) { console.warn("Index load failed, falling back to book 1"); }
-                }
-                
-                if (globalData && globalData.hadiths) {
-                    const target = specificIdParam 
-                        ? globalData.hadiths.find(h => h.id == specificIdParam)
-                        : globalData.hadiths.find(h => h.number == numberParam);
-
-                    if (target) {
-                        await loadBook(target.vol);
-                        // Double check if rendered (loadBook calls applyFilters -> renderPage)
-                        await scrollToElement(`hadith-${target.id}`);
-                    } else await loadBook(1);
-                } else await loadBook(1);
-            } else await loadBook(1);
-        } catch (error) {
-            console.error("Hadith Init Failed:", error);
-            if (headerEn) headerEn.textContent = "Load Error";
-            hadithContainer.innerHTML = `<div style="text-align: center; padding: 40px; color: var(--error);">${error.message}</div>`;
-        }
-    }
-
-    function updateDocumentTitle() {
-        if (!collectionMeta) return;
-        const title = currentLang === 'bn' ? collectionMeta.titleBn : collectionMeta.titleEn;
-        document.title = `${title || collectionMeta.titleEn} — Noor Al-Huda`;
-    }
-
-    function updateSidebarSelection() {
-        document.querySelectorAll('.surah-item').forEach(el => {
-            const num = parseInt(el.dataset.number);
-            // Handle Global (0) and specific volumes
-            if (currentBook === 0) {
-                el.classList.toggle('active', !el.dataset.number); // Global item has no data-number
-            } else {
-                el.classList.toggle('active', num === currentBook);
-            }
-        });
-    }
-
-    // --- Data Loading ---
-    async function loadBook(bookNumber) {
+    function loadBook(bookNumber) {
         if (!collectionMeta) return;
         currentBook = bookNumber;
         updateSidebarSelection();
@@ -310,7 +166,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const loadingText = (window.i18n && window.i18n.translations[currentLang].loading) || "Loading Hadiths...";
         hadithContainer.innerHTML = `<div style="text-align: center; padding: 40px; color: var(--gold);"><i class="ph ph-spinner-gap ph-spin" style="font-size: 32px;"></i><p>${loadingText}</p></div>`;
         if (resultsMeta) resultsMeta.style.display = 'none';
-        stopSequentialPlay();
+        
+        // Only stop if we aren't resuming a global hadith session
+        const state = JSON.parse(localStorage.getItem('persistent_audio_state') || "{}");
+        if (state.type !== 'hadith') {
+            stopSequentialPlay();
+        }
 
         if (bookNumber === 0) {
             if (headerAr) headerAr.textContent = "البحث العام";

@@ -130,39 +130,65 @@ window.updateProgressTime = function(current, total) {
     }
 };
 
-    // 8. Global Player Persistence
+    // 8. Global Player Persistence & Sequence Manager
     const saveAudioState = () => {
-        if (!globalAudio.src) return;
+        if (!globalAudio.src && !window.speechSynthesis.speaking) return;
         const state = {
             src: globalAudio.src,
             currentTime: globalAudio.currentTime,
-            paused: globalAudio.paused,
+            paused: globalAudio.paused && !window.speechSynthesis.speaking,
             title: document.querySelector('.player-title')?.textContent || "",
             sub: document.querySelector('.player-sub')?.textContent || "",
-            type: window.hadithPlaybackActive ? 'hadith' : (window.quranAudio && !window.quranAudio.paused ? 'quran' : 'tts'),
+            type: localStorage.getItem('active_media_type') || 'tts',
             lastUpdate: Date.now()
         };
         localStorage.setItem('persistent_audio_state', JSON.stringify(state));
     };
 
+    window.playNextInSequence = function() {
+        const state = JSON.parse(localStorage.getItem('persistent_audio_state') || "{}");
+        if (state.type === 'quran') {
+            const qState = JSON.parse(localStorage.getItem('quran_playback_state') || "{}");
+            if (qState.surah) {
+                const nextAyah = (qState.ayahIndex || 0) + 1;
+                // We can't easily play next if we aren't on the quran page, 
+                // but we can at least try to trigger the quran logic if it's loaded
+                if (window.playNextAyah) window.playNextAyah();
+                else {
+                    // If not on page, we might need to load the page or just stop.
+                    // But for true background, we should ideally be able to fetch next source.
+                    console.log("Quran page not active, cannot auto-advance ayah from background yet.");
+                }
+            }
+        } else if (state.type === 'hadith') {
+            if (window.playNextHadith) window.playNextHadith();
+        } else if (state.type === 'media') {
+            if (window.playNextMedia) window.playNextMedia();
+        }
+    };
+
     globalAudio.addEventListener('timeupdate', () => {
         if (window.MediaSessionManager) window.MediaSessionManager.updatePositionState();
-        if (window.hadithPlaybackActive) return; // Handled by hadith script
         const cur = globalAudio.currentTime;
         const dur = globalAudio.duration;
         if (!dur) return;
         const p = (cur / dur) * 100;
-        window.updateProgressBar(p);
-        window.updateProgressTime(cur);
+        
+        // Only update UI if we aren't in hadith sequential mode (which handles its own UI)
+        if (!window.hadithPlaybackActive) {
+            window.updateProgressBar(p);
+            window.updateProgressTime(cur);
+        }
 
         // Save state every 2 seconds
         if (Math.floor(cur) % 2 === 0) saveAudioState();
     });
 
     globalAudio.addEventListener('loadedmetadata', () => {
-        if (window.hadithPlaybackActive) return;
         const dur = globalAudio.duration;
-        window.updateProgressTime(0, dur);
+        if (!window.hadithPlaybackActive) {
+            window.updateProgressTime(0, dur);
+        }
 
         // Ensure playback rate is maintained
         const speedS = document.getElementById('speed-select');
@@ -217,8 +243,10 @@ window.updateProgressTime = function(current, total) {
         }
     };
     
-    // Call resume
-    resumeAudio();
+    globalAudio.addEventListener('ended', () => {
+        if (window.MediaSessionManager) window.MediaSessionManager.updatePlaybackState('none');
+        window.playNextInSequence();
+    });
 
 window.toggleSpeech = function(textToRead, playIconElement, lang = 'ar', onEnd = null, textElement = null) {
     restoreHighlight();
@@ -252,6 +280,7 @@ window.toggleSpeech = function(textToRead, playIconElement, lang = 'ar', onEnd =
     currentAudioIcon = playIconElement;
 
     if (window.MediaSessionManager) {
+        localStorage.setItem('active_media_type', (path.includes('/quran/') || path.includes('quran.html') || window.SURAH_ID) ? 'quran' : 'tts');
         window.MediaSessionManager.updateMetadata({
             title: textToRead.substring(0, 50),
             artist: lang === 'ar' ? 'Arabic Recitation' : (lang === 'bn' ? 'বাংলা অনুবাদ' : 'English Translation'),
@@ -287,6 +316,7 @@ window.toggleSpeech = function(textToRead, playIconElement, lang = 'ar', onEnd =
     globalAudio.volume = vol;
 
     if ((lang === 'en' || lang === 'bn' || lang === 'ar') && 'speechSynthesis' in window) {
+        localStorage.setItem('active_media_type', 'hadith');
         const utterance = new SpeechSynthesisUtterance(textToRead);
         if (lang === 'bn') utterance.lang = 'bn-BD';
         else if (lang === 'ar') utterance.lang = 'ar-SA';
