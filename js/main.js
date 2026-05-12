@@ -296,11 +296,14 @@ window.toggleSpeech = function(textToRead, playIconElement, lang = 'ar', onEnd =
     currentAudioIcon = playIconElement;
 
     const path = window.location.pathname;
+    const isQuran = path.includes('/quran/') || path.includes('quran.html') || window.SURAH_ID;
+    const isHadith = path.includes('/collection/') || path.includes('hadith.html');
+    
     if (window.MediaSessionManager) {
-        localStorage.setItem('active_media_type', (path.includes('/quran/') || path.includes('quran.html') || window.SURAH_ID) ? 'quran' : 'tts');
+        localStorage.setItem('active_media_type', isQuran ? 'quran' : (isHadith ? 'hadith' : 'tts'));
         window.MediaSessionManager.updateMetadata({
             title: textToRead.substring(0, 50),
-            artist: lang === 'ar' ? 'Arabic Recitation' : (lang === 'bn' ? 'বাংলা অনুবাদ' : 'English Translation'),
+            artist: isHadith ? (currentLang === 'bn' ? 'হাদিস পাঠ' : 'Hadith Recitation') : (lang === 'ar' ? 'Arabic Recitation' : (lang === 'bn' ? 'বাংলা অনুবাদ' : 'English Translation')),
             album: 'Noor Al-Huda'
         });
         window.MediaSessionManager.updatePlaybackState('playing');
@@ -332,6 +335,14 @@ window.toggleSpeech = function(textToRead, playIconElement, lang = 'ar', onEnd =
     const vol = parseFloat(document.getElementById('volume-slider')?.value || "1.0");
     globalAudio.volume = vol;
 
+    // Silent Audio Loop to keep Media Session alive during TTS
+    const playSilentAudio = () => {
+        // Base64 of a 1-second silent MP3
+        globalAudio.src = "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAA== ";
+        globalAudio.loop = true;
+        globalAudio.play().catch(() => {});
+    };
+
     if ((lang === 'en' || lang === 'bn' || lang === 'ar') && 'speechSynthesis' in window) {
         localStorage.setItem('active_media_type', 'hadith');
         const utterance = new SpeechSynthesisUtterance(textToRead);
@@ -343,6 +354,7 @@ window.toggleSpeech = function(textToRead, playIconElement, lang = 'ar', onEnd =
         utterance.volume = vol;
         
         utterance.onboundary = (event) => {
+            // ... (keep existing highlighting logic)
             if (event.name === 'word' && currentTextElement) {
                 const charIndex = event.charIndex;
                 let wordCount = 0;
@@ -359,25 +371,29 @@ window.toggleSpeech = function(textToRead, playIconElement, lang = 'ar', onEnd =
                 
                 currentTextElement.innerHTML = `${before}<span class="tts-highlight">${highlighted}</span>${after}`;
                 
-                // Scroll into view
                 const highlightEl = currentTextElement.querySelector('.tts-highlight');
                 if (highlightEl) {
-                    // Try to avoid excessive scrolling by only scrolling if it's out of view, or just smoothly scroll
                     const rect = highlightEl.getBoundingClientRect();
                     const isVisible = (rect.top >= 0) && (rect.bottom <= window.innerHeight);
-                    if (!isVisible) {
-                        highlightEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }
+                    if (!isVisible) highlightEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }
             }
         };
 
         utterance.onstart = () => { 
+            playSilentAudio();
             window.updateIcon(playIconElement, 'play');
             const mainPlay = document.querySelector('.play-main i');
-            if (mainPlay && mainPlay !== playIconElement) window.updateIcon(mainPlay, 'play'); 
+            if (mainPlay && mainPlay !== playIconElement) window.updateIcon(mainPlay, 'play');
+            
+            // Re-affirm metadata on start to ensure widget shows up
+            if (window.MediaSessionManager) {
+                window.MediaSessionManager.updatePlaybackState('playing');
+            }
         };
         utterance.onend = () => { 
+            globalAudio.pause();
+            globalAudio.src = "";
             if (currentAudioText === textToRead) { 
                 restoreHighlight();
                 window.updateIcon(playIconElement, 'pause');
@@ -387,7 +403,10 @@ window.toggleSpeech = function(textToRead, playIconElement, lang = 'ar', onEnd =
                 if (onEnd) onEnd();
             } 
         };
-        utterance.onerror = () => restoreHighlight();
+        utterance.onerror = () => {
+            globalAudio.pause();
+            restoreHighlight();
+        };
         window.speechSynthesis.speak(utterance);
     } else {
         const encodedText = encodeURIComponent(textToRead.substring(0, 500));

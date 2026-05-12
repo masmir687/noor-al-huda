@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'v1.6.4';
+const CACHE_VERSION = 'v1.6.5';
 const CACHE_NAME = `noor-al-huda-${CACHE_VERSION}`;
 
 // Assets to pre-cache immediately

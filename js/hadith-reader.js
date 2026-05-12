@@ -158,7 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    function loadBook(bookNumber) {
+    async function loadBook(bookNumber) {
         if (!collectionMeta) return;
         currentBook = bookNumber;
         updateSidebarSelection();
@@ -637,6 +637,21 @@ document.addEventListener('DOMContentLoaded', () => {
     function stopSequentialPlay() {
         window.toggleSpeech("", null);
     }
+
+    // --- System Media Session Handlers ---
+    window.onPlayerSkipBack = () => {
+        if (currentPlayingIndex > 0) {
+            window.playHadith(currentPlayingIndex - 1);
+        } else if (currentPage > 1) {
+            renderPage(currentPage - 1).then(() => {
+                window.playHadith(currentBatch.length - 1);
+            });
+        }
+    };
+
+    window.onPlayerSkipForward = () => {
+        window.playNextHadith();
+    };
 
     if (mainPlayBtn) {
         mainPlayBtn.onclick = () => {
