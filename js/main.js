@@ -295,6 +295,7 @@ window.toggleSpeech = function(textToRead, playIconElement, lang = 'ar', onEnd =
     currentAudioText = textToRead;
     currentAudioIcon = playIconElement;
 
+    const path = window.location.pathname;
     if (window.MediaSessionManager) {
         localStorage.setItem('active_media_type', (path.includes('/quran/') || path.includes('quran.html') || window.SURAH_ID) ? 'quran' : 'tts');
         window.MediaSessionManager.updateMetadata({
@@ -1059,6 +1060,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     initFeaturedVideos();
     document.addEventListener('languageChanged', initFeaturedVideos);
+
+    // Resume any persistent audio
+    resumeAudio();
 
     // --- VIDEO MODAL LOGIC ---
     const videoModal = document.createElement('div');

@@ -556,6 +556,44 @@ document.addEventListener('DOMContentLoaded', () => {
         else if (e.target.id === 'quran-sidebar-overlay') closeSidebar();
     });
 
+    function getBasePath() {
+        return window.location.pathname.includes('/collection/') ? '../../data/' : 'data/';
+    }
+
+    function updateSidebarSelection() {
+        document.querySelectorAll('.surah-item').forEach(el => {
+            el.classList.toggle('active', parseInt(el.dataset.number) === currentBook);
+        });
+    }
+
+    function updateDocumentTitle() {
+        if (collectionMeta) {
+            const title = currentLang === 'bn' ? collectionMeta.titleBn : collectionMeta.titleEn;
+            document.title = `${title} — Noor Al-Huda`;
+        }
+    }
+
+    async function init() {
+        const basePath = getBasePath();
+        try {
+            // Fetch collection metadata
+            const res = await fetch(`${basePath}${collectionId}_meta.json`);
+            collectionMeta = await res.json();
+            
+            if (authorSpan) authorSpan.textContent = collectionMeta.author;
+            
+            updateDocumentTitle();
+            renderSidebar();
+            
+            // Handle initial load from URL
+            const bookToLoad = parseInt(numberParam) || 1;
+            loadBook(bookToLoad);
+        } catch (error) {
+            console.error("Initialization failed:", error);
+            hadithContainer.innerHTML = `<div style="text-align: center; padding: 40px; color: var(--error);">Error initializing collection data.</div>`;
+        }
+    }
+
     function renderSidebar() {
         if (!bookListContainer || !collectionMeta) return;
         bookListContainer.innerHTML = '';
