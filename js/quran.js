@@ -561,11 +561,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (mainPlayBtn) {
         mainPlayBtn.onclick = () => {
-            if (quranAudio.src && !quranAudio.paused) {
+            if ((quranAudio.src && !quranAudio.paused) || (window.speechSynthesis.speaking && !window.speechSynthesis.paused)) {
                 quranAudio.pause();
-            } else if (quranAudio.src && quranAudio.paused) {
+                if (window.speechSynthesis.speaking) window.speechSynthesis.pause();
+            } else if ((quranAudio.src && quranAudio.paused) || window.speechSynthesis.paused) {
                 // Resume exactly where we paused on the same page, even if it was started individually
                 isGlobalPlay = true; // Convert to global session
+                if (window.speechSynthesis.paused) window.speechSynthesis.resume();
                 quranAudio.play();
             } else {
                 // Fresh start from global player

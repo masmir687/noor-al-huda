@@ -654,9 +654,33 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     if (mainPlayBtn) {
+        const mainPlayIcon = mainPlayBtn.querySelector('i');
         mainPlayBtn.onclick = () => {
-            const startIndex = currentPlayingIndex >= 0 ? currentPlayingIndex : 0;
-            window.playHadith(startIndex, true); // Sequential mode
+            const state = JSON.parse(localStorage.getItem('persistent_audio_state') || "{}");
+            const isOurSession = state.type === 'hadith' && state.collectionId === collectionId;
+
+            if (isOurSession && (window.speechSynthesis.speaking || window.speechSynthesis.paused)) {
+                if (window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
+                    window.speechSynthesis.pause();
+                    if (window.globalAudio) window.globalAudio.pause();
+                    if (mainPlayIcon) window.updateIcon(mainPlayIcon, 'pause');
+                } else {
+                    window.speechSynthesis.resume();
+                    if (window.globalAudio) window.globalAudio.play();
+                    if (mainPlayIcon) window.updateIcon(mainPlayIcon, 'play');
+                }
+            } else {
+                // If something else was playing (Quran, or different Hadith collection), STOP IT
+                if (window.speechSynthesis) window.speechSynthesis.cancel();
+                if (window.globalAudio) {
+                    window.globalAudio.pause();
+                    window.globalAudio.currentTime = 0;
+                }
+                
+                // Start fresh playback for THIS collection
+                const startIndex = currentPlayingIndex >= 0 ? currentPlayingIndex : 0;
+                window.playHadith(startIndex, true); // Sequential mode
+            }
         };
     }
 

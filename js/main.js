@@ -133,15 +133,21 @@ window.updateProgressTime = function(current, total) {
     // 8. Global Player Persistence & Sequence Manager
     const saveAudioState = () => {
         if (!globalAudio.src && !window.speechSynthesis.speaking) return;
+        const type = localStorage.getItem('active_media_type') || 'tts';
         const state = {
             src: globalAudio.src,
             currentTime: globalAudio.currentTime,
             paused: globalAudio.paused && !window.speechSynthesis.speaking,
             title: document.querySelector('.player-title')?.textContent || "",
             sub: document.querySelector('.player-sub')?.textContent || "",
-            type: localStorage.getItem('active_media_type') || 'tts',
+            type: type,
             lastUpdate: Date.now()
         };
+        
+        if (type === 'hadith') {
+            state.collectionId = window.COLLECTION_ID || new URLSearchParams(window.location.search).get('id');
+        }
+
         localStorage.setItem('persistent_audio_state', JSON.stringify(state));
     };
 
@@ -298,9 +304,10 @@ window.toggleSpeech = function(textToRead, playIconElement, lang = 'ar', onEnd =
     const path = window.location.pathname;
     const isQuran = path.includes('/quran/') || path.includes('quran.html') || window.SURAH_ID;
     const isHadith = path.includes('/collection/') || path.includes('hadith.html');
+    const mediaType = isQuran ? 'quran' : (isHadith ? 'hadith' : 'tts');
     
     if (window.MediaSessionManager) {
-        localStorage.setItem('active_media_type', isQuran ? 'quran' : (isHadith ? 'hadith' : 'tts'));
+        localStorage.setItem('active_media_type', mediaType);
         window.MediaSessionManager.updateMetadata({
             title: textToRead.substring(0, 50),
             artist: isHadith ? (currentLang === 'bn' ? 'হাদিস পাঠ' : 'Hadith Recitation') : (lang === 'ar' ? 'Arabic Recitation' : (lang === 'bn' ? 'বাংলা অনুবাদ' : 'English Translation')),
@@ -344,7 +351,7 @@ window.toggleSpeech = function(textToRead, playIconElement, lang = 'ar', onEnd =
     };
 
     if ((lang === 'en' || lang === 'bn' || lang === 'ar') && 'speechSynthesis' in window) {
-        localStorage.setItem('active_media_type', 'hadith');
+        localStorage.setItem('active_media_type', mediaType);
         const utterance = new SpeechSynthesisUtterance(textToRead);
         if (lang === 'bn') utterance.lang = 'bn-BD';
         else if (lang === 'ar') utterance.lang = 'ar-SA';
@@ -899,10 +906,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const isLib = document.querySelector('.quran-layout') || document.getElementById('hadith-container');
             if (isLib) return; // Handled by page scripts
             
-            if (globalAudio.src && !globalAudio.paused) {
+            if ((globalAudio.src && !globalAudio.paused) || (window.speechSynthesis.speaking && !window.speechSynthesis.paused)) {
                 globalAudio.pause();
+                if (window.speechSynthesis.speaking) window.speechSynthesis.pause();
                 window.updateIcon(playMainBtn.querySelector('i'), 'pause');
-            } else if (globalAudio.src) {
+            } else if (globalAudio.src || window.speechSynthesis.speaking) {
+                if (window.speechSynthesis.paused) window.speechSynthesis.resume();
                 globalAudio.play();
                 window.updateIcon(playMainBtn.querySelector('i'), 'play');
             }
