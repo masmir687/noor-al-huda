@@ -293,34 +293,12 @@ window.toggleSpeech = function(textToRead, playIconElement, lang = 'ar', onEnd =
         return;
     }
     
+    window.speechSynthesis.resume();
     window.speechSynthesis.cancel();
     if (!globalAudio.paused) { globalAudio.pause(); globalAudio.currentTime = 0; }
     if (window.quranAudio) window.quranAudio.pause();
     if (currentAudioIcon) window.updateIcon(currentAudioIcon, 'pause');
     
-    currentAudioText = textToRead;
-    currentAudioIcon = playIconElement;
-
-    const path = window.location.pathname;
-    const isQuran = path.includes('/quran/') || path.includes('quran.html') || window.SURAH_ID;
-    const isHadith = path.includes('/collection/') || path.includes('hadith.html');
-    const mediaType = isQuran ? 'quran' : (isHadith ? 'hadith' : 'tts');
-    
-    if (window.MediaSessionManager) {
-        localStorage.setItem('active_media_type', mediaType);
-        window.MediaSessionManager.updateMetadata({
-            title: textToRead.substring(0, 50),
-            artist: isHadith ? (currentLang === 'bn' ? 'হাদিস পাঠ' : 'Hadith Recitation') : (lang === 'ar' ? 'Arabic Recitation' : (lang === 'bn' ? 'বাংলা অনুবাদ' : 'English Translation')),
-            album: 'Noor Al-Huda'
-        });
-        window.MediaSessionManager.updatePlaybackState('playing');
-    }
-
-    if (textElement) {
-        currentTextElement = textElement;
-        currentOriginalHTML = textElement.innerHTML;
-    }
-
     // Expand salutations for TTS
     let expandedText = textToRead;
     if (lang === 'ar') {
@@ -337,6 +315,28 @@ window.toggleSpeech = function(textToRead, playIconElement, lang = 'ar', onEnd =
     
     // Use expanded text for both speech and highlighting to keep them in sync
     textToRead = expandedText;
+    currentAudioText = textToRead;
+    currentAudioIcon = playIconElement;
+
+    const path = window.location.pathname;
+    const isQuran = path.includes('/quran/') || path.includes('quran.html') || window.SURAH_ID;
+    const isHadith = path.includes('/collection/') || path.includes('hadith.html');
+    const mediaType = isQuran ? 'quran' : (isHadith ? 'hadith' : 'tts');
+    
+    if (window.MediaSessionManager) {
+        localStorage.setItem('active_media_type', mediaType);
+        window.MediaSessionManager.updateMetadata({
+            title: textToRead.substring(0, 50),
+            artist: isHadith ? (localStorage.getItem('lang') === 'bn' ? 'হাদিস পাঠ' : 'Hadith Recitation') : (lang === 'ar' ? 'Arabic Recitation' : (lang === 'bn' ? 'বাংলা অনুবাদ' : 'English Translation')),
+            album: 'Noor Al-Huda'
+        });
+        window.MediaSessionManager.updatePlaybackState('playing');
+    }
+
+    if (textElement) {
+        currentTextElement = textElement;
+        currentOriginalHTML = textElement.innerHTML;
+    }
 
     const speed = parseFloat(document.getElementById('speed-select')?.value || "1.0");
     const vol = parseFloat(document.getElementById('volume-slider')?.value || "1.0");

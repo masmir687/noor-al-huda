@@ -117,10 +117,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    let currentPlayId = 0;
+
     window.playHadith = async function(index, sequential = true) {
+        const myPlayId = ++currentPlayId;
+        
         if (index < 0 || index >= currentBatch.length) {
             if (sequential && currentPage < totalPages) {
-                renderPage(currentPage + 1).then(() => window.playHadith(0, true));
+                renderPage(currentPage + 1).then(() => {
+                    if (myPlayId === currentPlayId) window.playHadith(0, true);
+                });
                 return;
             }
             stopSequentialPlay();
@@ -139,10 +145,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Wait up to 5 seconds for background patch
             for (let i = 0; i < 50; i++) {
+                if (myPlayId !== currentPlayId) return; // Cancelled by another click
                 if (h.english && !h.english.includes("No text available") && !h.english.includes("Loading from mirror")) break;
                 await new Promise(r => setTimeout(r, 100));
             }
         }
+
+        if (myPlayId !== currentPlayId) return; // Final check after wait
 
         const content = currentLang === 'bn' && h.bengali ? h.bengali : h.english;
         const card = document.getElementById(`hadith-${h.id}`);
@@ -151,7 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (window.toggleSpeech) {
             window.toggleSpeech(content, icon || null, currentLang, () => {
-                if (isSequentialActive) window.playNextHadith();
+                if (isSequentialActive && myPlayId === currentPlayId) window.playNextHadith();
             }, textEl);
             updateSequentialUI();
             savePlaybackState();
@@ -439,11 +448,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
             window.BookmarkDB?.get(bookmarkBtn.dataset.id).then(exists => {
                 if (exists) {
-                    btn.classList.add('active');
+                    bookmarkBtn.classList.add('active');
                 }
             });
 
             bookmarkBtn.onclick = async (e) => {
+                e.preventDefault();
                 e.stopPropagation();
                 const item = {
                     id: bookmarkBtn.dataset.id, 
@@ -457,6 +467,7 @@ document.addEventListener('DOMContentLoaded', () => {
             };
 
             listenBtn.onclick = (e) => {
+                e.preventDefault();
                 e.stopPropagation();
                 scrollToElement(`hadith-${hData.id}`);
                 window.playHadith(index, false); // Single play
